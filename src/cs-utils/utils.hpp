@@ -94,9 +94,6 @@ float CS_UTILS_EXPORT getCurrentFarClipDistance();
 
 std::string CS_UTILS_EXPORT loadFileContentsToString(std::string const& file);
 
-void printCounter();
-void resetCounter();
-
 } // namespace cs::utils
 
 #endif // CS_UTILS_UTILS_HPP
