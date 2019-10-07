@@ -8,6 +8,8 @@
 
 #include <GL/freeglut.h>
 
+#include "../cs-utils/filesystem.hpp"
+#include "../cs-utils/utils.hpp"
 #include "InputManager.hpp"
 #include "cs-version.hpp"
 #include "tools/Tool.hpp"
@@ -171,8 +173,17 @@ GuiManager::GuiManager(std::shared_ptr<const Settings> const& settings,
   mNotifications->waitForFinishedLoading();
   mLoadingScreen->waitForFinishedLoading();
 
-  mLoadingScreen->callJavascript(
-      "set_version", GIT_RECENT_TAG + " (" + GIT_BRANCH + " @" + GIT_COMMIT_HASH + ")");
+  std::string version(GIT_RECENT_TAG);
+
+  if (GIT_BRANCH != "") {
+    version += " (" + GIT_BRANCH;
+    if (GIT_COMMIT_HASH != "") {
+      version += " @" + GIT_COMMIT_HASH;
+    }
+    version += ")";
+  }
+
+  mLoadingScreen->callJavascript("set_version", version);
   mLoadingScreen->callJavascript("set_loading", true);
 
   // Register callbacks for notifications area.
@@ -415,7 +426,7 @@ void GuiManager::addPluginTabToSideBar(
 
 void GuiManager::addPluginTabToSideBarFromHTML(
     std::string const& name, std::string const& icon, std::string const& htmlFile) {
-  std::string content = utils::loadFileContentsToString(htmlFile);
+  std::string content = utils::filesystem::loadToString(htmlFile);
   addPluginTabToSideBar(name, icon, content);
 }
 
@@ -426,7 +437,7 @@ void GuiManager::addSettingsSectionToSideBar(
 
 void GuiManager::addSettingsSectionToSideBarFromHTML(
     std::string const& name, std::string const& icon, std::string const& htmlFile) {
-  std::string content = utils::loadFileContentsToString(htmlFile);
+  std::string content = utils::filesystem::loadToString(htmlFile);
   addSettingsSectionToSideBar(name, icon, content);
 }
 
@@ -435,7 +446,7 @@ void GuiManager::addScriptToSideBar(std::string const& src) {
 }
 
 void GuiManager::addScriptToSideBarFromJS(std::string const& jsFile) {
-  std::string content = utils::loadFileContentsToString(jsFile);
+  std::string content = utils::filesystem::loadToString(jsFile);
   addScriptToSideBar(content);
 }
 

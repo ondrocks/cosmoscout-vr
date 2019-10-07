@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------------------------------ #
 
 cmake_minimum_required(VERSION 3.12)
-project(cosmoscout-vr)
+project(cosmoscout-vr VERSION 1.1.1)
 
 # Use cmake 3.12's <PACKAGE>_ROOT variabled for searching.
 cmake_policy(SET CMP0074 NEW)
@@ -16,10 +16,10 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 # CMAKE_BUILD_TYPE must be set (except for Visual Studio).
 if(NOT MSVC)
   if(NOT CMAKE_BUILD_TYPE OR
-    (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release" AND
-    NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug"))
+    (NOT ${CMAKE_BUILD_TYPE} STREQUAL "release" AND
+    NOT ${CMAKE_BUILD_TYPE} STREQUAL "debug"))
 
-    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Release or Debug" FORCE)
+    set(CMAKE_BUILD_TYPE "release" CACHE STRING "release or debug" FORCE)
   endif()
 endif()
 
@@ -134,9 +134,6 @@ find_package(VistaCoreLibs REQUIRED
   COMPONENTS "VistaBase" "VistaKernel" "VistaKernelOpenSGExt" "VistaOGLExt"
 )
 
-# strip "optimzed" flags as we will be using release libs only.
-list(FILTER VISTACORELIBS_LIBRARIES EXCLUDE REGEX optimized)
-
 # copy all third-party libraries to install directory
 install(
   DIRECTORY ${COSMOSCOUT_EXTERNALS_DIR}/lib/ ${COSMOSCOUT_EXTERNALS_DIR}/bin/ 
@@ -159,6 +156,8 @@ if (UNIX)
 endif()
 
 # create version header ----------------------------------------------------------------------------
+
+message(STATUS "Trying to get current git branch and commit...")
 
 # get the current git branch name
 execute_process(
@@ -183,6 +182,14 @@ execute_process(
   OUTPUT_VARIABLE GIT_RECENT_TAG
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
+
+# fallback to project version if it failed
+if (GIT_BRANCH STREQUAL "")
+  set(GIT_RECENT_TAG "v${PROJECT_VERSION}")
+  message(STATUS "  Failed - falling back to project version: ${GIT_RECENT_TAG}")
+else()
+  message(STATUS "  Success: ${GIT_RECENT_TAG} (${GIT_BRANCH} @${GIT_COMMIT_HASH})")
+endif()
 
 configure_file(
   ${CMAKE_SOURCE_DIR}/src/cs-core/cs-version.hpp.in
@@ -217,11 +224,3 @@ add_subdirectory(config)
 add_subdirectory(resources)
 add_subdirectory(src)
 add_subdirectory(plugins)
-
-# install data directory, complain if non-existent -------------------------------------------------
-
-if (EXISTS ${CMAKE_SOURCE_DIR}/data)
-  install(DIRECTORY ${CMAKE_SOURCE_DIR}/data DESTINATION "share/resources")
-else()
-  message(WARNING "Data directory was not found. Maybe you forgot to run the get_example_data.[sh/bat] script?")
-endif()
