@@ -52,9 +52,23 @@ Application::Application(cs::core::Settings const& settings)
     , mSettings(std::make_shared<cs::core::Settings>(settings)) {
 }
 
+
+void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity,
+                                GLsizei length, const GLchar* message, const void* userParam) {
+  if (type == GL_DEBUG_TYPE_ERROR)
+    fprintf(
+        stderr, "GL ERROR: type = 0x%x, severity = 0x%x, message = %s\n", type, severity, message);
+  /*else
+    fprintf(stdout, "GL WARNING: type = 0x%x, severity = 0x%x, message = %s\n", type, severity,
+            message);*/
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool Application::Init(VistaSystem* pVistaSystem) {
+  glEnable(GL_DEBUG_OUTPUT);
+  glDebugMessageCallback(MessageCallback, nullptr);
+
   // initialize curl - else it will be done in a not-threadsafe-manner in the TileSourcWMS
   cURLpp::initialize();
 
@@ -718,6 +732,9 @@ Application::~Application() {
   mPlugins.clear();
 
   cURLpp::terminate();
+
+  glDisable(GL_DEBUG_OUTPUT);
+  glDebugMessageCallback(nullptr, nullptr);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
