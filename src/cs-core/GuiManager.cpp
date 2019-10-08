@@ -9,10 +9,10 @@
 #include <GL/freeglut.h>
 
 #include "../cs-utils/filesystem.hpp"
-#include "../cs-utils/utils.hpp"
 #include "InputManager.hpp"
 #include "cs-version.hpp"
 #include "tools/Tool.hpp"
+#include "../cs-gui/ScreenSpaceGuiAreaRenderer.hpp"
 
 #include <VistaKernel/DisplayManager/GlutWindowImp/VistaGlutWindowingToolkit.h>
 #include <VistaKernel/DisplayManager/VistaDisplayManager.h>
@@ -26,6 +26,7 @@
 #include <VistaKernel/VistaFrameLoop.h>
 #include <VistaKernel/VistaSystem.h>
 #include <VistaKernelOpenSGExt/VistaOpenSGMaterialTools.h>
+#include <VistaOGLExt/VistaGLSLShader.h>
 #include <fstream>
 
 namespace cs::core {
@@ -72,7 +73,6 @@ GuiManager::GuiManager(std::shared_ptr<const Settings> const& settings,
   }
 
   VistaViewport* pViewport(GetVistaSystem()->GetDisplayManager()->GetViewports().begin()->second);
-
   mLocalGuiArea = new gui::ScreenSpaceGuiArea(pViewport);
 
   mViewportUpdater = new VistaViewportResizeToProjectionAdapter(pViewport);
@@ -155,7 +155,9 @@ GuiManager::GuiManager(std::shared_ptr<const Settings> const& settings,
   mStatistics->setRelPositionX(1.f);
   mStatistics->setIsInteractive(false);
 
-  mLocalGuiOpenGLnode = pSG->NewOpenGLNode(mLocalGuiTransform, mLocalGuiArea);
+  mScreenSpaceRenderer = std::make_unique<gui::ScreenSpaceGuiAreaRenderer>();
+  mScreenSpaceRenderer->addGuiArea(mLocalGuiArea);
+  mLocalGuiOpenGLnode = pSG->NewOpenGLNode(mLocalGuiTransform, mScreenSpaceRenderer.get());
   VistaOpenSGMaterialTools::SetSortKeyOnSubtree(
       mLocalGuiOpenGLnode, static_cast<int>(utils::DrawOrder::eGui));
 
@@ -239,6 +241,7 @@ GuiManager::~GuiManager() {
   delete mGlobalGuiArea;
   delete mViewportUpdater;
 
+  mScreenSpaceRenderer->removeGuiArea(mLocalGuiArea);
   mInputManager->unregisterSelectable(mLocalGuiOpenGLnode);
 
   if (mGlobalGuiOpenGLnode) {

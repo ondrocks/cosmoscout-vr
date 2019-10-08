@@ -15,6 +15,7 @@
 #include "../cs-gui/gui.hpp"
 #include "../cs-gui/types.hpp"
 
+#include "../cs-gui/ScreenSpaceGuiAreaRenderer.hpp"
 #include "../cs-utils/FrameTimings.hpp"
 
 #include <memory>
@@ -141,6 +142,10 @@ class CS_CORE_EXPORT GuiManager {
   gui::WorldSpaceGuiArea*                 mGlobalGuiArea   = nullptr;
   gui::ScreenSpaceGuiArea*                mLocalGuiArea    = nullptr;
 
+  std::unique_ptr<gui::ScreenSpaceGuiAreaRenderer> mScreenSpaceRenderer;
+  VistaTransformNode*                              mLocalGuiTransform  = nullptr;
+  VistaOpenGLNode*                                 mLocalGuiOpenGLnode = nullptr;
+
   gui::GuiItem* mLoadingScreen = nullptr;
   gui::GuiItem* mCalendar      = nullptr;
   gui::GuiItem* mSideBar       = nullptr;
@@ -150,8 +155,6 @@ class CS_CORE_EXPORT GuiManager {
   gui::GuiItem* mStatistics    = nullptr;
 
   VistaTransformNode* mGlobalGuiTransform  = nullptr;
-  VistaTransformNode* mLocalGuiTransform   = nullptr;
-  VistaOpenGLNode*    mLocalGuiOpenGLnode  = nullptr;
   VistaOpenGLNode*    mGlobalGuiOpenGLnode = nullptr;
 
   std::list<std::shared_ptr<tools::Tool>> mTools;

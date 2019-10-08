@@ -10,37 +10,22 @@
 #include "GuiArea.hpp"
 
 #include <VistaAspects/VistaObserver.h>
-#include <VistaKernel/GraphicsManager/VistaOpenGLDraw.h>
-#include <vector>
 
-class VistaTransformNode;
-class VistaTransformMatrix;
-class VistaVector3D;
-class VistaQuaternion;
-class VistaProjection;
 class VistaViewport;
-class VistaGLSLShader;
-class VistaVertexArrayObject;
-class VistaBufferObject;
 
 namespace cs::gui {
 
 /// This class is used to render static UI elements, which are always at the same position of the
 /// screen.
 class CS_GUI_EXPORT ScreenSpaceGuiArea : public GuiArea,
-                                         public IVistaOpenGLDraw,
                                          public IVistaObserver {
 
  public:
   explicit ScreenSpaceGuiArea(VistaViewport* pViewport);
-  ~ScreenSpaceGuiArea() override;
+  ~ScreenSpaceGuiArea() override = default;
 
   int getWidth() const override;
   int getHeight() const override;
-
-  /// Draws the UI to screen.
-  bool Do() override;
-  bool GetBoundingBox(VistaBoundingBox& bb) override;
 
   /// Handles changes to the screen size.
   void ObserverUpdate(IVistaObserveable* pObserveable, int nMsg, int nTicket) override;
@@ -49,8 +34,6 @@ class CS_GUI_EXPORT ScreenSpaceGuiArea : public GuiArea,
   virtual void onViewportChange();
 
   VistaViewport*   mViewport;
-  VistaGLSLShader* mShader      = nullptr;
-  bool             mShaderDirty = true;
   int              mWidth       = 0;
   int              mHeight      = 0;
 };
