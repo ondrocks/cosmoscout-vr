@@ -15,6 +15,7 @@
 #include <VistaOGLExt/VistaGLSLShader.h>
 #include <VistaOGLExt/VistaVertexArrayObject.h>
 
+#include <atomic>
 #include <glm/glm.hpp>
 #include <memory>
 
@@ -26,6 +27,7 @@ class VistaBufferObject;
 class VistaOpenGLNode;
 class VistaVertexArrayObject;
 
+
 namespace cs::core {
 class TimeControl;
 class SolarSystem;
@@ -34,6 +36,10 @@ class GuiManager;
 class GraphicsEngine;
 
 namespace tools {
+
+namespace internal {
+class MarkShader;
+}
 
 /// A mark is a single point on the surface. It is selectable and draggable.
 class CS_CORE_EXPORT Mark : public IVistaOpenGLDraw, public Tool {
@@ -45,11 +51,9 @@ class CS_CORE_EXPORT Mark : public IVistaOpenGLDraw, public Tool {
   cs::utils::Property<bool>       pActive   = false;
   cs::utils::Property<glm::vec3>  pColor    = glm::vec3(0.75, 0.75, 1.0);
 
-  Mark(std::shared_ptr<InputManager> const&  pInputManager,
-      std::shared_ptr<SolarSystem> const&    pSolarSystem,
-      std::shared_ptr<GraphicsEngine> const& graphicsEngine,
-      std::shared_ptr<GuiManager> const&     pGuiManager,
-      std::shared_ptr<TimeControl> const& pTimeControl, std::string const& sCenter,
+  Mark(std::shared_ptr<InputManager> pInputManager, std::shared_ptr<SolarSystem> pSolarSystem,
+      std::shared_ptr<GraphicsEngine> graphicsEngine, std::shared_ptr<GuiManager> pGuiManager,
+      std::shared_ptr<TimeControl> pTimeControl, std::string const& sCenter,
       std::string const& sFrame);
 
   Mark(Mark const& other);
@@ -81,19 +85,44 @@ class CS_CORE_EXPORT Mark : public IVistaOpenGLDraw, public Tool {
  private:
   void initData(std::string const& sCenter, std::string const& sFrame);
 
-  std::unique_ptr<VistaVertexArrayObject> mVAO;
-  std::unique_ptr<VistaBufferObject>      mVBO;
-  std::unique_ptr<VistaBufferObject>      mIBO;
-  std::unique_ptr<VistaGLSLShader>        mShader;
-
-  size_t mIndexCount;
+  static std::atomic_size_t instanceCounter;
+  static std::unique_ptr<internal::MarkShader> shader;
 
   int mSelfLngLatConnection = -1, mHoveredNodeConnection = -1, mSelectedNodeConnection = -1,
       mButtonsConnection = -1, mHoveredPlanetConnection = -1, mHeightScaleConnection = -1;
+};
+
+namespace internal {
+class MarkShader {
+ public:
+  MarkShader();
+  virtual ~MarkShader() = default;
+
+  VistaGLSLShader& getProgram();
+
+  void bind();
+  void release();
+
+  struct {
+    int32_t matModelView;
+    int32_t matProjection;
+    int32_t hoverSelectActive;
+    int32_t farClip;
+    int32_t color;
+  } mUniforms{};
+
+  static constexpr size_t INDEX_COUNT = 36;
+
+ private:
+  VistaGLSLShader        mShader{};
+  VistaVertexArrayObject mVAO;
+  VistaBufferObject      mVBO;
+  VistaBufferObject      mIBO;
 
   static const std::string SHADER_VERT;
   static const std::string SHADER_FRAG;
 };
+} // namespace internal
 
 } // namespace tools
 } // namespace cs::core
