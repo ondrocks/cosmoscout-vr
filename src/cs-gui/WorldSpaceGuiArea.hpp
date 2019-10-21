@@ -10,6 +10,9 @@
 #include "GuiArea.hpp"
 
 #include <VistaKernel/GraphicsManager/VistaOpenGLDraw.h>
+#include <VistaOGLExt/VistaGLSLShader.h>
+#include <memory>
+#include <atomic>
 
 class VistaTransformMatrix;
 class VistaVector3D;
@@ -19,6 +22,9 @@ class VistaGLSLShader;
 namespace cs::gui {
 
 class GuiItem;
+namespace internal {
+class WorldSpaceGuiAreaShader;
+}
 
 /// Responsible for drawing UI elements which are located in 3D space. For example a label
 /// following a satellite.
@@ -54,13 +60,36 @@ class CS_GUI_EXPORT WorldSpaceGuiArea : public GuiArea, public IVistaOpenGLDraw 
   bool GetBoundingBox(VistaBoundingBox& bb) override;
 
  private:
-  VistaGLSLShader* mShader               = nullptr;
-  bool             mShaderDirty          = true;
+  static std::atomic_size_t instanceCounter;
+  static std::unique_ptr<internal::WorldSpaceGuiAreaShader> shader;
+
   bool             mIgnoreDepth          = false;
   bool             mUseLinearDepthBuffer = false;
   int              mWidth                = 0;
   int              mHeight               = 0;
 };
+
+namespace internal {
+class WorldSpaceGuiAreaShader {
+ public:
+
+  WorldSpaceGuiAreaShader();
+  ~WorldSpaceGuiAreaShader() = default;
+
+  VistaGLSLShader& getProgram();
+
+  struct {
+    int32_t matModelView;
+    int32_t matProjection;
+    int32_t texture;
+    int32_t farClip;
+    int32_t useLinearDepth;
+  } mUniforms{};
+
+ private:
+  VistaGLSLShader mShader{};
+};
+}
 
 } // namespace cs::gui
 

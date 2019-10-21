@@ -7,6 +7,7 @@
 #include "WorldSpaceGuiArea.hpp"
 
 #include "../cs-utils/FrameTimings.hpp"
+#include "../cs-utils/filesystem.hpp"
 #include "GuiItem.hpp"
 
 #include <VistaKernel/DisplayManager/VistaDisplayManager.h>
@@ -22,87 +23,28 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-namespace {
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-const std::string QUAD_VERT = R"(
-vec2 positions[4] = vec2[](
-    vec2(-0.5, -0.5),
-    vec2(0.5, -0.5),
-    vec2(-0.5, 0.5),
-    vec2(0.5, 0.5)
-);
-
-uniform mat4 uMatModelView;
-uniform mat4 uMatProjection;
-
-out vec2 vTexCoords;
-out vec4 vPosition;
-
-void main()
-{
-  vec2 p = positions[gl_VertexID];
-  vTexCoords = vec2(p.x, -p.y) + 0.5;
-  vPosition = uMatModelView * vec4(p, 0, 1);
-  gl_Position = uMatProjection * vPosition;
-
-  #ifdef USE_LINEARDEPTHBUFFER
-    gl_Position.z = 0;
-  #else
-    if (gl_Position.w > 0) {
-      gl_Position /= gl_Position.w;
-      if (gl_Position.z >= 1) {
-        gl_Position.z = 0.999999;
-      }
-    }
-  #endif
-}
-)";
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-const std::string QUAD_FRAG = R"(
-in vec2 vTexCoords;                                                             
-in vec4 vPosition;
-
-uniform sampler2D iTexture;                                                
-uniform float iFarClip;                                                
-                                                                           
-layout(location = 0) out vec4 vOutColor;                                   
-                                                                           
-void main()                                                                
-{                                                                                                    
-  vOutColor = texture(iTexture, vTexCoords); 
-  if (vOutColor.a == 0.0) discard; 
-
-  vOutColor.rgb /= vOutColor.a;
-
-  #ifdef USE_LINEARDEPTHBUFFER
-    // write linear depth
-    gl_FragDepth = length(vPosition.xyz) / iFarClip;
-  #endif
-}  
-)";
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-} // namespace
-
 namespace cs::gui {
+
+std::atomic_size_t                                 WorldSpaceGuiArea::instanceCounter = 0;
+std::unique_ptr<internal::WorldSpaceGuiAreaShader> WorldSpaceGuiArea::shader;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 WorldSpaceGuiArea::WorldSpaceGuiArea(int width, int height)
-    : mShader(new VistaGLSLShader())
-    , mWidth(width)
+    : mWidth(width)
     , mHeight(height) {
+
+  if (instanceCounter++ == 0) {
+    shader = std::make_unique<internal::WorldSpaceGuiAreaShader>();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 WorldSpaceGuiArea::~WorldSpaceGuiArea() {
-  delete mShader;
+  if (--instanceCounter == 0) {
+    shader.reset();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -152,7 +94,6 @@ bool WorldSpaceGuiArea::getUseLinearDepthBuffer() const {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void WorldSpaceGuiArea::setUseLinearDepthBuffer(bool bEnable) {
-  mShaderDirty          = true;
   mUseLinearDepthBuffer = bEnable;
 }
 
@@ -173,35 +114,14 @@ bool WorldSpaceGuiArea::calculateMousePosition(
   x = (int)((intersection[0] + 0.5) * mWidth);
   y = (int)((-intersection[1] + 0.5) * mHeight);
 
-  if (intersection[0] >= -0.5f && intersection[0] <= 0.5f && intersection[1] >= -0.5f &&
-      intersection[1] <= 0.5f) {
-    return true;
-  }
-
-  return false;
+  return intersection[0] >= -0.5f && intersection[0] <= 0.5f && intersection[1] >= -0.5f &&
+         intersection[1] <= 0.5f;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool WorldSpaceGuiArea::Do() {
   utils::FrameTimings::ScopedTimer timer("User Interface");
-  if (mShaderDirty) {
-    delete mShader;
-    mShader = new VistaGLSLShader();
-
-    std::string defines = "#version 330\n";
-
-    if (mUseLinearDepthBuffer) {
-      defines += "#define USE_LINEARDEPTHBUFFER\n";
-    }
-
-    mShader->InitVertexShaderFromString(defines + QUAD_VERT);
-    mShader->InitFragmentShaderFromString(defines + QUAD_FRAG);
-    mShader->Link();
-
-    mShaderDirty = false;
-  }
-
   if (mIgnoreDepth)
     glPushAttrib(GL_ENABLE_BIT | GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
   else
@@ -215,7 +135,10 @@ bool WorldSpaceGuiArea::Do() {
     glDisable(GL_DEPTH_TEST);
   }
 
-  mShader->Bind();
+  auto  uniforms      = shader->mUniforms;
+  auto& shaderProgram = shader->getProgram();
+
+  shaderProgram.Bind();
 
   if (mUseLinearDepthBuffer) {
     double near, far;
@@ -225,7 +148,8 @@ bool WorldSpaceGuiArea::Do() {
         ->m_pViewport->GetProjection()
         ->GetProjectionProperties()
         ->GetClippingRange(near, far);
-    mShader->SetUniform(mShader->GetUniformLocation("iFarClip"), (float)far);
+    shaderProgram.SetUniform(uniforms.farClip, (float)far);
+    shaderProgram.SetUniform(uniforms.useLinearDepth, mUseLinearDepthBuffer);
   }
 
   // get modelview and projection matrices
@@ -234,7 +158,7 @@ bool WorldSpaceGuiArea::Do() {
   glm::mat4 modelViewMat = glm::make_mat4(glMat);
 
   glGetFloatv(GL_PROJECTION_MATRIX, &glMat[0]);
-  glUniformMatrix4fv(mShader->GetUniformLocation("uMatProjection"), 1, GL_FALSE, glMat);
+  glUniformMatrix4fv(uniforms.matProjection, 1, GL_FALSE, glMat);
 
   // draw back-to-front
   auto const& items = getItems();
@@ -247,15 +171,14 @@ bool WorldSpaceGuiArea::Do() {
           glm::scale(localMat, glm::vec3((*item)->getRelSizeX(), (*item)->getRelSizeY(), 1.f));
 
       (*item)->getTexture()->Bind(GL_TEXTURE0);
-      glUniformMatrix4fv(
-          mShader->GetUniformLocation("uMatModelView"), 1, GL_FALSE, glm::value_ptr(localMat));
-      mShader->SetUniform(mShader->GetUniformLocation("iTexture"), 0);
+      glUniformMatrix4fv(uniforms.matModelView, 1, GL_FALSE, glm::value_ptr(localMat));
+      shaderProgram.SetUniform(uniforms.texture, 0);
       glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
       (*item)->getTexture()->Unbind(GL_TEXTURE0);
     }
   }
 
-  mShader->Release();
+  shaderProgram.Release();
 
   if (mIgnoreDepth) {
     glDepthMask(GL_TRUE);
@@ -278,5 +201,28 @@ bool WorldSpaceGuiArea::GetBoundingBox(VistaBoundingBox& oBoundingBox) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+namespace internal {
+WorldSpaceGuiAreaShader::WorldSpaceGuiAreaShader() {
+  mShader.InitVertexShaderFromString(cs::utils::filesystem::loadToString(
+      "../share/resources/shaders/WorldSpaceGuiArea.vert.glsl"));
+  mShader.InitFragmentShaderFromString(cs::utils::filesystem::loadToString(
+      "../share/resources/shaders/WorldSpaceGuiArea.frag.glsl"));
+  mShader.Link();
+
+  mUniforms.matModelView   = mShader.GetUniformLocation("uMatModelView");
+  mUniforms.matProjection  = mShader.GetUniformLocation("uMatProjection");
+  mUniforms.useLinearDepth = mShader.GetUniformLocation("uUseLinearDepth");
+  mUniforms.texture        = mShader.GetUniformLocation("iTexture");
+  mUniforms.farClip        = mShader.GetUniformLocation("iFarClip");
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+VistaGLSLShader& WorldSpaceGuiAreaShader::getProgram() {
+  return mShader;
+}
+
+} // namespace internal
 
 } // namespace cs::gui
