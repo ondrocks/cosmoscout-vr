@@ -216,7 +216,7 @@
         "Mars": {
             "gravity": 3.711,
             "atmosphere": {
-                "seaLevelMolecularNumberDensity": 1.9154e23,
+                "seaLevelMolecularNumberDensity": 1.9154e11,
                 "molarMass": 0.04349,
                 "atmosphereHeight": 55000.0,
                 "atmosphereLayers": [
