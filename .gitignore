@@ -6,6 +6,7 @@
 /config/*
 !/config/CMakeLists.txt
 !/config/base
+!/config/eclipses/scene/full_desktop-eclipses.json
 
 # ignore all additional plugin directories in /plugins
 /plugins/*

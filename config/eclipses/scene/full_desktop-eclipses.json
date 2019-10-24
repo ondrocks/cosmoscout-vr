@@ -1,0 +1,1175 @@
+{
+    "startDate": "today",
+    "minDate": "1950-01-02 00:00:00.000",
+    "maxDate": "2049-12-31 00:00:00.000",
+    "observer": {
+        "center": "Earth",
+        "frame": "IAU_Earth",
+        "distance": 10000000.0,
+        "longitude": 11.281067,
+        "latitude": 48.086709
+    },
+    "sceneScale": {
+        "minScale": 5,
+        "maxScale": 100000000000000000,
+        "closeVisualDistance": 5,
+        "farVisualDistance": 5,
+        "closeRealDistance": 1.7,
+        "farRealDistance": 1000000,
+        "lockWeight": 0.1,
+        "trackWeight": 0.0002,
+        "minObjectSize": 10000.0,
+        "nearClip": 0.2,
+        "minFarClip": 200.0,
+        "maxFarClip": 20000.0
+    },
+    "events": [
+        {
+            "id": "1",
+            "content": "Apollo 17 landing",
+            "start": "1972-12-11T19:54:57",
+            "description": "Last human landing on the Moon.",
+            "style": "border-color: yellow",
+            "location": {
+                "planet": "Moon",
+                "place": "3.635° E 26.133° S 10.0 Tsd km"
+            }
+        }
+    ],
+    "spiceKernel": "../share/config/spice/vrdata.txt",
+    "widgetScale": 0.8,
+    "enableMouseRay": false,
+    "enableSensorSizeControl": true,
+    "anchors": {
+        "Sun": {
+            "center": "Sun",
+            "frame": "IAU_Sun",
+            "startExistence": "1950-01-02 00:00:00.000",
+            "endExistence": "2049-12-31 00:00:00.000"
+        },
+        "Mercury": {
+            "center": "Mercury",
+            "frame": "IAU_Mercury",
+            "startExistence": "1950-01-02 00:00:00.000",
+            "endExistence": "2049-12-31 00:00:00.000",
+            "shadow": "eclipse"
+        },
+        "Venus": {
+            "center": "Venus",
+            "frame": "IAU_Venus",
+            "startExistence": "1950-01-02 00:00:00.000",
+            "endExistence": "2049-12-31 00:00:00.000",
+            "shadow": "eclipse"
+        },
+        "Earth": {
+            "center": "Earth",
+            "frame": "IAU_Earth",
+            "startExistence": "1950-01-02 00:00:00.000",
+            "endExistence": "2049-12-31 00:00:00.000",
+            "shadow": "eclipse"
+        },
+        "Moon": {
+            "center": "Moon",
+            "frame": "IAU_Moon",
+            "startExistence": "1950-01-02 00:00:00.000",
+            "endExistence": "2049-12-31 00:00:00.000",
+            "shadow": "eclipse"
+        },
+        "Mars": {
+            "center": "Mars",
+            "frame": "IAU_Mars",
+            "startExistence": "1950-01-02 00:00:00.000",
+            "endExistence": "2049-12-31 00:00:00.000",
+            "shadow": "eclipse"
+        },
+        "Phobos": {
+            "center": "Phobos",
+            "frame": "IAU_Phobos",
+            "startExistence": "1950-01-02 00:00:00.000",
+            "endExistence": "2049-12-31 00:00:00.000",
+            "shadow": "eclipse"
+        },
+        "Deimos": {
+            "center": "Deimos",
+            "frame": "IAU_Deimos",
+            "startExistence": "1950-01-02 00:00:00.000",
+            "endExistence": "2049-12-31 00:00:00.000",
+            "shadow": "eclipse"
+        },
+        "Mars Express": {
+            "center": "MEX",
+            "frame": "J2000",
+            "startExistence": "2003-06-03 00:00:00.000",
+            "endExistence": "2021-01-01 00:00:00.000"
+        },
+        "Mars Reconnaissance Orbiter": {
+            "center": "MRO",
+            "frame": "IAU_Mars",
+            "startExistence": "2006-03-10 21:30:00.000",
+            "endExistence": "2018-03-12 14:31:00.000"
+        },
+        "Curiosity": {
+            "center": "MSL",
+            "frame": "MSL_ROVER",
+            "startExistence": "2012-08-06 05:19:46.831",
+            "endExistence": "2020-02-05 22:53:38.296"
+        },
+        "Jupiter": {
+            "center": "Jupiter",
+            "frame": "IAU_Jupiter",
+            "startExistence": "1950-01-02 00:00:00.000",
+            "endExistence": "2049-12-31 00:00:00.000",
+            "shadow": "eclipse"
+        },
+        "Saturn": {
+            "center": "Saturn",
+            "frame": "IAU_Saturn",
+            "startExistence": "1950-01-02 00:00:00.000",
+            "endExistence": "2049-12-31 00:00:00.000",
+            "shadow": "eclipse"
+        },
+        "Uranus": {
+            "center": "Uranus",
+            "frame": "IAU_Uranus",
+            "startExistence": "1950-01-02 00:00:00.000",
+            "endExistence": "2049-12-31 00:00:00.000",
+            "shadow": "eclipse"
+        },
+        "Neptune": {
+            "center": "Neptune",
+            "frame": "IAU_Neptune",
+            "startExistence": "1950-01-02 00:00:00.000",
+            "endExistence": "2049-12-31 00:00:00.000",
+            "shadow": "eclipse"
+        },
+        "Pluto": {
+            "center": "Pluto",
+            "frame": "IAU_Pluto",
+            "startExistence": "1950-01-02 00:00:00.000",
+            "endExistence": "2049-12-31 00:00:00.000",
+            "shadow": "eclipse"
+        },
+        "Ceres": {
+            "center": "Ceres",
+            "frame": "IAU_Ceres",
+            "startExistence": "1950-01-02 00:00:00.000",
+            "endExistence": "2049-12-31 00:00:00.000",
+            "shadow": "eclipse"
+        },
+        "Vesta": {
+            "center": "Vesta",
+            "frame": "IAU_Vesta",
+            "startExistence": "1950-01-02 00:00:00.000",
+            "endExistence": "2049-12-31 00:00:00.000",
+            "shadow": "eclipse"
+        }
+    },
+    "physical-properties": {
+        "Earth": {
+            "gravity": 9.81,
+            "atmosphere": {
+                "seaLevelMolecularNumberDensity": 2.547e19,
+                "molarMass": 0.0289644,
+                "atmosphereHeight": 42000.0,
+                "atmosphereLayers": [
+                    {
+                        "altitude": 0.0,
+                        "baseTemperature": 288.15,
+                        "temperatureLapseRate": -0.0065,
+                        "baseDensity": 1.225
+                    },
+                    {
+                        "altitude": 11000.0,
+                        "baseTemperature": 216.65,
+                        "temperatureLapseRate": 0.0,
+                        "baseDensity": 0.36391
+                    },
+                    {
+                        "altitude": 20000.0,
+                        "baseTemperature": 216.65,
+                        "temperatureLapseRate": 0.001,
+                        "baseDensity": 0.08803
+                    },
+                    {
+                        "altitude": 32000.0,
+                        "baseTemperature": 228.65,
+                        "temperatureLapseRate": 0.0028,
+                        "baseDensity": 0.01322
+                    }
+                ],
+                "sellmeierCoefficients": {
+                    "a": 8.06051e-5,
+                    "terms": [
+                        [
+                            2.480990e-2,
+                            132.274
+                        ],
+                        [
+                            1.74557e-4,
+                            39.32957
+                        ]
+                    ]
+                }
+            }
+        },
+
+        "Mars": {
+            "gravity": 3.711,
+            "atmosphere": {
+                "seaLevelMolecularNumberDensity": 1.9154e23,
+                "molarMass": 0.04349,
+                "atmosphereHeight": 55000.0,
+                "atmosphereLayers": [
+                    {
+                        "altitude": 0.0,
+                        "baseTemperature": 198.25,
+                        "temperatureLapseRate": -0.002,
+                        "baseDensity": 0.0161
+                    },
+                    {
+                        "altitude": 8500.0,
+                        "baseTemperature": 181.25,
+                        "temperatureLapseRate": 0.0019,
+                        "baseDensity": 0.0073
+                    },
+                    {
+                        "altitude": 16000.0,
+                        "baseTemperature": 195.25,
+                        "temperatureLapseRate": -0.0017,
+                        "baseDensity": 0.0031
+                    },
+                    {
+                        "altitude": 31000.0,
+                        "baseTemperature": 169.75,
+                        "temperatureLapseRate": -0.0006,
+                        "baseDensity": 0.0007
+                    },
+                    {
+                        "altitude": 48000.0,
+                        "baseTemperature": 159.55,
+                        "temperatureLapseRate": -0.00365,
+                        "baseDensity": 0.0001
+                    }
+                ],
+                "sellmeierCoefficients": {
+                    "a": 2.8001182622e-8,
+                    "terms": [
+                        [
+                            1.2299914346e-8,
+                            0.0584738
+                        ],
+                        [
+                            6.61551039203e-4,
+                            210.9241
+                        ],
+                        [
+                            2.29011174411e-5,
+                            60.122959
+                        ],
+                        [
+                            1.29088475817e-5,
+                            144
+                        ]
+                    ]
+                }
+            }
+        }
+    },
+    "plugins": {
+        "csp-stars": {
+            "backgroundColor1": [
+                0.5,
+                0.8,
+                1.0,
+                0.3
+            ],
+            "backgroundColor2": [
+                0.5,
+                1.0,
+                0.8,
+                0.3
+            ],
+            "backgroundTexture1": "../share/resources/textures/celestial_grid.png",
+            "backgroundTexture2": "../share/resources/textures/constellation_figures.png",
+            "maxMagnitude": 15.0,
+            "maxOpacity": 1.0,
+            "maxSize": 3.0,
+            "minMagnitude": -15.0,
+            "minOpacity": 0.5,
+            "minSize": 0.1,
+            "scalingExponent": 3.0,
+            "starTexture": "../share/resources/textures/star.png",
+            "hipparcosCatalog": "/vr_data/Context/Stars/hip_main.dat",
+            "tycho2Catalog": "/vr_data/Context/Stars/tyc2_main.dat"
+        },
+        "csp-lod-bodies": {
+            "maxGPUTilesColor": 2048,
+            "maxGPUTilesGray": 2048,
+            "maxGPUTilesDEM": 2048,
+            "mapCache": "/localdata1/map-cache/",
+            "bodies": {
+                "Mars": {
+                    "imgDatasets": [
+                        {
+                            "name": "HiRISE",
+                            "copyright": "NASA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "U8Vec3",
+                            "layers": "mars.viking.rgb,mars.gale.msl.rgb",
+                            "maxLevel": 16
+                        },
+                        {
+                            "name": "HRSC HMC30 Co5",
+                            "copyright": "DLR",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "U8Vec3",
+                            "layers": "mars.viking.rgb,mars.hrsc.HMC30.co5.rgb",
+                            "maxLevel": 10
+                        },
+                        {
+                            "name": "HRSC HMC30 Co5PS",
+                            "copyright": "DLR",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "U8Vec3",
+                            "layers": "mars.viking.rgb,mars.hrsc.HMC30.co5ps.rgb",
+                            "maxLevel": 10
+                        },
+                        {
+                            "name": "HRSC HMC30 ND5",
+                            "copyright": "DLR",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "U8Vec3",
+                            "layers": "mars.viking.rgb,mars.hrsc.HMC30.nd5.rgb",
+                            "maxLevel": 10
+                        },
+                        {
+                            "name": "HRSC Nadir",
+                            "copyright": "ESA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "UInt8",
+                            "layers": "mars.hrsc.nadir.gray",
+                            "maxLevel": 10
+                        },
+                        {
+                            "name": "Footprints (HRSC DEM)",
+                            "copyright": "ESA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "U8Vec3",
+                            "layers": "footprints.dem.hrsc.img",
+                            "maxLevel": 8
+                        },
+                        {
+                            "name": "Footprints (HRSC Nadir)",
+                            "copyright": "ESA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "U8Vec3",
+                            "layers": "mars.hrsc.nadir.gray,footprints.nadir.hrsc.img",
+                            "maxLevel": 10
+                        }
+                    ],
+                    "demDatasets": [
+                        {
+                            "name": "HiRISE",
+                            "copyright": "NASA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "Float32",
+                            "layers": "mars.mola.dem,mars.gale.msl.dem",
+                            "maxLevel": 15
+                        },
+                        {
+                            "name": "HRSC HMC30 DA5",
+                            "copyright": "NASA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "Float32",
+                            "layers": "mars.mola.dem,mars.hrsc.HMC30.da5.dtm",
+                            "maxLevel": 10
+                        },
+                        {
+                            "name": "HRSC",
+                            "copyright": "ESA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "Float32",
+                            "layers": "mars.hrsc.dem",
+                            "maxLevel": 7
+                        },
+                        {
+                            "name": "Mola",
+                            "copyright": "NASA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "Float32",
+                            "layers": "mars.mola.dem",
+                            "maxLevel": 6
+                        }
+                    ]
+                },
+                "Earth": {
+                    "imgDatasets": [
+                        {
+                            "name": "Helgoland + Blue Marble",
+                            "copyright": "DLR, NASA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "U8Vec3",
+                            "layers": "earth.bluemarble.rgb,earth.os.helgoland.rgb",
+                            "maxLevel": 18
+                        },
+                        {
+                            "name": "Blue Marble",
+                            "copyright": "NASA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "U8Vec3",
+                            "layers": "earth.bluemarble.rgb",
+                            "maxLevel": 7
+                        }
+                    ],
+                    "demDatasets": [
+                        {
+                            "name": "Helgoland + SRTM30",
+                            "copyright": "DLR, NASA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "Float32",
+                            "layers": "earth.srtm30.dem,earth.os.helgoland.dem",
+                            "maxLevel": 17
+                        },
+                        {
+                            "name": "SRTM30",
+                            "copyright": "NASA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "Float32",
+                            "layers": "earth.srtm30.dem",
+                            "maxLevel": 12
+                        },
+                        {
+                            "name": "Blue Marble",
+                            "copyright": "NASA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "Float32",
+                            "layers": "earth.bluemarble.dem",
+                            "maxLevel": 6
+                        },
+                        {
+                            "name": "CleanTOPO",
+                            "copyright": "Tom Patterson, US National Park Service",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "Float32",
+                            "layers": "earth.cleantopo.dem",
+                            "maxLevel": 6
+                        }
+                    ]
+                },
+                "Moon": {
+                    "imgDatasets": [
+                        {
+                            "name": "Apollo (LRO)",
+                            "copyright": "NASA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "UInt8",
+                            "layers": "moon.lro.wac.gray,moon.lro.nac.apollo11.gray,moon.lro.nac.apollo15.gray,moon.lro.nac.apollo16.gray,moon.lro.nac.apollo17.gray",
+                            "maxLevel": 15
+                        },
+                        {
+                            "name": "Clementine",
+                            "copyright": "NASA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "UInt8",
+                            "layers": "moon.clementine.750nm.gray",
+                            "maxLevel": 10
+                        }
+                    ],
+                    "demDatasets": [
+                        {
+                            "name": "Apollo (LRO)",
+                            "copyright": "NASA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "Float32",
+                            "layers": "moon.lro.wac.dem,moon.lro.nac.apollo11.dem,moon.lro.nac.apollo15.dem,moon.lro.nac.apollo16.dem,moon.lro.nac.apollo17.dem",
+                            "maxLevel": 13
+                        },
+                        {
+                            "name": "Kaguya",
+                            "copyright": "JAXA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "Float32",
+                            "layers": "moon.kaguya.dem",
+                            "maxLevel": 10
+                        }
+                    ]
+                },
+                "Phobos": {
+                    "imgDatasets": [
+                        {
+                            "name": "Viking",
+                            "copyright": "NASA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "UInt8",
+                            "layers": "phobos.viking.gray",
+                            "maxLevel": 8
+                        },
+                        {
+                            "name": "HRSC",
+                            "copyright": "ESA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "UInt8",
+                            "layers": "phobos.hrsc.gray",
+                            "maxLevel": 5
+                        }
+                    ],
+                    "demDatasets": [
+                        {
+                            "name": "HRSC",
+                            "copyright": "ESA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "Float32",
+                            "layers": "phobos.hrsc.dem",
+                            "maxLevel": 5
+                        }
+                    ]
+                },
+                "Ceres": {
+                    "imgDatasets": [
+                        {
+                            "name": "Dawn LAMO",
+                            "copyright": "ESA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "UInt8",
+                            "layers": "ceres.dawn.lamo.north.gray,ceres.dawn.lamo.south.gray,ceres.dawn.lamo.equator.gray",
+                            "maxLevel": 7
+                        },
+                        {
+                            "name": "Dawn HAMO",
+                            "copyright": "ESA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "UInt8",
+                            "layers": "ceres.dawn.hamo.north.gray,ceres.dawn.hamo.south.gray,ceres.dawn.hamo.equator.gray",
+                            "maxLevel": 7
+                        }
+                    ],
+                    "demDatasets": [
+                        {
+                            "name": "Dawn",
+                            "copyright": "ESA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "Float32",
+                            "layers": "ceres.dawn.spg.north.dtm,ceres.dawn.spg.south.dtm,ceres.dawn.spg.equator.dtm",
+                            "maxLevel": 6
+                        }
+                    ]
+                },
+                "Vesta": {
+                    "imgDatasets": [
+                        {
+                            "name": "Dawn LAMO",
+                            "copyright": "ESA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "UInt8",
+                            "layers": "vesta.dawn.lamo.north.gray,vesta.dawn.lamo.south.gray,vesta.dawn.lamo.equator.gray",
+                            "maxLevel": 7
+                        },
+                        {
+                            "name": "Dawn HAMO",
+                            "copyright": "ESA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "UInt8",
+                            "layers": "vesta.dawn.hamo.north.gray,vesta.dawn.hamo.south.gray,vesta.dawn.hamo.equator.gray",
+                            "maxLevel": 7
+                        }
+                    ],
+                    "demDatasets": [
+                        {
+                            "name": "Dawn",
+                            "copyright": "ESA",
+                            "url": "http://129.247.34.87/mapserv?service=wms",
+                            "format": "Float32",
+                            "layers": "vesta.dawn.north.dtm,vesta.dawn.south.dtm,vesta.dawn.equator.dtm",
+                            "maxLevel": 6
+                        }
+                    ]
+                }
+            }
+        },
+        "csp-atmospheres": {
+            "atmospheres": {
+                "Mars": {
+                    "atmosphereHeight": 0.03,
+                    "mieAnisotropy": 0.76,
+                    "mieHeight": 0.00144509,
+                    "mieScatteringB": 52.66,
+                    "mieScatteringG": 52.66,
+                    "mieScatteringR": 52.66,
+                    "rayleighAnisotropy": 0,
+                    "rayleighHeight": 0.00317919,
+                    "rayleighScatteringB": 19.89,
+                    "rayleighScatteringG": 46.71,
+                    "rayleighScatteringR": 69.2,
+                    "sunIntensity": 12
+                },
+                "Earth": {
+                    "atmosphereHeight": 0.015,
+                    "mieAnisotropy": 0.76,
+                    "mieHeight": 0.000188679,
+                    "mieScatteringB": 133.56,
+                    "mieScatteringG": 133.56,
+                    "mieScatteringR": 133.56,
+                    "rayleighAnisotropy": 0,
+                    "rayleighHeight": 0.001257862,
+                    "rayleighScatteringB": 210.516,
+                    "rayleighScatteringG": 85.86,
+                    "rayleighScatteringR": 36.89,
+                    "sunIntensity": 15,
+                    "cloudHeight": 0.001,
+                    "cloudTexture": "../share/resources/textures/earth-clouds.jpg"
+                }
+            }
+        },
+        "csp-measurement-tools": {
+            "polygon": {
+                "heightDiff": 1.002,
+                "maxAttempt": 5,
+                "maxPoints": 1000,
+                "sleekness": 15
+            },
+            "ellipse": {
+                "numSamples": 360
+            },
+            "path": {
+                "numSamples": 256
+            }
+        },
+        "csp-sharad": {
+            "filePath": "/vr_data/temp/CrossDrive_FinalWorkshop/sharad/"
+        },
+        "csp-simple-bodies": {
+            "bodies": {
+                "Sun": {
+                    "texture": "../share/resources/textures/sun.jpg"
+                },
+                "Mercury": {
+                    "texture": "../share/resources/textures/mercury.jpg"
+                },
+                "Venus": {
+                    "texture": "../share/resources/textures/venus.jpg"
+                },
+                "Jupiter": {
+                    "texture": "../share/resources/textures/jupiter.jpg"
+                },
+                "Saturn": {
+                    "texture": "../share/resources/textures/saturn.jpg"
+                },
+                "Uranus": {
+                    "texture": "../share/resources/textures/uranus.jpg"
+                },
+                "Neptune": {
+                    "texture": "../share/resources/textures/neptune.jpg"
+                },
+                "Pluto": {
+                    "texture": "../share/resources/textures/moon.jpg"
+                }
+            }
+        },
+        "csp-satellites": {
+            "satellites": {
+                "Mars Express": {
+                    "modelFile": "/vr_data/Geometry/DLR/MEX/mex.glb",
+                    "environmentMap": "../share/resources/textures/marsEnvMap.dds",
+                    "size": 10,
+                    "transformation": {
+                        "translation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "rotation": [
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "scale": 100
+                    }
+                },
+                "Mars Reconnaissance Orbiter": {
+                    "modelFile": "/vr_data/Geometry/NASA/MRO/MRO_13.glb",
+                    "environmentMap": "../share/resources/textures/marsEnvMap.dds",
+                    "size": 10,
+                    "transformation": {
+                        "translation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "rotation": [
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "scale": 100
+                    }
+                },
+                "Curiosity": {
+                    "modelFile": "/vr_data/Geometry/NASA/MSL/msl.gltf",
+                    "environmentMap": "../share/resources/textures/marsEnvMap.dds",
+                    "size": 0,
+                    "transformation": {
+                        "translation": [
+                            0.0,
+                            -133.6,
+                            0.0
+                        ],
+                        "rotation": [
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "scale": 1
+                    }
+                }
+            }
+        },
+        "csp-rings": {
+            "rings": {
+                "Saturn": {
+                    "texture": "../share/resources/textures/saturn-rings.png",
+                    "innerRadius": 67000000,
+                    "outerRadius": 140210000
+                }
+            }
+        },
+        "csp-anchor-labels": {
+            "defaultEnabled": true,
+            "enableDepthOverlap": true,
+            "ignoreOverlapThreshold": 0.1,
+            "labelScale": 1.2,
+            "depthScale": 1.0,
+            "labelOffset": 0.2
+        },
+        "csp-trajectories": {
+            "trajectories": {
+                "Sun": {
+                    "color": [
+                        1,
+                        1,
+                        1
+                    ],
+                    "drawFlare": true
+                },
+                "Mercury": {
+                    "color": [
+                        0.7,
+                        0.6,
+                        0.3
+                    ],
+                    "trail": {
+                        "length": 87.9,
+                        "samples": 1000,
+                        "parentCenter": "Solar System Barycenter",
+                        "parentFrame": "J2000"
+                    },
+                    "drawDot": true
+                },
+                "Venus": {
+                    "color": [
+                        0.8,
+                        0.8,
+                        0.6
+                    ],
+                    "trail": {
+                        "length": 224.5,
+                        "samples": 1000,
+                        "parentCenter": "Solar System Barycenter",
+                        "parentFrame": "J2000"
+                    },
+                    "drawDot": true
+                },
+                "Earth": {
+                    "color": [
+                        0.5,
+                        1.0,
+                        0.4
+                    ],
+                    "trail": {
+                        "length": 365.0,
+                        "samples": 5000,
+                        "parentCenter": "Solar System Barycenter",
+                        "parentFrame": "J2000"
+                    },
+                    "drawDot": true
+                },
+                "Moon": {
+                    "color": [
+                        0.8,
+                        0.8,
+                        0.8
+                    ],
+                    "trail": {
+                        "length": 28.0,
+                        "samples": 1000,
+                        "parentCenter": "Earth",
+                        "parentFrame": "J2000"
+                    },
+                    "drawDot": true
+                },
+                "Mars": {
+                    "color": [
+                        1.0,
+                        0.4,
+                        0.3
+                    ],
+                    "trail": {
+                        "length": 686.0,
+                        "samples": 5000,
+                        "parentCenter": "Solar System Barycenter",
+                        "parentFrame": "J2000"
+                    },
+                    "drawDot": true
+                },
+                "Phobos": {
+                    "color": [
+                        0.6,
+                        0.8,
+                        0.6
+                    ],
+                    "trail": {
+                        "length": 0.31,
+                        "samples": 1000,
+                        "parentCenter": "Mars",
+                        "parentFrame": "J2000"
+                    },
+                    "drawDot": true
+                },
+                "Deimos": {
+                    "color": [
+                        0.6,
+                        0.6,
+                        0.8
+                    ],
+                    "trail": {
+                        "length": 1.2,
+                        "samples": 1000,
+                        "parentCenter": "Mars",
+                        "parentFrame": "J2000"
+                    },
+                    "drawDot": true
+                },
+                "Mars Express": {
+                    "color": [
+                        1.0,
+                        0.2,
+                        0.2
+                    ],
+                    "trail": {
+                        "length": 0.25,
+                        "samples": 2000,
+                        "parentCenter": "Mars",
+                        "parentFrame": "J2000"
+                    },
+                    "drawDot": true
+                },
+                "Mars Reconnaissance Orbiter": {
+                    "color": [
+                        1.0,
+                        1.0,
+                        0.4
+                    ],
+                    "trail": {
+                        "length": 0.1,
+                        "samples": 1000,
+                        "parentCenter": "Mars",
+                        "parentFrame": "IAU_Mars"
+                    },
+                    "drawDot": true
+                },
+                "Curiosity": {
+                    "color": [
+                        1.0,
+                        0.0,
+                        0.4
+                    ],
+                    "drawDot": true
+                },
+                "Jupiter": {
+                    "color": [
+                        1.0,
+                        0.7,
+                        0.5
+                    ],
+                    "trail": {
+                        "length": 4330,
+                        "samples": 1000,
+                        "parentCenter": "Solar System Barycenter",
+                        "parentFrame": "J2000"
+                    },
+                    "drawDot": true
+                },
+                "Saturn": {
+                    "color": [
+                        1.0,
+                        0.9,
+                        0.3
+                    ],
+                    "trail": {
+                        "length": 10749,
+                        "samples": 1000,
+                        "parentCenter": "Solar System Barycenter",
+                        "parentFrame": "J2000"
+                    },
+                    "drawDot": true
+                },
+                "Uranus": {
+                    "color": [
+                        0.5,
+                        0.8,
+                        1.0
+                    ],
+                    "trail": {
+                        "length": 17885,
+                        "samples": 1000,
+                        "parentCenter": "Solar System Barycenter",
+                        "parentFrame": "J2000"
+                    },
+                    "drawDot": true
+                },
+                "Neptune": {
+                    "color": [
+                        0.2,
+                        0.2,
+                        0.5
+                    ],
+                    "trail": {
+                        "length": 17885,
+                        "samples": 1000,
+                        "parentCenter": "Solar System Barycenter",
+                        "parentFrame": "J2000"
+                    },
+                    "drawDot": true
+                },
+                "Pluto": {
+                    "color": [
+                        0.5,
+                        0.5,
+                        0.6
+                    ],
+                    "trail": {
+                        "length": 17885,
+                        "samples": 1000,
+                        "parentCenter": "Solar System Barycenter",
+                        "parentFrame": "J2000"
+                    },
+                    "drawDot": true
+                },
+                "Ceres": {
+                    "color": [
+                        0.4,
+                        0.4,
+                        0.4
+                    ],
+                    "trail": {
+                        "length": 1660,
+                        "samples": 1000,
+                        "parentCenter": "Solar System Barycenter",
+                        "parentFrame": "J2000"
+                    },
+                    "drawDot": true
+                },
+                "Vesta": {
+                    "color": [
+                        0.5,
+                        0.5,
+                        0.5
+                    ],
+                    "trail": {
+                        "length": 1325,
+                        "samples": 1000,
+                        "parentCenter": "Solar System Barycenter",
+                        "parentFrame": "J2000"
+                    },
+                    "drawDot": true
+                }
+            }
+        },
+        "csp-fly-to-locations": {
+            "targets": {
+                "Mercury": {
+                    "icon": "mercury.png"
+                },
+                "Venus": {
+                    "icon": "venus.png"
+                },
+                "Earth": {
+                    "icon": "earth.png",
+                    "locations": {
+                        "Africa": {
+                            "group": "Continents",
+                            "latitude": 2.0,
+                            "longitude": 16.0,
+                            "extent": 10000000
+                        },
+                        "Asia": {
+                            "group": "Continents",
+                            "latitude": 56.0,
+                            "longitude": 104.0,
+                            "extent": 10000000
+                        },
+                        "Australia": {
+                            "group": "Continents",
+                            "latitude": -24.0,
+                            "longitude": 135.0,
+                            "extent": 10000000
+                        },
+                        "Braunschweig": {
+                            "group": "Cities",
+                            "latitude": 52.26,
+                            "longitude": 10.53,
+                            "extent": 10000
+                        },
+                        "Europe": {
+                            "group": "Continents",
+                            "latitude": 51.0,
+                            "longitude": 10.0,
+                            "extent": 10000000
+                        },
+                        "New York": {
+                            "group": "Cities",
+                            "latitude": 40.7,
+                            "longitude": -73.99,
+                            "extent": 30000
+                        },
+                        "North America": {
+                            "group": "Continents",
+                            "latitude": 39.78,
+                            "longitude": -100.0,
+                            "extent": 10000000
+                        },
+                        "South America": {
+                            "group": "Continents",
+                            "latitude": -10.3,
+                            "longitude": -53.2,
+                            "extent": 10000000
+                        }
+                    }
+                },
+                "Moon": {
+                    "icon": "moon.png",
+                    "locations": {
+                        "Apollo 11": {
+                            "group": "Landings",
+                            "latitude": 0.675,
+                            "longitude": 23.475,
+                            "extent": 250
+                        },
+                        "Apollo 15": {
+                            "group": "Landings",
+                            "latitude": 26.133,
+                            "longitude": 3.635,
+                            "extent": 250
+                        },
+                        "Apollo 16": {
+                            "group": "Landings",
+                            "latitude": -8.975,
+                            "longitude": 15.5,
+                            "extent": 250
+                        },
+                        "Apollo 17": {
+                            "group": "Landings",
+                            "latitude": 20.192,
+                            "longitude": 30.774,
+                            "extent": 250
+                        }
+                    }
+                },
+                "Mars": {
+                    "icon": "mars.png",
+                    "locations": {
+                        "Adams": {
+                            "group": "Craters",
+                            "latitude": 30.91,
+                            "longitude": 163.1,
+                            "extent": 200000
+                        },
+                        "Ares Vallis": {
+                            "group": "Canyons",
+                            "latitude": 10.29,
+                            "longitude": 334.2,
+                            "extent": 100000
+                        },
+                        "Bond": {
+                            "group": "Craters",
+                            "latitude": -32.79,
+                            "longitude": 324.06,
+                            "extent": 200000
+                        },
+                        "Caxias": {
+                            "group": "Craters",
+                            "latitude": -28.95,
+                            "longitude": 259.32,
+                            "extent": 300000
+                        },
+                        "Ceraunius Tholus": {
+                            "group": "Volcanoes",
+                            "latitude": 23,
+                            "longitude": 263.0,
+                            "extent": 300000
+                        },
+                        "Gale": {
+                            "group": "Craters",
+                            "latitude": -5.4,
+                            "longitude": 137.8,
+                            "extent": 300000
+                        },
+                        "Curiosity": {
+                            "group": "Rover",
+                            "latitude": -4.63,
+                            "longitude": 137.3528,
+                            "extent": 100
+                        },
+                        "Hadriacus Mons": {
+                            "group": "Volcanoes",
+                            "latitude": -30,
+                            "longitude": 92.0,
+                            "extent": 500000
+                        },
+                        "Marikh Vallis": {
+                            "group": "Canyons",
+                            "latitude": -19.25,
+                            "longitude": 3.9,
+                            "extent": 1000000
+                        },
+                        "Olympus Mons": {
+                            "group": "Volcanoes",
+                            "latitude": 18,
+                            "longitude": 226.0,
+                            "extent": 800000
+                        },
+                        "Valles Marineris": {
+                            "group": "Canyons",
+                            "latitude": -10,
+                            "longitude": 290.0,
+                            "extent": 2000000
+                        }
+                    }
+                },
+                "Phobos": {
+                    "icon": "phobos.png"
+                },
+                "Mars Express": {
+                    "icon": "mex.png"
+                },
+                "Curiosity": {
+                    "icon": "curiosity.png"
+                },
+                "Jupiter": {
+                    "icon": "jupiter.png"
+                },
+                "Saturn": {
+                    "icon": "saturn.png"
+                },
+                "Uranus": {
+                    "icon": "uranus.png"
+                },
+                "Neptune": {
+                    "icon": "neptune.png"
+                }
+            }
+        }
+    }
+}
