@@ -9,6 +9,7 @@
 
 #include "../cs-graphics/HDRBuffer.hpp"
 #include "../cs-graphics/Shadows.hpp"
+#include "../cs-graphics/eclipse-shadows/EclipseShadowCaster.hpp"
 #include "../cs-utils/Property.hpp"
 #include "Settings.hpp"
 
@@ -62,6 +63,8 @@ class CS_CORE_EXPORT GraphicsEngine {
   void registerCaster(graphics::ShadowCaster* caster);
   void unregisterCaster(graphics::ShadowCaster* caster);
 
+  std::vector<std::unique_ptr<graphics::EclipseShadowCaster>> const& getEclipseShadowCaster() const;
+
   /// The light direction in world space.
   void update(glm::vec3 const& sunDirection);
 
@@ -76,6 +79,8 @@ class CS_CORE_EXPORT GraphicsEngine {
   std::shared_ptr<graphics::HDRBuffer>          mHDRBuffer;
   std::shared_ptr<graphics::ClearHDRBufferNode> mClearNode;
   std::shared_ptr<graphics::ToneMappingNode>    mToneMappingNode;
+
+  std::vector<std::unique_ptr<graphics::EclipseShadowCaster>> mEclipseShadowCaster;
 };
 
 } // namespace cs::core

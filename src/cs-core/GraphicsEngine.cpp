@@ -9,6 +9,7 @@
 #include "../cs-graphics/ClearHDRBufferNode.hpp"
 #include "../cs-graphics/HDRBuffer.hpp"
 #include "../cs-graphics/ToneMappingNode.hpp"
+#include "../cs-graphics/eclipse-shadows/AtmosphereEclipseShadowCaster.hpp"
 #include "../cs-utils/utils.hpp"
 
 #include <VistaKernel/DisplayManager/VistaDisplayManager.h>
@@ -126,6 +127,19 @@ GraphicsEngine::GraphicsEngine(std::shared_ptr<const core::Settings> const& sett
   pGlowIntensity.touch();
   pExposureMeteringMode.touch();
   pEnableHDR.touch();
+
+  for (const auto& [name, anchor] : settings->mAnchors) {
+    if (anchor.mShadow && anchor.mShadow.value() == "eclipse") {
+      auto it = settings->mBodyProperties.find(name);
+      if (it != settings->mBodyProperties.end() && it->second.atmosphere.has_value()) {
+        auto props = it->second;
+
+        //graphics::AtmosphereEclipseShadowCaster(props);
+
+        //mEclipseShadowCaster.emplace_back()
+      }
+    }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -200,6 +214,12 @@ void GraphicsEngine::calculateCascades() {
   mShadowMap->setCascadeSplits(splits);
   mShadowMap->setSunNearClipOffset(pShadowMapExtension.get().x);
   mShadowMap->setSunFarClipOffset(pShadowMapExtension.get().y);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+std::vector<std::unique_ptr<graphics::EclipseShadowCaster>> const& GraphicsEngine::getEclipseShadowCaster() const {
+  return mEclipseShadowCaster;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -167,11 +167,13 @@
     "physical-properties": {
         "Earth": {
             "gravity": 9.81,
+            "semiMajorAxis": 149598023000.0,
+            "meanRadius": 6371000.0,
             "atmosphere": {
                 "seaLevelMolecularNumberDensity": 2.547e19,
                 "molarMass": 0.0289644,
-                "atmosphereHeight": 42000.0,
-                "atmosphereLayers": [
+                "height": 42000.0,
+                "layers": [
                     {
                         "altitude": 0.0,
                         "baseTemperature": 288.15,
@@ -215,11 +217,13 @@
 
         "Mars": {
             "gravity": 3.711,
+            "semiMajorAxis": 227939200000.0,
+            "meanRadius": 3389500.0,
             "atmosphere": {
                 "seaLevelMolecularNumberDensity": 1.9154e11,
                 "molarMass": 0.04349,
-                "atmosphereHeight": 55000.0,
-                "atmosphereLayers": [
+                "height": 55000.0,
+                "layers": [
                     {
                         "altitude": 0.0,
                         "baseTemperature": 198.25,

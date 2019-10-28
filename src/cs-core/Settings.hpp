@@ -54,10 +54,11 @@ namespace cs::core {
 class CS_CORE_EXPORT Settings {
  public:
   struct Anchor {
-    std::string mCenter;
-    std::string mFrame;
-    std::string mStartExistence;
-    std::string mEndExistence;
+    std::string                mCenter;
+    std::string                mFrame;
+    std::string                mStartExistence;
+    std::string                mEndExistence;
+    std::optional<std::string> mShadow;
   };
 
   struct Gui {
@@ -116,6 +117,37 @@ class CS_CORE_EXPORT Settings {
     double mMaxFarClip;
   };
 
+  /// DocTODO
+  struct AtmosphereLayer {
+    double altitude;             ///< m
+    double baseTemperature;      ///< K
+    double temperatureLapseRate; ///< K/m
+    double baseDensity;          ///< kg/m^3
+  };
+
+  /// DocTODO
+  struct SellmeierCoefficients {
+    double                                 a;
+    std::vector<std::pair<double, double>> terms;
+  };
+
+  /// DocTODO
+  struct Atmosphere {
+    double                       seaLevelMolecularNumberDensity; ///< cm^-3
+    double                       molarMass;                      ///< kg/mol
+    double                       height;                         ///< m
+    std::vector<AtmosphereLayer> layers;
+    SellmeierCoefficients        sellmeierCoefficients;
+  };
+
+  /// DocTODO
+  struct BodyProperties {
+    double                    gravity;       ///< m/s^2
+    double                    semiMajorAxis; ///< m
+    double                    meanRadius;    ///< m
+    std::optional<Atmosphere> atmosphere;
+  };
+
   /// Defines the initial simulation time.
   std::string mStartDate;
 
@@ -157,8 +189,10 @@ class CS_CORE_EXPORT Settings {
   /// Events to show on the timenavigation bar
   std::vector<Event> mEvents;
 
-  /// A map with configuration options for each plugin. The JSON object is not parsed, this is done
-  /// by the plugins themselves.
+  std::map<std::string, BodyProperties> mBodyProperties;
+
+  /// A map with configuration options for each plugin. The JSON object is not parsed, this is
+  /// done by the plugins themselves.
   std::map<std::string, nlohmann::json> mPlugins;
 
   /// Creates an instance of this struct from a given JSON file.
