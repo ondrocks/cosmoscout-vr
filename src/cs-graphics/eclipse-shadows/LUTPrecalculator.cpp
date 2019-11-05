@@ -90,20 +90,27 @@ std::pair<uint32_t, uint32_t> LUTPrecalculator::createLUT(
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssboDensities);
 
   glUniform1f(mUniforms.planet.uAtmosphericHeight, bodyProperties.atmosphere->height);
-  glUniform1f(mUniforms.planet.uGravity, bodyProperties.gravity);
+  glUniform1f(mUniforms.planet.uGravity, static_cast<float>(*bodyProperties.gravity));
   glUniform1f(mUniforms.planet.uMolarMass, bodyProperties.atmosphere->molarMass);
   glUniform1f(mUniforms.planet.uSeaLevelMolecularNumberDensity,
       bodyProperties.atmosphere->seaLevelMolecularNumberDensity);
 
-  glUniform1f(mUniforms.sellmeierCoefficients.uA, 8.06051 * 1e-5);
+  auto& coefficients = bodyProperties.atmosphere->sellmeierCoefficients;
+  // glUniform1f(mUniforms.sellmeierCoefficients.uA, 8.06051 * 1e-5);
+  glUniform1f(mUniforms.sellmeierCoefficients.uA, coefficients.a);
 
-  std::array<glm::vec2, 2> coefficients = {
-      glm::vec2{2.480990e-2f, 132.274f}, glm::vec2{1.74557e-4f, 39.32957f}};
-  glUniform1ui(mUniforms.sellmeierCoefficients.uNumTerms, coefficients.size());
+  // std::array<glm::vec2, 2> coefficients = {
+  // glm::vec2{2.480990e-2f, 132.274f}, glm::vec2{1.74557e-4f, 39.32957f}};
 
-  for (size_t i = 0; i < coefficients.size(); ++i) {
-    glUniform2f(mUniforms.sellmeierCoefficients.uTerms[i], coefficients[i].x, coefficients[i].y);
+  // glUniform1ui(mUniforms.sellmeierCoefficients.uNumTerms, coefficients.size());
+  glUniform1ui(mUniforms.sellmeierCoefficients.uNumTerms, coefficients.terms.size());
+
+  for (size_t i = 0; i < coefficients.terms.size(); ++i) {
+    glUniform2f(mUniforms.sellmeierCoefficients.uTerms[i], coefficients.terms[i].first,
+        coefficients.terms[i].second);
   }
+
+  // TODO atmospheric layer data
 
   const uint32_t numThreadsX = 32;
   const uint32_t numThreadsY = 32;

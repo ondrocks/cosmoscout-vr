@@ -2,6 +2,8 @@
 
 #extension GL_ARB_compute_variable_group_size: enable
 
+layout (local_size_variable) in;
+
 struct Planet {
     float atmosphericHeight;              // m
     float gravitationAcceleration;        // m/s^2
@@ -26,11 +28,15 @@ const uint MIN_WAVELENGTH = 390;
 const uint MAX_WAVELENGTH = 749;
 const uint NUM_WAVELENGTHS = MAX_WAVELENGTH - MIN_WAVELENGTH + 1;
 
-const float DX = 1.0;                              // m
+const float DX = 1.0;                               // m
 const float IDEAL_UNIVERSAL_GAS_CONSTANT = 8.31447; // J / (mol * K)
 
 uniform Planet planet;
 uniform SellmeierCoefficients sellmeierCoefficients;
+
+layout(std140, binding = 2) uniform AtmosphericLayers {
+    AtmosphericLayer[] atmosphericLayers;
+};
 
 layout(std430, binding = 0) buffer RefractiveIndices {
     float[][NUM_WAVELENGTHS] refractiveIndicesAtAltitudes; // DX steps
@@ -40,11 +46,17 @@ layout(std430, binding = 1) buffer Densities {
     float[] densitiesAtAltitudes;
 };
 
-layout (local_size_variable) in;
-
-// TODO replace with user defined SSBO lookup
 AtmosphericLayer layerAtAltitude(float altitude) {
-    if (altitude < 11000.0) {
+    for (uint i = 1; i < atmosphericLayers.length(); ++i) {
+        AtmosphericLayer layer = atmosphericLayers[i];
+
+        if (altitude < layer.baseHeight)
+            return atmosphericLayers[i - 1];
+    }
+
+    return atmosphericLayers[atmosphericLayers.length() - 1];
+
+    /*if (altitude < 11000.0) {
         return AtmosphericLayer(288.15, -0.0065, 1.2250, 0.0);
     } else if (altitude < 20000.0) {
         return AtmosphericLayer(216.65, 0.0, 0.36391, 11000.0);
@@ -52,7 +64,7 @@ AtmosphericLayer layerAtAltitude(float altitude) {
         return AtmosphericLayer(216.65, 0.001, 0.08803, 20000.0);
     } else {
         return AtmosphericLayer(228.65, 0.0028, 0.01322, 32000.0);
-    }
+    }*/
 }
 
 float densityAtAltitude(float altitude) {

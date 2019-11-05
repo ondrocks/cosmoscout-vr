@@ -134,7 +134,7 @@ GraphicsEngine::GraphicsEngine(std::shared_ptr<const core::Settings> const& sett
       if (it != settings->mBodyProperties.end() && it->second.atmosphere.has_value()) {
         auto props = it->second;
 
-        //graphics::AtmosphereEclipseShadowCaster(props);
+        auto a = graphics::AtmosphereEclipseShadowCaster(props);
 
         //mEclipseShadowCaster.emplace_back()
       }

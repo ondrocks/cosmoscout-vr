@@ -142,7 +142,7 @@ class CS_CORE_EXPORT Settings {
 
   /// DocTODO
   struct BodyProperties {
-    double                    gravity;       ///< m/s^2
+    std::optional<double>     gravity;       ///< m/s^2
     double                    semiMajorAxis; ///< m
     double                    meanRadius;    ///< m
     std::optional<Atmosphere> atmosphere;
