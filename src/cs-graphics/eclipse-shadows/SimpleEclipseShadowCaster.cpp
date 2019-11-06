@@ -6,6 +6,7 @@
 
 #include "SimpleEclipseShadowCaster.hpp"
 #include <cmath>
+#include <fstream>
 #include <glm/glm.hpp>
 
 #include "../../cs-utils/SimpleTexture.hpp"
@@ -14,6 +15,26 @@
 #include "Geometry.hpp"
 
 namespace cs::graphics {
+
+void saveGreyscale(const std::string& name, const utils::Texture4f& texture) {
+
+  std::ofstream output(name + ".pgm", std::ios::out | std::ios::trunc);
+
+  output << "P2 " << texture.mWidth << " " << texture.mHeight << " 255\n";
+
+  int linebreakCounter = 0;
+  for (int i = 0; i < texture.mWidth; ++i) {
+    for (int j = 0; j < texture.mHeight; ++j) {
+      output << static_cast<int>(texture.get(j, i).r * 255.0) << " ";
+
+      // pgm doesn't allow more then 70 characters per line. Every value uses up to 4 characters.
+      if (linebreakCounter++ == 16) {
+        output << "\n";
+        linebreakCounter = 0;
+      }
+    }
+  }
+}
 
 std::pair<cs::utils::Texture4f, double> generateShadowTexture(Body const& body) {
   const double shadowLength = TEX_SHADOW_LENGTH_FACTOR *
@@ -66,6 +87,8 @@ std::pair<cs::utils::Texture4f, double> generateShadowTexture(Body const& body) 
   for (auto&& task : tasks) {
     task.get();
   }
+
+  saveGreyscale("eclipse_shadow_" + std::to_string(body.meanRadius), texture);
 
   return {texture, xAxisScalingExponent};
 }

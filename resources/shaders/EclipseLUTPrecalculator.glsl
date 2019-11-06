@@ -34,7 +34,7 @@ const float IDEAL_UNIVERSAL_GAS_CONSTANT = 8.31447; // J / (mol * K)
 uniform Planet planet;
 uniform SellmeierCoefficients sellmeierCoefficients;
 
-layout(std140, binding = 2) buffer AtmosphericLayers {
+layout(std430, binding = 2) buffer AtmosphericLayers {
     AtmosphericLayer[] atmosphericLayers;
 };
 
@@ -47,7 +47,7 @@ layout(std430, binding = 1) buffer Densities {
 };
 
 AtmosphericLayer layerAtAltitude(float altitude) {
-    for (uint i = 1; i < atmosphericLayers.length(); ++i) {
+    /*for (uint i = 1; i < atmosphericLayers.length(); ++i) {
         AtmosphericLayer layer = atmosphericLayers[i];
 
         if (altitude < layer.baseHeight)
@@ -55,8 +55,8 @@ AtmosphericLayer layerAtAltitude(float altitude) {
     }
 
     return atmosphericLayers[atmosphericLayers.length() - 1];
-
-    /*if (altitude < 11000.0) {
+*/
+    if (altitude < 11000.0) {
         return AtmosphericLayer(288.15, -0.0065, 1.2250, 0.0);
     } else if (altitude < 20000.0) {
         return AtmosphericLayer(216.65, 0.0, 0.36391, 11000.0);
@@ -64,7 +64,7 @@ AtmosphericLayer layerAtAltitude(float altitude) {
         return AtmosphericLayer(216.65, 0.001, 0.08803, 20000.0);
     } else {
         return AtmosphericLayer(228.65, 0.0028, 0.01322, 32000.0);
-    }*/
+    }
 }
 
 float densityAtAltitude(float altitude) {
