@@ -58,15 +58,15 @@ PhotonAtmosphereTracer::~PhotonAtmosphereTracer() {
 }
 
 void PhotonAtmosphereTracer::traceThroughAtmosphere(
-    uint32_t ssboPhotons, size_t numPhotons, core::Settings::BodyProperties const& bodyProperties) {
-  auto [ssboRefractiveIndices, ssboDensities] = mLutPrecalculator->createLUT(bodyProperties);
+    uint32_t ssboPhotons, size_t numPhotons, BodyWithAtmosphere const& body) {
+  auto [ssboRefractiveIndices, ssboDensities] = mLutPrecalculator->createLUT(body);
 
   glUseProgram(mProgram);
 
-  glUniform1f(mUniforms.planetAtmosphericHeight, bodyProperties.atmosphere->height);
+  glUniform1f(mUniforms.planetAtmosphericHeight, body.atmosphere.height);
   glUniform1f(mUniforms.planetSeaLevelMolecularNumberDensity,
-      bodyProperties.atmosphere->seaLevelMolecularNumberDensity);
-  glUniform1f(mUniforms.planetRadius, bodyProperties.meanRadius);
+      body.atmosphere.seaLevelMolecularNumberDensity);
+  glUniform1f(mUniforms.planetRadius, body.meanRadius);
 
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssboPhotons);
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssboRefractiveIndices);

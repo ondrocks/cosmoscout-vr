@@ -7,7 +7,6 @@
 #ifndef CS_GRAPHICS_TEXTURE_TRACER_HPP
 #define CS_GRAPHICS_TEXTURE_TRACER_HPP
 
-#include "BodyWithAtmosphere.hpp"
 #include "EclipseConstants.hpp"
 #include <array>
 #include <cstddef>
@@ -19,8 +18,8 @@ namespace cs::graphics {
 class TextureTracer {
  public:
   virtual void                    init(){};
-  virtual std::vector<FloatPixel> traceThroughTexture(uint32_t ssboPhotons, size_t numPhotons,
-      core::Settings::BodyProperties const& bodyProperties) = 0;
+  virtual std::vector<FloatPixel> traceThroughTexture(
+      uint32_t ssboPhotons, size_t numPhotons, BodyWithAtmosphere const& body) = 0;
 };
 } // namespace cs::graphics
 

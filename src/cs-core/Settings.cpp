@@ -19,6 +19,7 @@ void from_json(const nlohmann::json& j, Settings::Anchor& o) {
   o.mFrame          = parseProperty<std::string>("frame", j);
   o.mStartExistence = parseProperty<std::string>("startExistence", j);
   o.mEndExistence   = parseProperty<std::string>("endExistence", j);
+  o.mShadow         = parseOptional<std::string>("shadow", j);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -91,6 +92,49 @@ void from_json(const nlohmann::json& j, Settings::SceneScale& o) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+void from_json(const nlohmann::json& j, Settings::SellmeierCoefficients& o) {
+  o.a     = parseProperty<double>("a", j);
+  o.terms = parseVector<std::pair<double, double>>("terms", j);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void from_json(const nlohmann::json& j, Settings::AtmosphereLayer& o) {
+  o.altitude             = parseProperty<double>("altitude", j);
+  o.baseTemperature      = parseProperty<double>("baseTemperature", j);
+  o.temperatureLapseRate = parseProperty<double>("temperatureLapseRate", j);
+  o.baseDensity          = parseProperty<double>("baseDensity", j);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void from_json(const nlohmann::json& j, Settings::Atmosphere& o) {
+  o.seaLevelMolecularNumberDensity = parseProperty<double>("seaLevelMolecularNumberDensity", j);
+  o.molarMass                      = parseProperty<double>("molarMass", j);
+  o.height                         = parseProperty<double>("height", j);
+
+  o.layers = parseVector<Settings::AtmosphereLayer>("layers", j);
+  o.sellmeierCoefficients =
+      parseSection<Settings::SellmeierCoefficients>("sellmeierCoefficients", j);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void from_json(const nlohmann::json& j, Settings::Orbit& o) {
+  o.semiMajorAxisSun = parseProperty<double>("semiMajorAxisSun", j);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void from_json(const nlohmann::json& j, Settings::BodyProperties& o) {
+  o.gravity    = parseOptional<double>("gravity", j);
+  o.meanRadius = parseProperty<double>("meanRadius", j);
+  o.orbit      = parseSection<Settings::Orbit>("orbit", j);
+  o.atmosphere = parseOptionalSection<Settings::Atmosphere>("atmosphere", j);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void from_json(const nlohmann::json& j, Settings& o) {
   o.mStartDate      = parseProperty<std::string>("startDate", j);
   o.mObserver       = parseSection<Settings::Observer>("observer", j);
@@ -112,6 +156,8 @@ void from_json(const nlohmann::json& j, Settings& o) {
 
   o.mEnableSensorSizeControl = parseProperty<bool>("enableSensorSizeControl", j);
   o.mEvents                  = parseVector<Settings::Event>("events", j);
+
+  o.mBodyProperties = parseMap<std::string, Settings::BodyProperties>("bodyProperties", j);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

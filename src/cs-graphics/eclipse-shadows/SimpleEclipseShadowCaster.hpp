@@ -7,18 +7,17 @@
 #ifndef CS_GRAPHICS_SIMPLE_ECLIPSE_SHADOW_CASTER_HPP
 #define CS_GRAPHICS_SIMPLE_ECLIPSE_SHADOW_CASTER_HPP
 
-#include "../../cs-core/Settings.hpp"
 #include "../../cs-utils/SimpleTexture.hpp"
+#include "BodyProperties.hpp"
 #include "EclipseShadowCaster.hpp"
 #include <utility>
 
 namespace cs::graphics {
-std::pair<cs::utils::Texture4f, double> generateShadowTexture(
-    core::Settings::BodyProperties const& bodyProperties);
+std::pair<cs::utils::Texture4f, double> generateShadowTexture(Body const& body);
 
 class SimpleEclipseShadowCaster : public EclipseShadowCaster {
  public:
-  SimpleEclipseShadowCaster(core::Settings::BodyProperties const& bodyProperties);
+  explicit SimpleEclipseShadowCaster(Body const& body);
   virtual ~SimpleEclipseShadowCaster();
 
   void bind(GLenum textureUnit) override;

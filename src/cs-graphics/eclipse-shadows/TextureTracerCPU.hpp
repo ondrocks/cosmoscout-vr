@@ -7,7 +7,7 @@
 #ifndef CS_GRAPHICS_TEXTURE_TRACER_CPU_HPP
 #define CS_GRAPHICS_TEXTURE_TRACER_CPU_HPP
 
-#include "../../cs-core/Settings.hpp"
+#include "BodyProperties.hpp"
 #include "TextureTracer.hpp"
 
 #include <cstddef>
@@ -17,8 +17,8 @@
 namespace cs::graphics {
 class TextureTracerCPU : public TextureTracer {
  public:
-  std::vector<FloatPixel> traceThroughTexture(uint32_t ssboPhotons, size_t numPhotons,
-      core::Settings::BodyProperties const& bodyProperties) override;
+  std::vector<FloatPixel> traceThroughTexture(
+      uint32_t ssboPhotons, size_t numPhotons, BodyWithAtmosphere const& body) override;
 };
 } // namespace cs::graphics
 

@@ -66,10 +66,9 @@ LUTPrecalculator::LUTPrecalculator() {
   glDeleteShader(precalculatorShader);
 }
 
-std::pair<uint32_t, uint32_t> LUTPrecalculator::createLUT(
-    core::Settings::BodyProperties const& bodyProperties) {
+std::pair<uint32_t, uint32_t> LUTPrecalculator::createLUT(BodyWithAtmosphere const& body) {
   const float DX        = 1.0;
-  auto        heightDim = static_cast<uint32_t>(bodyProperties.atmosphere->height / DX);
+  auto        heightDim = static_cast<uint32_t>(body.atmosphere.height / DX);
 
   size_t bufferSize = heightDim * NUM_WAVELENGTHS;
   auto   data       = std::vector<float>(bufferSize);
@@ -89,13 +88,13 @@ std::pair<uint32_t, uint32_t> LUTPrecalculator::createLUT(
   glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float) * heightDim, nullptr, GL_STATIC_READ);
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssboDensities);
 
-  glUniform1f(mUniforms.planet.uAtmosphericHeight, bodyProperties.atmosphere->height);
-  glUniform1f(mUniforms.planet.uGravity, static_cast<float>(*bodyProperties.gravity));
-  glUniform1f(mUniforms.planet.uMolarMass, bodyProperties.atmosphere->molarMass);
+  glUniform1f(mUniforms.planet.uAtmosphericHeight, body.atmosphere.height);
+  glUniform1f(mUniforms.planet.uGravity, static_cast<float>(body.gravity));
+  glUniform1f(mUniforms.planet.uMolarMass, body.atmosphere.molarMass);
   glUniform1f(mUniforms.planet.uSeaLevelMolecularNumberDensity,
-      bodyProperties.atmosphere->seaLevelMolecularNumberDensity);
+      body.atmosphere.seaLevelMolecularNumberDensity);
 
-  auto& coefficients = bodyProperties.atmosphere->sellmeierCoefficients;
+  auto& coefficients = body.atmosphere.sellmeierCoefficients;
   // glUniform1f(mUniforms.sellmeierCoefficients.uA, 8.06051 * 1e-5);
   glUniform1f(mUniforms.sellmeierCoefficients.uA, coefficients.a);
 
@@ -110,7 +109,13 @@ std::pair<uint32_t, uint32_t> LUTPrecalculator::createLUT(
         coefficients.terms[i].second);
   }
 
-  // TODO atmospheric layer data
+  uint32_t layerSSBO;
+  glGenBuffers(1, &layerSSBO);
+  glBindBuffer(GL_SHADER_STORAGE_BUFFER, layerSSBO);
+  glBufferData(GL_SHADER_STORAGE_BUFFER, body.atmosphere.layers.size() * sizeof(AtmosphereLayer),
+      body.atmosphere.layers.data(), GL_STATIC_READ);
+
+  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, layerSSBO);
 
   const uint32_t numThreadsX = 32;
   const uint32_t numThreadsY = 32;
@@ -126,6 +131,8 @@ std::pair<uint32_t, uint32_t> LUTPrecalculator::createLUT(
 
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
   glUseProgram(0);
+
+  glDeleteBuffers(1, &layerSSBO);
 
   return {ssboRefractiveIndices, ssboDensities};
 }

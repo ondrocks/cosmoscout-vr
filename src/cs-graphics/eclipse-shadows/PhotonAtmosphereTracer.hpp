@@ -20,8 +20,8 @@ class PhotonAtmosphereTracer {
 
   void init();
 
-  void traceThroughAtmosphere(uint32_t ssboPhotons, size_t numPhotons,
-                              core::Settings::BodyProperties const& bodyProperties);
+  void traceThroughAtmosphere(
+      uint32_t ssboPhotons, size_t numPhotons, BodyWithAtmosphere const& body);
 
   virtual ~PhotonAtmosphereTracer();
 

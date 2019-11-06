@@ -9,15 +9,13 @@
 
 namespace cs::graphics {
 
-AtmosphereEclipseShadowCaster::AtmosphereEclipseShadowCaster(
-    core::Settings::BodyProperties const& bodyProperties) {
-  mRadius = bodyProperties.meanRadius + bodyProperties.atmosphere->height;
+AtmosphereEclipseShadowCaster::AtmosphereEclipseShadowCaster(BodyWithAtmosphere const& body) {
+  mRadius = body.meanRadius + body.atmosphere.height;
 
   AtmosphereEclipseTextureGenerator textureGenerator{};
 
   // TODO photon count
-  auto [texture, xScalingExponent] =
-      textureGenerator.createShadowMap(bodyProperties, 1'000'000);
+  auto [texture, xScalingExponent] = textureGenerator.createShadowMap(body, 1'000'000);
 
   mScalingExponent = xScalingExponent;
 

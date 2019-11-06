@@ -15,16 +15,15 @@
 
 namespace cs::graphics {
 
-std::pair<cs::utils::Texture4f, double> generateShadowTexture(
-    core::Settings::BodyProperties const& bodyProperties) {
+std::pair<cs::utils::Texture4f, double> generateShadowTexture(Body const& body) {
   const double shadowLength = TEX_SHADOW_LENGTH_FACTOR *
-                              (bodyProperties.semiMajorAxis * bodyProperties.meanRadius) /
-                              (SUN_RADIUS - bodyProperties.meanRadius);
+                              (body.orbit.semiMajorAxisSun * body.meanRadius) /
+                              (SUN_RADIUS - body.meanRadius);
 
   const double xAxisScalingExponent =
       std::log(shadowLength) / std::log(static_cast<double>(TEX_WIDTH));
 
-  const double pixSize = bodyProperties.meanRadius / (TEX_HEIGHT / TEX_HEIGHT_TO_RADIUS_FACTOR);
+  const double pixSize = body.meanRadius / (TEX_HEIGHT / TEX_HEIGHT_TO_RADIUS_FACTOR);
 
   cs::utils::Texture4f texture(TEX_WIDTH, TEX_HEIGHT);
 
@@ -39,9 +38,9 @@ std::pair<cs::utils::Texture4f, double> generateShadowTexture(
         const glm::dvec2 pixelPositionRelPlanetNorm = glm::normalize(pixelPositionRelPlanet);
         const double     pixelDistanceToPlanet      = glm::length(pixelPositionRelPlanet);
         const double     planetAngularRadius =
-            angularRadOfSphere(pixelDistanceToPlanet, bodyProperties.meanRadius);
+            angularRadOfSphere(pixelDistanceToPlanet, body.meanRadius);
 
-        const glm::dvec2 pixelPositionRelSun(bodyProperties.semiMajorAxis + xx, y * pixSize);
+        const glm::dvec2 pixelPositionRelSun(body.orbit.semiMajorAxisSun + xx, y * pixSize);
         const glm::dvec2 pixelPositionRelSunNorm = glm::normalize(pixelPositionRelSun);
         const double     pixelDistanceToSun      = glm::length(pixelPositionRelSun);
         const double     sunAngularRadius = angularRadOfSphere(pixelDistanceToSun, SUN_RADIUS);
@@ -71,10 +70,9 @@ std::pair<cs::utils::Texture4f, double> generateShadowTexture(
   return {texture, xAxisScalingExponent};
 }
 
-SimpleEclipseShadowCaster::SimpleEclipseShadowCaster(
-    core::Settings::BodyProperties const& bodyProperties) {
-  mRadius                           = bodyProperties.meanRadius;
-  auto [shadowTex, scalingExponent] = generateShadowTexture(bodyProperties);
+SimpleEclipseShadowCaster::SimpleEclipseShadowCaster(Body const& body) {
+  mRadius                           = body.meanRadius;
+  auto [shadowTex, scalingExponent] = generateShadowTexture(body);
   mScalingExponent                  = scalingExponent;
 
   glGenTextures(1, &mShadowTexture);

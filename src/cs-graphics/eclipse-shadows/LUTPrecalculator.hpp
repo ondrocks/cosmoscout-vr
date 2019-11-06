@@ -7,7 +7,7 @@
 #ifndef CS_GRAPHICS_REFRACTIVE_INDEX_PRECALCULATOR_HPP
 #define CS_GRAPHICS_REFRACTIVE_INDEX_PRECALCULATOR_HPP
 
-#include "../../cs-core/Settings.hpp"
+#include "BodyProperties.hpp"
 #include <cstdint>
 #include <utility>
 
@@ -17,7 +17,7 @@ class LUTPrecalculator {
  public:
   LUTPrecalculator();
 
-  std::pair<uint32_t, uint32_t> createLUT(core::Settings::BodyProperties const& bodyProperties);
+  std::pair<uint32_t, uint32_t> createLUT(BodyWithAtmosphere const& body);
 
   virtual ~LUTPrecalculator();
 

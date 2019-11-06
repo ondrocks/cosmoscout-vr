@@ -12,10 +12,10 @@ struct Planet {
 };
 
 struct AtmosphericLayer {
+    float baseHeight;           // m
     float baseTemperature;      // K
     float temperatureLapseRate; // K / m
     float baseDensity;          // kg/m^3
-    float baseHeight;           // m
 };
 
 struct SellmeierCoefficients {
@@ -34,7 +34,7 @@ const float IDEAL_UNIVERSAL_GAS_CONSTANT = 8.31447; // J / (mol * K)
 uniform Planet planet;
 uniform SellmeierCoefficients sellmeierCoefficients;
 
-layout(std140, binding = 2) uniform AtmosphericLayers {
+layout(std140, binding = 2) buffer AtmosphericLayers {
     AtmosphericLayer[] atmosphericLayers;
 };
 

@@ -57,13 +57,14 @@ class CS_CORE_EXPORT GraphicsEngine {
   utils::Property<float> pApproximateSceneBrightness = 1.f;
   utils::Property<float> pAverageLuminance           = 1.f;
 
-  GraphicsEngine(std::shared_ptr<const Settings> const& settings);
+  explicit GraphicsEngine(std::shared_ptr<const Settings> const& settings);
 
   /// All objects which are able to cast shadows need to be registered.
   void registerCaster(graphics::ShadowCaster* caster);
   void unregisterCaster(graphics::ShadowCaster* caster);
 
-  std::vector<std::unique_ptr<graphics::EclipseShadowCaster>> const& getEclipseShadowCaster() const;
+  std::unordered_map<std::string, std::unique_ptr<graphics::EclipseShadowCaster>> const&
+  getEclipseShadowCaster() const;
 
   /// The light direction in world space.
   void update(glm::vec3 const& sunDirection);
@@ -80,7 +81,8 @@ class CS_CORE_EXPORT GraphicsEngine {
   std::shared_ptr<graphics::ClearHDRBufferNode> mClearNode;
   std::shared_ptr<graphics::ToneMappingNode>    mToneMappingNode;
 
-  std::vector<std::unique_ptr<graphics::EclipseShadowCaster>> mEclipseShadowCaster;
+  std::unordered_map<std::string, std::unique_ptr<graphics::EclipseShadowCaster>>
+      mEclipseShadowCaster;
 };
 
 } // namespace cs::core

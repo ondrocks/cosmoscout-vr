@@ -7,8 +7,8 @@
 #ifndef CS_GRAPHICS_ATMOSPHERE_ECLIPSE_SHADOW_GENERATOR_HPP
 #define CS_GRAPHICS_ATMOSPHERE_ECLIPSE_SHADOW_GENERATOR_HPP
 
-#include "../../cs-core/Settings.hpp"
 #include "../../cs-utils/SimpleTexture.hpp"
+#include "BodyProperties.hpp"
 #include "ColorConverter.hpp"
 #include "Photon.hpp"
 #include "PhotonAtmosphereTracer.hpp"
@@ -20,7 +20,8 @@ class AtmosphereEclipseTextureGenerator {
  public:
   AtmosphereEclipseTextureGenerator();
 
-  std::pair<cs::utils::Texture4f, double> createShadowMap(core::Settings::BodyProperties const& bodyProperties, size_t photonCount);
+  std::pair<cs::utils::Texture4f, double> createShadowMap(
+      BodyWithAtmosphere const& body, size_t photonCount);
 
  private:
   /// Generates a point on one half of the suns surface:
@@ -31,8 +32,8 @@ class AtmosphereEclipseTextureGenerator {
   ///       o
   /// o  o
   glm::dvec2           randomPointOnSunSurface(double sunPositionX);
-  PhotonF              emitPhoton(core::Settings::BodyProperties const& bodyProperties);
-  std::vector<PhotonF> generatePhotons(uint32_t count, core::Settings::BodyProperties const& bodyProperties);
+  PhotonF              emitPhoton(BodyWithAtmosphere const& body);
+  std::vector<PhotonF> generatePhotons(uint32_t count, BodyWithAtmosphere const& body);
 
   std::mt19937_64                         mRNG;
   std::uniform_int_distribution<uint32_t> mDistributionWavelength;

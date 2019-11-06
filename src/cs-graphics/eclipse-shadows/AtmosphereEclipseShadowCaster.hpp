@@ -8,12 +8,12 @@
 #define CS_GRAPHICS_ATMOSPHERE_ECLIPSE_SHADOW_CASTER_HPP
 
 #include "EclipseShadowCaster.hpp"
-#include "../../cs-core/Settings.hpp"
+#include "BodyProperties.hpp"
 
 namespace cs::graphics {
 class AtmosphereEclipseShadowCaster : public EclipseShadowCaster {
  public:
-  explicit AtmosphereEclipseShadowCaster(core::Settings::BodyProperties const& bodyProperties);
+  explicit AtmosphereEclipseShadowCaster(BodyWithAtmosphere const& body);
   virtual ~AtmosphereEclipseShadowCaster();
 
   void bind(GLenum textureUnit) override;

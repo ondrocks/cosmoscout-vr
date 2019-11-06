@@ -10,6 +10,7 @@
 #include "../cs-graphics/HDRBuffer.hpp"
 #include "../cs-graphics/ToneMappingNode.hpp"
 #include "../cs-graphics/eclipse-shadows/AtmosphereEclipseShadowCaster.hpp"
+#include "../cs-graphics/eclipse-shadows/SimpleEclipseShadowCaster.hpp"
 #include "../cs-utils/utils.hpp"
 
 #include <VistaKernel/DisplayManager/VistaDisplayManager.h>
@@ -129,14 +130,42 @@ GraphicsEngine::GraphicsEngine(std::shared_ptr<const core::Settings> const& sett
   pEnableHDR.touch();
 
   for (const auto& [name, anchor] : settings->mAnchors) {
+
+
     if (anchor.mShadow && anchor.mShadow.value() == "eclipse") {
       auto it = settings->mBodyProperties.find(name);
-      if (it != settings->mBodyProperties.end() && it->second.atmosphere.has_value()) {
+      if (it != settings->mBodyProperties.end() && it->second.atmosphere.has_value() &&
+          it->second.gravity.has_value()) {
         auto props = it->second;
 
-        auto a = graphics::AtmosphereEclipseShadowCaster(props);
+        std::vector<graphics::AtmosphereLayer> layers(props.atmosphere->layers.size());
+        for (size_t i = 0; i < props.atmosphere->layers.size(); ++i) {
+          layers[i] = {props.atmosphere->layers[i].altitude,
+              props.atmosphere->layers[i].baseTemperature,
+              props.atmosphere->layers[i].temperatureLapseRate,
+              props.atmosphere->layers[i].baseDensity};
+        }
 
-        //mEclipseShadowCaster.emplace_back()
+        /*auto a = graphics::AtmosphereEclipseShadowCaster(
+            {*props.gravity, props.meanRadius, {props.orbit.semiMajorAxisSun},
+                {props.atmosphere->seaLevelMolecularNumberDensity, props.atmosphere->molarMass,
+                    props.atmosphere->height, layers,
+                    {props.atmosphere->sellmeierCoefficients.a,
+                        props.atmosphere->sellmeierCoefficients.terms}}});*/
+
+        mEclipseShadowCaster.emplace(name,
+            std::make_unique<graphics::AtmosphereEclipseShadowCaster>(graphics::BodyWithAtmosphere{
+                *props.gravity, props.meanRadius, {props.orbit.semiMajorAxisSun},
+                {props.atmosphere->seaLevelMolecularNumberDensity, props.atmosphere->molarMass,
+                    props.atmosphere->height, layers,
+                    {props.atmosphere->sellmeierCoefficients.a,
+                        props.atmosphere->sellmeierCoefficients.terms}}}));
+
+      } else if (it != settings->mBodyProperties.end()) {
+        auto props = it->second;
+        mEclipseShadowCaster.emplace(
+            name, std::make_unique<graphics::SimpleEclipseShadowCaster>(
+                      graphics::Body{props.meanRadius, {props.orbit.semiMajorAxisSun}}));
       }
     }
   }
@@ -218,7 +247,8 @@ void GraphicsEngine::calculateCascades() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::vector<std::unique_ptr<graphics::EclipseShadowCaster>> const& GraphicsEngine::getEclipseShadowCaster() const {
+std::unordered_map<std::string, std::unique_ptr<graphics::EclipseShadowCaster>> const&
+GraphicsEngine::getEclipseShadowCaster() const {
   return mEclipseShadowCaster;
 }
 

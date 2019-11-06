@@ -25,15 +25,16 @@ void operator+=(std::atomic<double>& atomic, double value) {
   } while (!atomic.compare_exchange_strong(old, old + value));
 }
 
-std::vector<FloatPixel> TextureTracerCPU::traceThroughTexture(uint32_t ssboPhotons,
-    size_t numPhotons, core::Settings::BodyProperties const& bodyProperties) {
-  const double atmosphericRadius = bodyProperties.meanRadius + bodyProperties.atmosphere->height;
+std::vector<FloatPixel> TextureTracerCPU::traceThroughTexture(
+    uint32_t ssboPhotons, size_t numPhotons, BodyWithAtmosphere const& body) {
+  const double atmosphericRadius = body.meanRadius + body.atmosphere.height;
   const double rectangleHeight =
       atmosphericRadius * TEX_HEIGHT_TO_RADIUS_FACTOR / static_cast<double>(TEX_HEIGHT);
 
   const double shadowHeight = atmosphericRadius * TEX_HEIGHT_TO_RADIUS_FACTOR;
 
-  const double shadowLength = TEX_SHADOW_LENGTH_FACTOR * (bodyProperties.semiMajorAxis * atmosphericRadius) /
+  const double shadowLength = TEX_SHADOW_LENGTH_FACTOR *
+                              (body.orbit.semiMajorAxisSun * atmosphericRadius) /
                               (SUN_RADIUS - atmosphericRadius);
 
   const double xAxisScalingFactor =
@@ -192,7 +193,7 @@ std::vector<FloatPixel> TextureTracerCPU::traceThroughTexture(uint32_t ssboPhoto
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboPhotons);
   glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(PhotonF) * photons.size(), photons.data());
 
-  const double pixelInAtmosphere = bodyProperties.atmosphere->height / rectangleHeight;
+  const double pixelInAtmosphere = body.atmosphere.height / rectangleHeight;
   const double photonsPerPixel   = photons.size() / pixelInAtmosphere;
 
   std::vector<std::future<void>> photonTasks(photons.size());

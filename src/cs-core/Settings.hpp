@@ -17,6 +17,7 @@
 #include <map>
 #include <optional>
 #include <string>
+#include <variant>
 #include <vector>
 
 namespace nlohmann {
@@ -43,7 +44,6 @@ struct adl_serializer<std::optional<T>> {
     }
   }
 };
-
 } // namespace nlohmann
 
 namespace cs::core {
@@ -141,10 +141,18 @@ class CS_CORE_EXPORT Settings {
   };
 
   /// DocTODO
+  struct Orbit {
+    // double perihelion;    ///< m
+    // double aphelion;      ///< m
+    double semiMajorAxisSun; ///< m
+    // double eccentricity;
+  };
+
+  /// DocTODO
   struct BodyProperties {
-    std::optional<double>     gravity;       ///< m/s^2
-    double                    semiMajorAxis; ///< m
-    double                    meanRadius;    ///< m
+    std::optional<double>     gravity;    ///< m/s^2
+    double                    meanRadius; ///< m
+    Orbit                     orbit;      ///< m
     std::optional<Atmosphere> atmosphere;
   };
 
