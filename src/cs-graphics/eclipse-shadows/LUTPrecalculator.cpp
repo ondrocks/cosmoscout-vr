@@ -9,13 +9,25 @@
 #include "EclipseConstants.hpp"
 #include <GL/glew.h>
 #include <array>
-#include <glm/glm.hpp>
 #include <iostream>
 #include <vector>
 
 namespace cs::graphics {
 
+void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity,
+    GLsizei length, const GLchar* message, const void* userParam) {
+  if (type == GL_DEBUG_TYPE_ERROR)
+    fprintf(
+        stderr, "GL ERROR: type = 0x%x, severity = 0x%x, message = %s\n", type, severity, message);
+  else
+    fprintf(stdout, "GL WARNING: type = 0x%x, severity = 0x%x, message = %s\n", type, severity,
+        message);
+}
+
 LUTPrecalculator::LUTPrecalculator() {
+  glEnable(GL_DEBUG_OUTPUT);
+  glDebugMessageCallback(MessageCallback, nullptr);
+
   mProgram                        = glCreateProgram();
   uint32_t    precalculatorShader = glCreateShader(GL_COMPUTE_SHADER);
   std::string shaderCode          = cs::utils::filesystem::loadToString(
@@ -51,8 +63,6 @@ LUTPrecalculator::LUTPrecalculator() {
   mUniforms.planet.uAtmosphericHeight = glGetUniformLocation(mProgram, "planet.atmosphericHeight");
   mUniforms.planet.uGravity   = glGetUniformLocation(mProgram, "planet.gravitationAcceleration");
   mUniforms.planet.uMolarMass = glGetUniformLocation(mProgram, "planet.molarMass");
-  mUniforms.planet.uSeaLevelMolecularNumberDensity =
-      glGetUniformLocation(mProgram, "planet.seaLevelMolecularNumber");
 
   mUniforms.sellmeierCoefficients.uA = glGetUniformLocation(mProgram, "sellmeierCoefficients.a");
   mUniforms.sellmeierCoefficients.uNumTerms =
@@ -64,6 +74,9 @@ LUTPrecalculator::LUTPrecalculator() {
 
   glDetachShader(mProgram, precalculatorShader);
   glDeleteShader(precalculatorShader);
+
+  glDisable(GL_DEBUG_OUTPUT);
+  glDebugMessageCallback(nullptr, nullptr);
 }
 
 std::pair<uint32_t, uint32_t> LUTPrecalculator::createLUT(BodyWithAtmosphere const& body) {
@@ -91,8 +104,6 @@ std::pair<uint32_t, uint32_t> LUTPrecalculator::createLUT(BodyWithAtmosphere con
   glUniform1f(mUniforms.planet.uAtmosphericHeight, body.atmosphere.height);
   glUniform1f(mUniforms.planet.uGravity, static_cast<float>(body.gravity));
   glUniform1f(mUniforms.planet.uMolarMass, body.atmosphere.molarMass);
-  glUniform1f(mUniforms.planet.uSeaLevelMolecularNumberDensity,
-      body.atmosphere.seaLevelMolecularNumberDensity);
 
   auto& coefficients = body.atmosphere.sellmeierCoefficients;
   // glUniform1f(mUniforms.sellmeierCoefficients.uA, 8.06051 * 1e-5);
@@ -133,6 +144,20 @@ std::pair<uint32_t, uint32_t> LUTPrecalculator::createLUT(BodyWithAtmosphere con
   glUseProgram(0);
 
   glDeleteBuffers(1, &layerSSBO);
+
+  /*std::cout << body << "\n" << std::endl;
+
+  for (int h = 0; h < body.atmosphere.height; h += 10000) {
+    std::cout << "Height: " << h * DX << std::endl;
+    std::cout << "Density: " << densities[h] << std::endl;
+    for (int w = 0; w < NUM_WAVELENGTHS; w += 10) {
+      int idx = h * NUM_WAVELENGTHS + w;
+      printf("%.8f, ", data[idx]);
+    }
+    std::cout << std::endl;
+  }
+
+  std::exit(0);*/
 
   return {ssboRefractiveIndices, ssboDensities};
 }

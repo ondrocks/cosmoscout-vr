@@ -7,6 +7,7 @@
 #ifndef CS_GRAPHICS_BODY_PROPERTIES_HPP
 #define CS_GRAPHICS_BODY_PROPERTIES_HPP
 
+#include <ostream>
 #include <utility>
 #include <vector>
 
@@ -14,46 +15,87 @@ namespace cs::graphics {
 
 /// DocTODO
 struct AtmosphereLayer {
-  double altitude;             ///< m
-  double baseTemperature;      ///< K
-  double temperatureLapseRate; ///< K/m
-  double baseDensity;          ///< kg/m^3
+  float altitude;             ///< m
+  float baseTemperature;      ///< K
+  float temperatureLapseRate; ///< K/m
+  float baseDensity;          ///< kg/m^3
+
+  friend std::ostream& operator<<(std::ostream& os, const AtmosphereLayer& layer) {
+    os << "{altitude: " << layer.altitude << " baseTemperature: " << layer.baseTemperature
+       << " temperatureLapseRate: " << layer.temperatureLapseRate
+       << " baseDensity: " << layer.baseDensity << "}";
+    return os;
+  }
 };
 
 /// DocTODO
 struct SellmeierCoefficients {
-  double                                 a;
-  std::vector<std::pair<double, double>> terms;
+  float                                 a;
+  std::vector<std::pair<float, float>> terms;
+
+  friend std::ostream& operator<<(std::ostream& os, const SellmeierCoefficients& coefficients) {
+    os << "{a: " << coefficients.a << " terms: [";
+    for (const auto& term : coefficients.terms) {
+      os << "{" << term.first << ", " << term.second << "}, ";
+    }
+    os << "]}";
+    return os;
+  }
 };
 
 /// DocTODO
 struct Atmosphere {
-  double                       seaLevelMolecularNumberDensity; ///< cm^-3
-  double                       molarMass;                      ///< kg/mol
-  double                       height;                         ///< m
+  float                       seaLevelMolecularNumberDensity; ///< cm^-3
+  float                       molarMass;                      ///< kg/mol
+  float                       height;                         ///< m
   std::vector<AtmosphereLayer> layers;
   SellmeierCoefficients        sellmeierCoefficients;
+
+  friend std::ostream& operator<<(std::ostream& os, const Atmosphere& atmosphere) {
+    os << "{seaLevelMolecularNumberDensity: " << atmosphere.seaLevelMolecularNumberDensity
+       << " molarMass: " << atmosphere.molarMass << " height: " << atmosphere.height
+       << " layers: [";
+
+    for (const auto& layer : atmosphere.layers) {
+      os << layer << ", ";
+    }
+
+    os << "] sellmeierCoefficients: " << atmosphere.sellmeierCoefficients << "}";
+    return os;
+  }
 };
 
 /// DocTODO
 struct Orbit {
   // double perihelion;    ///< m
   // double aphelion;      ///< m
-  double semiMajorAxisSun; ///< m
+  float semiMajorAxisSun; ///< m
   // double eccentricity;
+
+  friend std::ostream& operator<<(std::ostream& os, const Orbit& orbit) {
+    os << "semiMajorAxisSun: " << orbit.semiMajorAxisSun;
+    return os;
+  }
 };
 
 struct Body {
-  double meanRadius;
+  float meanRadius;
   Orbit orbit;
 };
 
 struct BodyWithAtmosphere {
-  double gravity;
-  double meanRadius;
+  float gravity;
+  float meanRadius;
   Orbit orbit;
   Atmosphere atmosphere;
+
+  friend std::ostream& operator<<(std::ostream& os, const BodyWithAtmosphere& atmosphere) {
+    os << "gravity: " << atmosphere.gravity << " meanRadius: " << atmosphere.meanRadius
+       << " orbit: " << atmosphere.orbit << " atmosphere: " << atmosphere.atmosphere;
+    return os;
+  }
 };
+
 }
 
 #endif // CS_GRAPHICS_BODY_PROPERTIES_HPP

@@ -24,16 +24,15 @@ class LUTPrecalculator {
  private:
   struct Uniforms {
     struct {
-      uint32_t uAtmosphericHeight;
-      uint32_t uGravity;
-      uint32_t uMolarMass;
-      uint32_t uSeaLevelMolecularNumberDensity;
+      int32_t uAtmosphericHeight;
+      int32_t uGravity;
+      int32_t uMolarMass;
     } planet;
 
     struct {
-      uint32_t uA;
-      uint32_t uNumTerms;
-      uint32_t uTerms[8];
+      int32_t uA;
+      int32_t uNumTerms;
+      int32_t uTerms[8];
     } sellmeierCoefficients;
 
   } mUniforms;

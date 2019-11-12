@@ -2,13 +2,10 @@
 
 #extension GL_ARB_compute_variable_group_size: enable
 
-layout (local_size_variable) in;
-
 struct Planet {
     float atmosphericHeight;              // m
     float gravitationAcceleration;        // m/s^2
     float molarMass;                      // kg / mol
-    float seaLevelMolecularNumberDensity; // cm^−3
 };
 
 struct AtmosphericLayer {
@@ -46,8 +43,10 @@ layout(std430, binding = 1) buffer Densities {
     float[] densitiesAtAltitudes;
 };
 
+layout (local_size_variable) in;
+
 AtmosphericLayer layerAtAltitude(float altitude) {
-    /*for (uint i = 1; i < atmosphericLayers.length(); ++i) {
+    for (uint i = 1; i < atmosphericLayers.length(); ++i) {
         AtmosphericLayer layer = atmosphericLayers[i];
 
         if (altitude < layer.baseHeight)
@@ -55,16 +54,16 @@ AtmosphericLayer layerAtAltitude(float altitude) {
     }
 
     return atmosphericLayers[atmosphericLayers.length() - 1];
-*/
-    if (altitude < 11000.0) {
-        return AtmosphericLayer(288.15, -0.0065, 1.2250, 0.0);
+
+    /*if (altitude < 11000.0) {
+        return AtmosphericLayer(0.0, 288.15, -0.0065, 1.2250);
     } else if (altitude < 20000.0) {
-        return AtmosphericLayer(216.65, 0.0, 0.36391, 11000.0);
+        return AtmosphericLayer(11000.0, 216.65, 0.0, 0.36391);
     } else if (altitude < 32000.0) {
-        return AtmosphericLayer(216.65, 0.001, 0.08803, 20000.0);
+        return AtmosphericLayer(20000.0, 216.65, 0.001, 0.08803);
     } else {
-        return AtmosphericLayer(228.65, 0.0028, 0.01322, 32000.0);
-    }
+        return AtmosphericLayer(32000.0, 228.65, 0.0028, 0.01322);
+    }*/
 }
 
 float densityAtAltitude(float altitude) {
