@@ -171,6 +171,10 @@ double angularRadOfSphereD(double distance, double radius) {
     return asind(radius / distance);
 }
 
+float angularRadOfSphere(float distance, float radius) {
+    return asin(radius / distance);
+}
+
 double angleD(dvec3 v1, dvec3 v2) {
     double a = length(v1);
     double b = length(v2);
@@ -187,6 +191,24 @@ double angleD(dvec3 v1, dvec3 v2) {
     double bot = (a + (b + c)) * ((a - c) + b);
 
     return 2.0LF * atan2d(sqrt(top), sqrt(bot));
+}
+
+float angle(vec3 v1, vec3 v2) {
+    float a = length(v1);
+    float b = length(v2);
+    float c = length(v1 - v2);
+
+    float mu;
+    if (b >= c) {
+        mu = c - (a - b);
+    } else {
+        mu = b - (a - c);
+    }
+
+    float top = ((a - b) + c) * mu;
+    float bot = (a + (b + c)) * ((a - c) + b);
+
+    return 2.0 * atan(sqrt(top), sqrt(bot));
 }
 
 float calcEclipseApprox(vec4 occludingBody, vec3 fragmentPosition) {
@@ -314,4 +336,4 @@ vec3 applyEclipseShadows(vec3 fragmentPosition, vec3 fragmentNormal) {
     return light;
 }
 
-#endif// CS_ECLIPSE_SHADOWS_GLSL
+#endif // CS_ECLIPSE_SHADOWS_GLSL

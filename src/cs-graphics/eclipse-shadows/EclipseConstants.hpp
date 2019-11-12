@@ -23,7 +23,7 @@ double const TEX_SHADOW_LENGTH_FACTOR    = 8.0;
 // TODO make configurable
 uint32_t const TEX_WIDTH  = 512u;
 uint32_t const TEX_HEIGHT = TEX_WIDTH;
-uint32_t const NUM_PHOTONS = 1'000'000;
+uint32_t const NUM_PHOTONS = 100'000;
 
 struct FloatPixel {
   std::array<float, NUM_WAVELENGTHS> intensitiesAtWavelengths;

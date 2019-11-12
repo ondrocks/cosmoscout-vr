@@ -34,6 +34,17 @@
                 "planet": "Moon",
                 "place": "3.635° E 26.133° S 10.0 Tsd km"
             }
+        },
+        {
+            "id": "2",
+            "content": "Eclipse Jupiter",
+            "start": "2015-01-24T05:01:00",
+            "description": "Io and Callisto cast their shadows on Jupiter.",
+            "style": "border-color: yellow",
+            "location": {
+                "planet": "Jupiter",
+                "place": "30.24° E 0.54° N 381.0 Tsd km"
+            }
         }
     ],
     "spiceKernel": "../share/config/spice/vrdata.txt",
@@ -117,6 +128,20 @@
         "Jupiter": {
             "center": "Jupiter",
             "frame": "IAU_Jupiter",
+            "startExistence": "1950-01-02 00:00:00.000",
+            "endExistence": "2049-12-31 00:00:00.000",
+            "shadow": "eclipse"
+        },
+        "Io": {
+            "center": "Io",
+            "frame": "IAU_Io",
+            "startExistence": "1950-01-02 00:00:00.000",
+            "endExistence": "2049-12-31 00:00:00.000",
+            "shadow": "eclipse"
+        },
+        "Callisto": {
+            "center": "Callisto",
+            "frame": "IAU_Callisto",
             "startExistence": "1950-01-02 00:00:00.000",
             "endExistence": "2049-12-31 00:00:00.000",
             "shadow": "eclipse"
@@ -307,6 +332,20 @@
             }
         },
 
+        "Io": {
+            "meanRadius": 1821600.0,
+            "orbit": {
+                "semiMajorAxisSun": 778570000000.0
+            }
+        },
+
+        "Callisto": {
+            "meanRadius": 2410300.0,
+            "orbit": {
+                "semiMajorAxisSun": 778570000000.0
+            }
+        },
+
         "Saturn": {
             "meanRadius": 58232000.0,
             "orbit": {
@@ -350,7 +389,7 @@
         }
     },
     "plugins": {
-        "csp-stars": {
+        "#csp-stars": {
             "backgroundColor1": [
                 0.5,
                 0.8,
@@ -660,7 +699,7 @@
                 }
             }
         },
-        "csp-atmospheres": {
+        "#csp-atmospheres": {
             "atmospheres": {
                 "Mars": {
                     "atmosphereHeight": 0.03,
@@ -708,7 +747,7 @@
                 "numSamples": 256
             }
         },
-        "csp-sharad": {
+        "#csp-sharad": {
             "filePath": "/vr_data/temp/CrossDrive_FinalWorkshop/sharad/"
         },
         "csp-simple-bodies": {
@@ -725,6 +764,12 @@
                 "Jupiter": {
                     "texture": "../share/resources/textures/jupiter.jpg"
                 },
+                "Io": {
+                    "texture": "../share/resources/textures/io.jpg"
+                },
+                "Callisto": {
+                    "texture": "../share/resources/textures/callisto.jpg"
+                },
                 "Saturn": {
                     "texture": "../share/resources/textures/saturn.jpg"
                 },
@@ -739,7 +784,7 @@
                 }
             }
         },
-        "csp-satellites": {
+        "#csp-satellites": {
             "satellites": {
                 "Mars Express": {
                     "modelFile": "/vr_data/Geometry/DLR/MEX/mex.glb",
