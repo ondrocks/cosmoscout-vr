@@ -13,6 +13,7 @@
 #include "../cs-core/GraphicsEngine.hpp"
 #include "../cs-core/SolarSystem.hpp"
 #include "../cs-scene/CelestialObject.hpp"
+#include "eclipse-shadows/EclipseConstants.hpp"
 
 namespace cs::graphics {
 
@@ -55,8 +56,6 @@ void EclipseShadowReceiver::initUniforms(VistaGLSLShader const& shader) {
         shader.GetProgram(), ("uBodyShadowNormals[" + std::to_string(i) + "]").c_str());
   }
 }
-
-const double TEX_SHADOW_LENGTH_FACTOR = 8.0;
 
 void EclipseShadowReceiver::setupRender(
     VistaGLSLShader& shader, EclipseCalcType eclipseCalcType, int textureOffset) {

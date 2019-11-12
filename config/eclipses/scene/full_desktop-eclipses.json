@@ -45,6 +45,28 @@
                 "planet": "Jupiter",
                 "place": "30.24° E 0.54° N 381.0 Tsd km"
             }
+        },
+        {
+            "id": "3",
+            "content": "Solar Eclipse Sahara",
+            "start": "2006-03-29T10:10:00",
+            "description": "A solar eclipse.",
+            "style": "border-color: yellow",
+            "location": {
+                "planet": "Earth",
+                "place": "0.0° E 0.0° N 22.0 Tsd km"
+            }
+        },
+        {
+            "id": "4",
+            "content": "Lunar Eclipse",
+            "start": "2019-01-21T03:15:00",
+            "description": "A lunar eclipse.",
+            "style": "border-color: yellow",
+            "location": {
+                "planet": "Moon",
+                "place": "9.0° E 6.0° N 5.389 Tsd km"
+            }
         }
     ],
     "spiceKernel": "../share/config/spice/vrdata.txt",
@@ -415,7 +437,7 @@
             "hipparcosCatalog": "/vr_data/Context/Stars/hip_main.dat",
             "tycho2Catalog": "/vr_data/Context/Stars/tyc2_main.dat"
         },
-        "csp-lod-bodies": {
+        "#csp-lod-bodies": {
             "maxGPUTilesColor": 2048,
             "maxGPUTilesGray": 2048,
             "maxGPUTilesDEM": 2048,
@@ -733,7 +755,7 @@
                 }
             }
         },
-        "csp-measurement-tools": {
+        "#csp-measurement-tools": {
             "polygon": {
                 "heightDiff": 1.002,
                 "maxAttempt": 5,
@@ -760,6 +782,12 @@
                 },
                 "Venus": {
                     "texture": "../share/resources/textures/venus.jpg"
+                },
+                "Earth": {
+                    "texture": "../share/resources/textures/earth.jpg"
+                },
+                "Moon": {
+                    "texture": "../share/resources/textures/moon.jpg"
                 },
                 "Jupiter": {
                     "texture": "../share/resources/textures/jupiter.jpg"
