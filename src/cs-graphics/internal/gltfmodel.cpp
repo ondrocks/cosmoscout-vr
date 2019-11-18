@@ -565,7 +565,6 @@ GLProgramInfo getProgramInfo(unsigned int program) {
   info.u_FarClip_loc                 = glGetUniformLocation(program, "u_FarClip");
 
   auto usTexs   = get_active_uniforms(program);
-  info.uniforms = usTexs.first;
   info.textures = usTexs.second;
 
   glUseProgram(0);
@@ -761,7 +760,7 @@ gli::texture_cube prefilterCubemapGGX(gli::texture_cube const& inputCubemap, std
       for (std::size_t face = 0; face < filteredGliTex.faces(); ++face) {
         auto target = static_cast<GLenum>(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face);
         glGetTexImage(target, (GLint)level, formatExternal,
-            formatType, // GL_FLOAT,
+            formatType, // GL_HALF_FLOAT,
             filteredGliTex[face][level].data());
         CheckGLErrors("after glGetTexImage");
       }
@@ -851,7 +850,7 @@ gli::texture_cube irradianceCubemap(gli::texture_cube const& inputCubemap, int w
       for (auto face = 0u; face < filteredGliTex.faces(); ++face) {
         auto target = static_cast<GLenum>(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face);
         glGetTexImage(target, level, formatExternal,
-            formatType, // GL_FLOAT,
+            formatType, // GL_HALF_FLOAT,
             filteredGliTex[face][level].data());
         CheckGLErrors("after glGetTexImage");
       }
