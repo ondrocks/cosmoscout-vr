@@ -119,11 +119,21 @@ SimpleEclipseShadowCaster::~SimpleEclipseShadowCaster() {
 }
 
 void SimpleEclipseShadowCaster::bind(GLenum textureUnit) {
-  glBindTexture(textureUnit, mShadowTexture);
+  int nActiveTexUnit = 0;
+  glGetIntegerv(GL_ACTIVE_TEXTURE, &nActiveTexUnit);
+
+  glActiveTexture(textureUnit);
+  glBindTexture(GL_TEXTURE_2D, mShadowTexture);
+  glActiveTexture(nActiveTexUnit);
 }
 
 void SimpleEclipseShadowCaster::unbind(GLenum textureUnit) {
-  glBindTexture(textureUnit, 0);
+  int nActiveTexUnit = 0;
+  glGetIntegerv(GL_ACTIVE_TEXTURE, &nActiveTexUnit);
+
+  glActiveTexture(textureUnit);
+  glBindTexture(GL_TEXTURE_2D, 0);
+  glActiveTexture(nActiveTexUnit);
 }
 
 } // namespace cs::graphics
