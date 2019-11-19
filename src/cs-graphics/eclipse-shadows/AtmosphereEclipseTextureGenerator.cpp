@@ -119,7 +119,6 @@ AtmosphereEclipseTextureGenerator::AtmosphereEclipseTextureGenerator()
   mColorConverter.init();
 }
 
-
 std::string toPPMString(const std::vector<glm::vec4>& data, size_t width, size_t height) {
   std::string output = "P3\n";
   output.append(std::to_string(width) + " " + std::to_string(height) + "\n");
@@ -127,8 +126,10 @@ std::string toPPMString(const std::vector<glm::vec4>& data, size_t width, size_t
 
   size_t counter = 0;
   for (auto&& pixel : data) {
-    output.append(std::to_string(lroundf(std::clamp(pixel.x * 25.0f, 0.0f, 1.0f) * 65535.0f))  + " ");
-    output.append(std::to_string(lroundf(std::clamp(pixel.y * 25.0f, 0.0f, 1.0f) * 65535.0f))  + " ");
+    output.append(
+        std::to_string(lroundf(std::clamp(pixel.x * 25.0f, 0.0f, 1.0f) * 65535.0f)) + " ");
+    output.append(
+        std::to_string(lroundf(std::clamp(pixel.y * 25.0f, 0.0f, 1.0f) * 65535.0f)) + " ");
     output.append(std::to_string(lroundf(std::clamp(pixel.z * 25.0f, 0.0f, 1.0f) * 65535.0f)));
 
     if (counter++ == 5) {
@@ -141,7 +142,8 @@ std::string toPPMString(const std::vector<glm::vec4>& data, size_t width, size_t
   return output;
 }
 
-void toPPMFile(const std::vector<glm::vec4>& data, size_t width, size_t height, const std::string_view fileName) {
+void toPPMFile(const std::vector<glm::vec4>& data, size_t width, size_t height,
+    const std::string_view fileName) {
   std::string   output = toPPMString(data, width, height);
   std::ofstream ofStream(fileName.data(), std::ios::out);
   ofStream << output;
@@ -162,11 +164,11 @@ std::pair<utils::Texture4f, double> AtmosphereEclipseTextureGenerator::createSha
   auto result = mTextureTracer->traceThroughTexture(ssboPhotons, photons.size(), body);
   std::vector<glm::vec4> texture = mColorConverter.convert(result);
 
-  toPPMFile(texture, TEX_WIDTH, TEX_HEIGHT, "eclipse_shadow_" + std::to_string(body.gravity) + ".raw.ppm");
+  toPPMFile(texture, TEX_WIDTH, TEX_HEIGHT,
+      "eclipse_shadow_" + std::to_string(body.gravity) + ".raw.ppm");
 
   std::vector<glm::vec4> outputTexture =
       guassianBlur<static_cast<size_t>(TEX_WIDTH * 0.01)>(texture, TEX_WIDTH, TEX_HEIGHT);
-
 
   auto [shadowTexture, scalingExponent] = generateShadowTexture({body.meanRadius, body.orbit});
   auto data                             = shadowTexture.dataPtr();

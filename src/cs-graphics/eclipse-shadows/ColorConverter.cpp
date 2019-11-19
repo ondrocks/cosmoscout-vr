@@ -19,7 +19,8 @@ void ColorConverter::init() {
   mProgram               = glCreateProgram();
   uint32_t computeShader = glCreateShader(GL_COMPUTE_SHADER);
 
-  std::string code   = cs::utils::filesystem::loadToString("../share/resources/shaders/EclipseColorTransform.glsl");
+  std::string code =
+      cs::utils::filesystem::loadToString("../share/resources/shaders/EclipseColorTransform.glsl");
   const char* shader = code.c_str();
   glShaderSource(computeShader, 1, &shader, nullptr);
   glCompileShader(computeShader);

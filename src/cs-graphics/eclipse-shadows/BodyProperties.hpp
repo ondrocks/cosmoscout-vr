@@ -30,7 +30,7 @@ struct AtmosphereLayer {
 
 /// DocTODO
 struct SellmeierCoefficients {
-  float                                 a;
+  float                                a;
   std::vector<std::pair<float, float>> terms;
 
   friend std::ostream& operator<<(std::ostream& os, const SellmeierCoefficients& coefficients) {
@@ -45,9 +45,9 @@ struct SellmeierCoefficients {
 
 /// DocTODO
 struct Atmosphere {
-  float                       seaLevelMolecularNumberDensity; ///< cm^-3
-  float                       molarMass;                      ///< kg/mol
-  float                       height;                         ///< m
+  float                        seaLevelMolecularNumberDensity; ///< cm^-3
+  float                        molarMass;                      ///< kg/mol
+  float                        height;                         ///< m
   std::vector<AtmosphereLayer> layers;
   SellmeierCoefficients        sellmeierCoefficients;
 
@@ -84,9 +84,9 @@ struct Body {
 };
 
 struct BodyWithAtmosphere {
-  float gravity;
-  float meanRadius;
-  Orbit orbit;
+  float      gravity;
+  float      meanRadius;
+  Orbit      orbit;
   Atmosphere atmosphere;
 
   friend std::ostream& operator<<(std::ostream& os, const BodyWithAtmosphere& atmosphere) {
@@ -96,6 +96,6 @@ struct BodyWithAtmosphere {
   }
 };
 
-}
+} // namespace cs::graphics
 
 #endif // CS_GRAPHICS_BODY_PROPERTIES_HPP

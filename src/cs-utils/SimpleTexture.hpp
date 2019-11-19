@@ -26,10 +26,9 @@ class CS_UTILS_EXPORT SimpleTexture {
   SimpleTexture(size_t width, size_t height)
       : mData(width * height)
       , mWidth(width)
-      , mHeight(height) {
-  }
+      , mHeight(height){}
 
-  [[nodiscard]] T get(size_t x, size_t y) const {
+            [[nodiscard]] T get(size_t x, size_t y) const {
     return mData[y * mWidth + x];
   }
 
@@ -37,29 +36,26 @@ class CS_UTILS_EXPORT SimpleTexture {
     mData[y * mWidth + x] = value;
   }
 
-  [[nodiscard]] T* dataPtr() {
-    return mData.data();
-  }
+  [[nodiscard]] T* dataPtr() { return mData.data(); }
 
- private:
-  std::vector<T> mData;
+  private : std::vector<T> mData;
 };
 
-typedef SimpleTexture<int32_t> Texture1i;
+typedef SimpleTexture<int32_t>  Texture1i;
 typedef SimpleTexture<uint32_t> Texture1ui;
-typedef SimpleTexture<int64_t> Texture1l;
+typedef SimpleTexture<int64_t>  Texture1l;
 typedef SimpleTexture<uint64_t> Texture1ul;
 
-typedef SimpleTexture<float> Texture1f;
+typedef SimpleTexture<float>  Texture1f;
 typedef SimpleTexture<double> Texture1d;
 
-typedef SimpleTexture<glm::vec2> Texture2f;
+typedef SimpleTexture<glm::vec2>  Texture2f;
 typedef SimpleTexture<glm::dvec2> Texture2d;
 
-typedef SimpleTexture<glm::vec3> Texture3f;
+typedef SimpleTexture<glm::vec3>  Texture3f;
 typedef SimpleTexture<glm::dvec3> Texture3d;
 
-typedef SimpleTexture<glm::vec4> Texture4f;
+typedef SimpleTexture<glm::vec4>  Texture4f;
 typedef SimpleTexture<glm::dvec4> Texture4d;
 
 } // namespace cs::utils

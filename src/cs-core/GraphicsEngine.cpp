@@ -32,6 +32,7 @@ GraphicsEngine::GraphicsEngine(std::shared_ptr<const core::Settings> const& sett
   auto pSG = GetVistaSystem()->GetGraphicsManager()->GetSceneGraph();
 
   pWidgetScale = settings->mWidgetScale;
+  pEnableHDR   = settings->mEnableHDR.value_or(false);
 
   // setup shadows ---------------------------------------------------------------------------------
 
@@ -102,35 +103,15 @@ GraphicsEngine::GraphicsEngine(std::shared_ptr<const core::Settings> const& sett
     if (!pEnableAutoExposure.get()) {
       mToneMappingNode->setExposure(value);
     }
+
+    if (pEnableAutoGlow.get()) {
+      float glow = (pAutoExposureRange.get()[0] - value) /
+                   (pAutoExposureRange.get()[0] - pAutoExposureRange.get()[1]);
+      pGlowIntensity = std::clamp(glow * 0.5f, 0.001f, 1.f);
+    }
   });
 
-  pHeightScale.touch();
-  pWidgetScale.touch();
-  pEnableLighting.touch();
-  pLightingQuality.touch();
-  pEnableShadows.touch();
-  pEnableShadowsDebug.touch();
-  pEnableShadowsFreeze.touch();
-  pShadowMapResolution.touch();
-  pShadowMapCascades.touch();
-  pShadowMapBias.touch();
-  pShadowMapRange.touch();
-  pShadowMapExtension.touch();
-  pShadowMapSplitDistribution.touch();
-  pEnableAutoExposure.touch();
-  pExposure.touch();
-  pAutoExposureRange.touch();
-  pExposureCompensation.touch();
-  pExposureAdaptionSpeed.touch();
-  pSensorDiagonal.touch();
-  pFocalLength.touch();
-  pAmbientBrightness.touch();
-  pGlowIntensity.touch();
-  pExposureMeteringMode.touch();
-  pEnableHDR.touch();
-
   for (const auto& [name, anchor] : settings->mAnchors) {
-
 
     if (anchor.mShadow && anchor.mShadow.value() == "eclipse") {
       auto it = settings->mBodyProperties.find(name);
@@ -156,23 +137,26 @@ GraphicsEngine::GraphicsEngine(std::shared_ptr<const core::Settings> const& sett
         const auto& sellmeier = props.atmosphere->sellmeierCoefficients.terms;
         std::vector<std::pair<float, float>> sellmeierTerms(sellmeier.size());
         for (size_t i = 0; i < sellmeier.size(); ++i) {
-          sellmeierTerms[i] = {static_cast<float>(sellmeier[i].first), static_cast<float>(sellmeier[i].second)};
+          sellmeierTerms[i] = {
+              static_cast<float>(sellmeier[i].first), static_cast<float>(sellmeier[i].second)};
         }
 
         mEclipseShadowCaster.emplace(name,
             std::make_unique<graphics::AtmosphereEclipseShadowCaster>(graphics::BodyWithAtmosphere{
-                static_cast<float>(*props.gravity),
-                          static_cast<float>(props.meanRadius), {static_cast<float>(props.orbit.semiMajorAxisSun)},
-                {static_cast<float>(props.atmosphere->seaLevelMolecularNumberDensity), static_cast<float>(props.atmosphere->molarMass),
+                static_cast<float>(*props.gravity), static_cast<float>(props.meanRadius),
+                {static_cast<float>(props.orbit.semiMajorAxisSun)},
+                {static_cast<float>(props.atmosphere->seaLevelMolecularNumberDensity),
+                    static_cast<float>(props.atmosphere->molarMass),
                     static_cast<float>(props.atmosphere->height), layers,
                     {static_cast<float>(props.atmosphere->sellmeierCoefficients.a),
-                     sellmeierTerms}}}));
+                        sellmeierTerms}}}));
 
       } else if (it != settings->mBodyProperties.end()) {
         auto props = it->second;
         mEclipseShadowCaster.emplace(
             name, std::make_unique<graphics::SimpleEclipseShadowCaster>(
-                      graphics::Body{static_cast<float>(props.meanRadius), {static_cast<float>(props.orbit.semiMajorAxisSun)}}));
+                      graphics::Body{static_cast<float>(props.meanRadius),
+                          {static_cast<float>(props.orbit.semiMajorAxisSun)}}));
       }
     }
   }
@@ -220,6 +204,7 @@ void GraphicsEngine::update(glm::vec3 const& sunDirection) {
 
   if (pEnableHDR.get()) {
     pAverageLuminance = mToneMappingNode->getLastAverageLuminance();
+    pMaximumLuminance = mToneMappingNode->getLastMaximumLuminance();
   }
 }
 

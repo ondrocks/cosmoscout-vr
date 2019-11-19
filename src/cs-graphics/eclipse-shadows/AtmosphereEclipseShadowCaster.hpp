@@ -7,8 +7,8 @@
 #ifndef CS_GRAPHICS_ATMOSPHERE_ECLIPSE_SHADOW_CASTER_HPP
 #define CS_GRAPHICS_ATMOSPHERE_ECLIPSE_SHADOW_CASTER_HPP
 
-#include "EclipseShadowCaster.hpp"
 #include "BodyProperties.hpp"
+#include "EclipseShadowCaster.hpp"
 
 namespace cs::graphics {
 class AtmosphereEclipseShadowCaster : public EclipseShadowCaster {

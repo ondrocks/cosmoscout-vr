@@ -7,8 +7,8 @@
 #ifndef CS_GRAPHICS_COLOR_CONVERTER_HPP
 #define CS_GRAPHICS_COLOR_CONVERTER_HPP
 
-#include <glm/vec4.hpp>
 #include <cstdint>
+#include <glm/vec4.hpp>
 #include <vector>
 
 namespace cs::graphics {

@@ -170,8 +170,13 @@ bool Application::Init(VistaSystem* pVistaSystem) {
     mGuiManager->setCursor(cs::gui::Cursor::ePointer);
   }
 
+  // Initialize some gui components
   if (!mSettings->mEnableSensorSizeControl) {
     mGuiManager->getSideBar()->callJavascript("hide", "#enableSensorSizeControl");
+  }
+
+  if (!mSettings->mEnableHDR.value_or(false)) {
+    mGuiManager->getSideBar()->callJavascript("set_checkbox_value", "set_enable_hdr", false);
   }
 
   mGuiManager->enableLoadingScreen(true);
@@ -347,6 +352,36 @@ void Application::FrameUpdate() {
         // We will keep the loading screen active for some frames, as the first frames are usually a
         // bit choppy as data is uploaded to the GPU.
         mHideLoadingScreenAtFrame = GetFrameCount() + cLoadingDelay;
+
+        // touch all public properties -------------------------------------------------------------
+
+        mGraphicsEngine->pHeightScale.touch();
+        mGraphicsEngine->pWidgetScale.touch();
+        mGraphicsEngine->pEnableLighting.touch();
+        mGraphicsEngine->pEnableHDR.touch();
+        mGraphicsEngine->pLightingQuality.touch();
+        mGraphicsEngine->pEnableShadows.touch();
+        mGraphicsEngine->pEnableShadowsDebug.touch();
+        mGraphicsEngine->pEnableShadowsFreeze.touch();
+        mGraphicsEngine->pShadowMapResolution.touch();
+        mGraphicsEngine->pShadowMapCascades.touch();
+        mGraphicsEngine->pShadowMapBias.touch();
+        mGraphicsEngine->pShadowMapRange.touch();
+        mGraphicsEngine->pShadowMapExtension.touch();
+        mGraphicsEngine->pShadowMapSplitDistribution.touch();
+        mGraphicsEngine->pEnableAutoExposure.touch();
+        mGraphicsEngine->pExposure.touch();
+        mGraphicsEngine->pAutoExposureRange.touch();
+        mGraphicsEngine->pExposureCompensation.touch();
+        mGraphicsEngine->pExposureAdaptionSpeed.touch();
+        mGraphicsEngine->pSensorDiagonal.touch();
+        mGraphicsEngine->pFocalLength.touch();
+        mGraphicsEngine->pAmbientBrightness.touch();
+        mGraphicsEngine->pGlowIntensity.touch();
+        mGraphicsEngine->pExposureMeteringMode.touch();
+        mGraphicsEngine->pApproximateSceneBrightness.touch();
+        mGraphicsEngine->pAverageLuminance.touch();
+        mGraphicsEngine->pMaximumLuminance.touch();
 
         // initial observer animation --------------------------------------------------------------
 
@@ -808,8 +843,21 @@ void Application::registerGuiCallbacks() {
     }
   });
 
+  mGuiManager->getSideBar()->registerCallback<bool>(
+      "set_enable_auto_glow", ([this](bool val) { mGraphicsEngine->pEnableAutoGlow = val; }));
+
+  mGraphicsEngine->pGlowIntensity.onChange().connect([this](float value) {
+    if (mGraphicsEngine->pEnableAutoGlow.get()) {
+      mGuiManager->getSideBar()->callJavascript("set_slider_value", "set_glow_intensity", value);
+    }
+  });
+
   mGraphicsEngine->pAverageLuminance.onChange().connect([this](float value) {
-    mGuiManager->getSideBar()->callJavascript("set_scene_luminance", value);
+    mGuiManager->getSideBar()->callJavascript("set_average_scene_luminance", value);
+  });
+
+  mGraphicsEngine->pMaximumLuminance.onChange().connect([this](float value) {
+    mGuiManager->getSideBar()->callJavascript("set_maximum_scene_luminance", value);
   });
 
   mGuiManager->getSideBar()->registerCallback("set_exposure_metering_mode_0", ([this]() {

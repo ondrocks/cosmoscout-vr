@@ -40,6 +40,6 @@ class LUTPrecalculator {
   uint32_t mProgram;
 };
 
-}
+} // namespace cs::graphics
 
-#endif //CS_GRAPHICS_REFRACTIVE_INDEX_PRECALCULATOR_HPP
+#endif // CS_GRAPHICS_REFRACTIVE_INDEX_PRECALCULATOR_HPP

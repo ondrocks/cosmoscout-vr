@@ -10,14 +10,14 @@
 #include <GL/glew.h>
 
 namespace cs::graphics {
-  class EclipseShadowCaster {
-   public:
-    double mScalingExponent;
-    double mRadius;
+class EclipseShadowCaster {
+ public:
+  double mScalingExponent;
+  double mRadius;
 
-    virtual void bind(GLenum textureUnit) = 0;
-    virtual void unbind(GLenum textureUnit) = 0;
-  };
-}
+  virtual void bind(GLenum textureUnit)   = 0;
+  virtual void unbind(GLenum textureUnit) = 0;
+};
+} // namespace cs::graphics
 
 #endif // CS_GRAPHICS_ECLIPSE_SHADOW_CASTER_HPP

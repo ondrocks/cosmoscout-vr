@@ -72,11 +72,11 @@ function set_slider_value(id, val1, val2) {
 }
 
 function set_radio_checked(id) {
-    $('#' + id).prop('checked', true);
+    $('#' + id).prop('checked', true).change();
 }
 
 function set_checkbox_value(id, value) {
-    $('#' + id).prop('checked', value);
+    $('#' + id).prop('checked', value).change();
 }
 
 function set_textbox_value(id, value) {
@@ -114,6 +114,10 @@ function init() {
     });
 
     $('[data-toggle="tooltip"]').tooltip({ delay: 500, placement: "auto", html: false });
+    $('[data-toggle="tooltip-top"]').tooltip({ delay: 500, placement: "top", html: false });
+    $('[data-toggle="tooltip-right"]').tooltip({ delay: 500, placement: "right", html: false });
+    $('[data-toggle="tooltip-left"]').tooltip({ delay: 500, placement: "left", html: false });
+    $('[data-toggle="tooltip-bottom"]').tooltip({ delay: 500, placement: "bottom", html: false });
 
     $('.radiolabel input').change(function () {
         if (this.checked) {
@@ -147,12 +151,15 @@ function init_slider(id, min, max, step, start) {
     });
 }
 
-function set_scene_luminance(value) {
-    $("#scene-luminance").text(beauty_print_number(parseFloat(value)));
+function set_average_scene_luminance(value) {
+    $("#average-scene-luminance").text(beauty_print_number(parseFloat(value)));
+}
+
+function set_maximum_scene_luminance(value) {
+    $("#maximum-scene-luminance").text(beauty_print_number(parseFloat(value)));
 }
 
 $(document).ready(function () {
-    //init();
 
     const slider = document.getElementById("set_shadowmap_resolution");
     noUiSlider.create(slider, {
@@ -183,8 +190,8 @@ $(document).ready(function () {
     init_slider("set_exposure_compensation", -10, 10, 0.5, [0]);
     init_slider("set_exposure_adaption_speed", 0, 20, 0.1, [3]);
     init_slider("set_ambient_light", 0.0, 1.0, 0.001, [0.25]);
-    init_slider("set_exposure_range", -30.0, 30, 0.1, [-15, 10]);
-    init_slider("set_glow_intensity", 0.0, 1, 0.01, [0.1]);
+    init_slider("set_exposure_range", -30.0, 30, 0.1, [-12, 10]);
+    init_slider("set_glow_intensity", 0.0, 1, 0.01, [0.5]);
 
     $(document).on('click', '.item-create-button', function () {
         $(this).addClass('active');
@@ -199,6 +206,14 @@ $(document).ready(function () {
         } else {
             $("#set_exposure").removeClass("unresponsive");
             $("#set_exposure_range").addClass("unresponsive");
+        }
+    });
+
+    $('#set_enable_auto_glow').change(function () {
+        if (this.checked) {
+            $("#set_glow_intensity").addClass("unresponsive");
+        } else {
+            $("#set_glow_intensity").removeClass("unresponsive");
         }
     });
 
