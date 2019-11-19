@@ -249,11 +249,11 @@ const std::string ToneMappingNode::sFragmentShader = R"(
     gl_FragDepth = texelFetch(uDepth, ivec2(vTexcoords * textureSize(uDepth, 0)), 0).r;
     
     color = Uncharted2Tonemap(uExposure*color);
-
     vec3 whiteScale = vec3(1.0)/Uncharted2Tonemap(vec3(W));
+    oColor = linear_to_srgb(color*whiteScale);
 
-    // oColor = linear_to_srgb(color*whiteScale);
-    oColor = color*whiteScale;
+    // oColor = color*uExposure;
+    // oColor = pow(oColor, vec3(1.0 / 2.2));
   }
 )";
 

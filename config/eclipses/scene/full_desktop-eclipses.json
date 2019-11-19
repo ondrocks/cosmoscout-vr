@@ -29,7 +29,7 @@
             "content": "Apollo 17 landing",
             "start": "1972-12-11T19:54:57",
             "description": "Last human landing on the Moon.",
-            "style": "border-color: yellow",
+            "style": "border-color: green",
             "location": {
                 "planet": "Moon",
                 "place": "3.635° E 26.133° S 10.0 Tsd km"
@@ -59,10 +59,32 @@
         },
         {
             "id": "4",
-            "content": "Lunar Eclipse",
+            "content": "Lunar Eclipse 2015",
+            "start": "2015-09-28T01:00:00",
+            "description": "A lunar eclipse.",
+            "style": "border-color: grey",
+            "location": {
+                "planet": "Moon",
+                "place": "9.0° E 6.0° N 5.389 Tsd km"
+            }
+        },
+        {
+            "id": "5",
+            "content": "Lunar Eclipse 2019",
             "start": "2019-01-21T03:15:00",
             "description": "A lunar eclipse.",
-            "style": "border-color: yellow",
+            "style": "border-color: grey",
+            "location": {
+                "planet": "Moon",
+                "place": "9.0° E 6.0° N 5.389 Tsd km"
+            }
+        },
+        {
+            "id": "5",
+            "content": "Lunar Eclipse 2019",
+            "start": "2010-12-21T07:40:00",
+            "description": "A lunar eclipse.",
+            "style": "border-color: grey",
             "location": {
                 "planet": "Moon",
                 "place": "9.0° E 6.0° N 5.389 Tsd km"
@@ -218,14 +240,12 @@
                 "semiMajorAxisSun": 57909050000.0
             }
         },
-
         "Venus": {
             "meanRadius": 6051800.0,
             "orbit": {
                 "semiMajorAxisSun": 108208000000.0
             }
         },
-
         "Earth": {
             "gravity": 9.81,
             "meanRadius": 6371000.0,
@@ -265,20 +285,24 @@
                 "sellmeierCoefficients": {
                     "a": 8.06051e-5,
                     "terms": [
-                        [2.480990e-2, 132.274],
-                        [1.74557e-4, 39.32957]
+                        [
+                            2.480990e-2,
+                            132.274
+                        ],
+                        [
+                            1.74557e-4,
+                            39.32957
+                        ]
                     ]
                 }
             }
         },
-
         "Moon": {
             "meanRadius": 1737100.0,
             "orbit": {
                 "semiMajorAxisSun": 149598023000.0
             }
         },
-
         "Mars": {
             "gravity": 3.711,
             "meanRadius": 3389500.0,
@@ -324,85 +348,86 @@
                 "sellmeierCoefficients": {
                     "a": 2.8001182622e-8,
                     "terms": [
-                        [1.2299914346e-8, 0.0584738],
-                        [6.61551039203e-4, 210.9241],
-                        [2.29011174411e-5, 60.122959],
-                        [1.29088475817e-5, 144]
+                        [
+                            1.2299914346e-8,
+                            0.0584738
+                        ],
+                        [
+                            6.61551039203e-4,
+                            210.9241
+                        ],
+                        [
+                            2.29011174411e-5,
+                            60.122959
+                        ],
+                        [
+                            1.29088475817e-5,
+                            144
+                        ]
                     ]
                 }
             }
         },
-
         "Phobos": {
             "meanRadius": 11266.7,
             "orbit": {
                 "semiMajorAxisSun": 227939200000.0
             }
         },
-
         "Deimos": {
             "meanRadius": 6200.0,
             "orbit": {
                 "semiMajorAxisSun": 227939200000.0
             }
         },
-
         "Jupiter": {
             "meanRadius": 69911000.0,
             "orbit": {
                 "semiMajorAxisSun": 778570000000.0
             }
         },
-
         "Io": {
             "meanRadius": 1821600.0,
             "orbit": {
                 "semiMajorAxisSun": 778570000000.0
             }
         },
-
         "Callisto": {
             "meanRadius": 2410300.0,
             "orbit": {
                 "semiMajorAxisSun": 778570000000.0
             }
         },
-
         "Saturn": {
             "meanRadius": 58232000.0,
             "orbit": {
                 "semiMajorAxisSun": 1433530000000.0
             }
         },
-
         "Uranus": {
             "meanRadius": 25362000.0,
             "orbit": {
                 "semiMajorAxisSun": 2.8750317e+12
             }
         },
-
         "Neptune": {
             "meanRadius": 24622000.0,
             "orbit": {
                 "semiMajorAxisSun": 4.50439e+12
             }
         },
-
         "Pluto": {
             "meanRadius": 2374000.0,
             "orbit": {
                 "semiMajorAxisSun": 5.90642e+12
             }
         },
-
         "Ceres": {
             "meanRadius": 469730.0,
             "orbit": {
                 "semiMajorAxisSun": 414261000000.0
             }
         },
-
         "Vesta": {
             "meanRadius": 262700.0,
             "orbit": {
