@@ -150,7 +150,7 @@ void toPPMFile(const std::vector<glm::vec4>& data, size_t width, size_t height,
   ofStream.close();
 }
 
-std::pair<utils::Texture4f, double> AtmosphereEclipseTextureGenerator::createShadowMap(
+utils::Texture4f AtmosphereEclipseTextureGenerator::createShadowMap(
     BodyWithAtmosphere const& body, size_t photonCount) {
   std::vector<PhotonF> photons = generatePhotons(photonCount, body);
 
@@ -170,8 +170,8 @@ std::pair<utils::Texture4f, double> AtmosphereEclipseTextureGenerator::createSha
   std::vector<glm::vec4> outputTexture =
       guassianBlur<static_cast<size_t>(TEX_WIDTH * 0.01)>(texture, TEX_WIDTH, TEX_HEIGHT);
 
-  auto [shadowTexture, scalingExponent] = generateShadowTexture({body.meanRadius, body.orbit});
-  auto data                             = shadowTexture.dataPtr();
+  auto shadowTexture = generateShadowTexture({body.meanRadius, body.orbit});
+  auto data          = shadowTexture.dataPtr();
 
   utils::Texture4f resultTexture(TEX_WIDTH, TEX_HEIGHT);
 
@@ -181,7 +181,7 @@ std::pair<utils::Texture4f, double> AtmosphereEclipseTextureGenerator::createSha
 
   glDeleteBuffers(1, &ssboPhotons);
 
-  return {resultTexture, scalingExponent};
+  return resultTexture;
 }
 
 std::uniform_real_distribution<> angleGenerator(-glm::half_pi<double>(), glm::half_pi<double>());

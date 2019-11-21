@@ -37,14 +37,12 @@ std::vector<FloatPixel> TextureTracerCPU::traceThroughTexture(
                               (body.orbit.semiMajorAxisSun * atmosphericRadius) /
                               (SUN_RADIUS - atmosphericRadius);
 
-  const double xAxisScalingFactor =
-      std::log(shadowLength) / std::log(static_cast<double>(TEX_WIDTH));
-
   auto horizontalRectangles = std::array<glm::dvec2, TEX_WIDTH>{};
 
   double xx0 = 0.0;
   for (int x = 0; x < TEX_WIDTH; ++x) {
-    const double xx1        = std::pow(static_cast<double>(x + 1), xAxisScalingFactor);
+    const double xx1 =
+        std::pow(static_cast<double>(x + 1) / TEX_WIDTH, TEX_SHADOW_WIDTH_EXPONENT) * shadowLength;
     horizontalRectangles[x] = glm::dvec2(xx0, xx1 - xx0);
     xx0                     = xx1;
   }

@@ -12,7 +12,6 @@
 namespace cs::graphics {
 class EclipseShadowCaster {
  public:
-  double mScalingExponent;
   double mRadius;
 
   virtual void bind(GLenum textureUnit)   = 0;

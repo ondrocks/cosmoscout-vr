@@ -19,6 +19,7 @@ uint32_t const NUM_WAVELENGTHS = MAX_WAVELENGTH - MIN_WAVELENGTH + 1;
 
 double const TEX_HEIGHT_TO_RADIUS_FACTOR = 4.0;
 double const TEX_SHADOW_LENGTH_FACTOR    = 8.0;
+double const TEX_SHADOW_WIDTH_EXPONENT   = 5.0;
 
 // TODO make configurable
 uint32_t const TEX_WIDTH   = 512u;

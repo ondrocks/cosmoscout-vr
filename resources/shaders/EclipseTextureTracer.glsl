@@ -5,6 +5,7 @@
 // TODO make configurable
 const uint TEX_WIDTH = 512u;
 const uint TEX_HEIGHT = TEX_WIDTH;
+const float TEX_SHADOW_WIDTH_EXPONENT = 5.0;
 
 // TODO make configurable
 const uint MIN_WAVELENGTH = 390u;
@@ -34,11 +35,9 @@ layout(std430, binding = 1) buffer Pixels {
   Pixel[] pixels;
 };
 
-uniform float xAxisScalingFactor;
-
 vec2 getHorizontalRectangleAt(int i) {
-  float x0 = pow(float(i), xAxisScalingFactor);
-  float x1 = pow(float(i + 1), xAxisScalingFactor);
+  float x0 = pow(float(i), 1.0 / TEX_SHADOW_WIDTH_EXPONENT);
+  float x1 = pow(float(i + 1), 1.0 / TEX_SHADOW_WIDTH_EXPONENT);
   return vec2(x0, x1 - x0);
 }
 

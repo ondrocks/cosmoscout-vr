@@ -3,7 +3,6 @@
 
 // For texture mode
 uniform sampler2D uShadowTextures[16];
-uniform float uScalingFactor[16];
 uniform float uShadowLength[16];
 uniform vec3 uBodyShadowNormals[16];
 
@@ -286,6 +285,7 @@ vec3 projectPointOnRay(vec3 origin, vec3 direction, vec3 p) {
 }
 
 const float TEX_HEIGHT_TO_RADIUS_FACTOR = 4.0;
+const float TEX_SHADOW_WIDTH_EXPONENT = 5.0;
 
 vec3 calcEclipseTextureLookup(int i, vec3 fragmentPosition) {
     vec3 pos = uOccludingBodies[i].xyz;
@@ -294,7 +294,7 @@ vec3 calcEclipseTextureLookup(int i, vec3 fragmentPosition) {
     float x = distance(pos, xPos);
     float y = distance(xPos, fragmentPosition);
 
-    x = pow(x / uShadowLength[i], uScalingFactor[i]);
+    x = pow(x / uShadowLength[i], 1.0/TEX_SHADOW_WIDTH_EXPONENT);
     y = y / (uOccludingBodies[i].w * TEX_HEIGHT_TO_RADIUS_FACTOR);
 
     if (x <= 0.0 || x >= 1.0 || y <= 0.0 || y >= 1.0) {
