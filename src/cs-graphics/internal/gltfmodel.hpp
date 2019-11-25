@@ -124,8 +124,9 @@ struct Mesh {
   std::vector<Primitive> primitives;
 
   /// minPos and maxPos define the bounding box of the mesh.
-  glm::vec3 minPos = glm::vec3(std::numeric_limits<float>::lowest());
-  glm::vec3 maxPos = glm::vec3(std::numeric_limits<float>::max());
+  /// initialize with a degenerate bounding box
+  glm::vec3 minPos = glm::vec3(std::numeric_limits<float>::max());
+  glm::vec3 maxPos = glm::vec3(std::numeric_limits<float>::lowest());
 };
 
 /// Represents a GLTF model.
