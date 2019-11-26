@@ -40,9 +40,6 @@ struct TextureVar {
 
 /// Contains all available infos about a GLSL program, including the uniforms and textures.
 struct GLProgramInfo {
-  /// Maps Attribute semantics such as "POSITION", "NORMAL", "TEXCOORD_0", to
-  /// attribute locations e.g. 0 == pbr_attributes["POSITION"]
-  std::map<std::string, int>        pbr_attributes;
   std::map<std::string, TextureVar> textures;
 
   int u_MVPMatrix_loc;
