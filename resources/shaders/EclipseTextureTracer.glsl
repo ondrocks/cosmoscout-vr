@@ -3,9 +3,9 @@
 #extension GL_ARB_compute_variable_group_size: enable
 
 // TODO make configurable
-const uint TEX_WIDTH = 512u;
+const uint TEX_WIDTH = 256u;
 const uint TEX_HEIGHT = TEX_WIDTH;
-const float TEX_SHADOW_WIDTH_EXPONENT = 5.0;
+const float TEX_SHADOW_WIDTH_EXPONENT = 2.0;
 
 // TODO make configurable
 const uint MIN_WAVELENGTH = 390u;

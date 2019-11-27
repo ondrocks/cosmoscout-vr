@@ -369,7 +369,7 @@ vec3(3.063998E-04, 1.183671E-04, 0.000000E+00)
 };
 
 // TODO make configurable
-const uint TEX_WIDTH = 512u;
+const uint TEX_WIDTH = 256u;
 const uint TEX_HEIGHT = TEX_WIDTH;
 
 // TODO make configurable

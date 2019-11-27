@@ -15,7 +15,7 @@ uniform float uSunRadius;
 uniform int uNumOccludingBodies;
 uniform int uEclipseCalcType;
 
-const double PI_D = 3.141592654LF;
+const double PI_D = 3.14159265358979323846LF;
 const double TWO_PI_D = 2.0LF * PI_D;
 const float PI_F = 3.141592654;
 const float TWO_PI_F = 2.0 * PI_F;
@@ -285,7 +285,7 @@ vec3 projectPointOnRay(vec3 origin, vec3 direction, vec3 p) {
 }
 
 const float TEX_HEIGHT_TO_RADIUS_FACTOR = 4.0;
-const float TEX_SHADOW_WIDTH_EXPONENT = 5.0;
+const float TEX_SHADOW_WIDTH_EXPONENT = 2.0;
 
 vec3 calcEclipseTextureLookup(int i, vec3 fragmentPosition) {
     vec3 pos = uOccludingBodies[i].xyz;
