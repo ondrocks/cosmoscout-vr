@@ -113,8 +113,7 @@
             "center": "Venus",
             "frame": "IAU_Venus",
             "startExistence": "1950-01-02 00:00:00.000",
-            "endExistence": "2049-12-31 00:00:00.000",
-            "shadow": "eclipse"
+            "endExistence": "2049-12-31 00:00:00.000"
         },
         "Earth": {
             "center": "Earth",
@@ -134,22 +133,19 @@
             "center": "Mars",
             "frame": "IAU_Mars",
             "startExistence": "1950-01-02 00:00:00.000",
-            "endExistence": "2049-12-31 00:00:00.000",
-            "shadow": "eclipse"
+            "endExistence": "2049-12-31 00:00:00.000"
         },
         "Phobos": {
             "center": "Phobos",
             "frame": "IAU_Phobos",
             "startExistence": "1950-01-02 00:00:00.000",
-            "endExistence": "2049-12-31 00:00:00.000",
-            "shadow": "eclipse"
+            "endExistence": "2049-12-31 00:00:00.000"
         },
         "Deimos": {
             "center": "Deimos",
             "frame": "IAU_Deimos",
             "startExistence": "1950-01-02 00:00:00.000",
-            "endExistence": "2049-12-31 00:00:00.000",
-            "shadow": "eclipse"
+            "endExistence": "2049-12-31 00:00:00.000"
         },
         "Mars Express": {
             "center": "MEX",
@@ -173,8 +169,7 @@
             "center": "Jupiter",
             "frame": "IAU_Jupiter",
             "startExistence": "1950-01-02 00:00:00.000",
-            "endExistence": "2049-12-31 00:00:00.000",
-            "shadow": "eclipse"
+            "endExistence": "2049-12-31 00:00:00.000"
         },
         "Io": {
             "center": "Io",
@@ -187,8 +182,7 @@
             "center": "Callisto",
             "frame": "IAU_Callisto",
             "startExistence": "1950-01-02 00:00:00.000",
-            "endExistence": "2049-12-31 00:00:00.000",
-            "shadow": "eclipse"
+            "endExistence": "2049-12-31 00:00:00.000"
         },
         "Saturn": {
             "center": "Saturn",
@@ -201,29 +195,25 @@
             "center": "Uranus",
             "frame": "IAU_Uranus",
             "startExistence": "1950-01-02 00:00:00.000",
-            "endExistence": "2049-12-31 00:00:00.000",
-            "shadow": "eclipse"
+            "endExistence": "2049-12-31 00:00:00.000"
         },
         "Neptune": {
             "center": "Neptune",
             "frame": "IAU_Neptune",
             "startExistence": "1950-01-02 00:00:00.000",
-            "endExistence": "2049-12-31 00:00:00.000",
-            "shadow": "eclipse"
+            "endExistence": "2049-12-31 00:00:00.000"
         },
         "Pluto": {
             "center": "Pluto",
             "frame": "IAU_Pluto",
             "startExistence": "1950-01-02 00:00:00.000",
-            "endExistence": "2049-12-31 00:00:00.000",
-            "shadow": "eclipse"
+            "endExistence": "2049-12-31 00:00:00.000"
         },
         "Ceres": {
             "center": "Ceres",
             "frame": "IAU_Ceres",
             "startExistence": "1950-01-02 00:00:00.000",
-            "endExistence": "2049-12-31 00:00:00.000",
-            "shadow": "eclipse"
+            "endExistence": "2049-12-31 00:00:00.000"
         },
         "Vesta": {
             "center": "Vesta",
