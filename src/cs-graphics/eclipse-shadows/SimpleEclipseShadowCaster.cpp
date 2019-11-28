@@ -37,13 +37,10 @@ void saveGreyscale(const std::string& name, const utils::Texture4f& texture) {
   }
 }
 
-std::pair<cs::utils::Texture4f, double> generateShadowTexture(Body const& body) {
+cs::utils::Texture4f generateShadowTexture(Body const& body) {
   const double shadowLength = TEX_SHADOW_LENGTH_FACTOR *
                               (body.orbit.semiMajorAxisSun * body.meanRadius) /
                               (SUN_RADIUS - body.meanRadius);
-
-  const double xAxisScalingExponent =
-      std::log(shadowLength) / std::log(static_cast<double>(TEX_WIDTH));
 
   const double pixSize = body.meanRadius / (TEX_HEIGHT / TEX_HEIGHT_TO_RADIUS_FACTOR);
 
@@ -55,7 +52,8 @@ std::pair<cs::utils::Texture4f, double> generateShadowTexture(Body const& body) 
   for (size_t y = 0; y < TEX_HEIGHT; ++y) {
     tasks[y] = tp.enqueue([&, y] {
       for (size_t x = 0; x < TEX_WIDTH; ++x) {
-        const double     xx = std::pow(static_cast<double>(x), xAxisScalingExponent);
+        const double xx =
+            std::pow(static_cast<double>(x) / TEX_WIDTH, TEX_SHADOW_WIDTH_EXPONENT) * shadowLength;
         const glm::dvec2 pixelPositionRelPlanet(xx, y * pixSize);
         const glm::dvec2 pixelPositionRelPlanetNorm = glm::normalize(pixelPositionRelPlanet);
         const double     pixelDistanceToPlanet      = glm::length(pixelPositionRelPlanet);
@@ -91,13 +89,12 @@ std::pair<cs::utils::Texture4f, double> generateShadowTexture(Body const& body) 
 
   saveGreyscale("eclipse_shadow_" + std::to_string(body.meanRadius), texture);
 
-  return {texture, xAxisScalingExponent};
+  return texture;
 }
 
 SimpleEclipseShadowCaster::SimpleEclipseShadowCaster(Body const& body) {
-  mRadius                           = body.meanRadius;
-  auto [shadowTex, scalingExponent] = generateShadowTexture(body);
-  mScalingExponent                  = scalingExponent;
+  mRadius        = body.meanRadius;
+  auto shadowTex = generateShadowTexture(body);
 
   glGenTextures(1, &mShadowTexture);
   glBindTexture(GL_TEXTURE_2D, mShadowTexture);

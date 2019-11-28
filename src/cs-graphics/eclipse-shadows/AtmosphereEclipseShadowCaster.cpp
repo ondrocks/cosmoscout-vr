@@ -15,9 +15,7 @@ AtmosphereEclipseShadowCaster::AtmosphereEclipseShadowCaster(BodyWithAtmosphere 
   AtmosphereEclipseTextureGenerator textureGenerator{};
 
   // TODO photon count
-  auto [texture, xScalingExponent] = textureGenerator.createShadowMap(body, NUM_PHOTONS);
-
-  mScalingExponent = xScalingExponent;
+  auto texture = textureGenerator.createShadowMap(body, NUM_PHOTONS);
 
   glGenTextures(1, &mShadowTexture);
   glBindTexture(GL_TEXTURE_2D, mShadowTexture);

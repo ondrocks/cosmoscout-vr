@@ -20,8 +20,7 @@ class AtmosphereEclipseTextureGenerator {
  public:
   AtmosphereEclipseTextureGenerator();
 
-  std::pair<cs::utils::Texture4f, double> createShadowMap(
-      BodyWithAtmosphere const& body, size_t photonCount);
+  cs::utils::Texture4f createShadowMap(BodyWithAtmosphere const& body, size_t photonCount);
 
  private:
   /// Generates a point on one half of the suns surface:

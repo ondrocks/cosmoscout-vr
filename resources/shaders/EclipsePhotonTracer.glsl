@@ -95,7 +95,7 @@ double square(double value) {
 double rayleighScatteringCrossSection(uint wavelength) {
     // TODO Normally wavelength should be converted with a factor of 1.0e-7, but for no particular reason 2.1e-8 works best.
     //      Let's not talk about this :/
-    double wavelengthInCM = double(wavelength) * 2.1e-8LF;
+    double wavelengthInCM = double(wavelength) * 2.3e-8LF;
     double wavelengthInCM4 = square(square(wavelengthInCM));
 
     double refractiveIndex = double(refractiveIndexAtSeaLevel(wavelength));
@@ -105,7 +105,7 @@ double rayleighScatteringCrossSection(uint wavelength) {
     double molecularNumberDensity2 = square(molecularNumberDensity);
 
     const double kingCorrectionFactor = 1.05LF;
-    const double PI_F = 3.14159LF;
+    const double PI_F = 3.14159265358979323846LF;
     const double PI_F_3 = PI_F * PI_F * PI_F;
 
     double dividend = 24.0LF * PI_F_3 * square(refractiveIndex2 - 1.0LF);
@@ -136,7 +136,7 @@ void attenuateLight(inout Photon photon, vec2 oldPosition) {
     // TODO don't know what to do with this for now... maybe make it configurable per planet?
     /// This value simulates particles in the upper atmosphere. On earth a value of 1.0e-6 corresponds to an L4 eclipse
     /// and 1.0e-4 produces an L0 eclipse.
-    double alpha = 15000.0 < altitude && altitude < 20000.0 ? 0.0e-6 : 0.0;
+    double alpha = 15000.0 < altitude && altitude < 20000.0 ? 2.0e-5 : 0.0;
 
     photon.intensity = float(double(photon.intensity) * approxE(-(alpha + beta) * DL));
 }

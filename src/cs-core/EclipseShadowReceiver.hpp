@@ -68,7 +68,6 @@ class CS_CORE_EXPORT EclipseShadowReceiver {
   static constexpr size_t MAX_BODIES = 16;
 
   std::array<int, MAX_BODIES> mUShadowTextures{};
-  std::array<int, MAX_BODIES> mUScalingFactor{};
   std::array<int, MAX_BODIES> mUShadowLength{};
   std::array<int, MAX_BODIES> mUBodyShadowNormals{};
 

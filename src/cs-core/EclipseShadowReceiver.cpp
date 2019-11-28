@@ -48,8 +48,6 @@ void EclipseShadowReceiver::initUniforms(VistaGLSLShader const& shader) {
   for (int i = 0; i < 16; ++i) {
     mUShadowTextures[i] = glGetUniformLocation(
         shader.GetProgram(), ("uShadowTextures[" + std::to_string(i) + "]").c_str());
-    mUScalingFactor[i] = glGetUniformLocation(
-        shader.GetProgram(), ("uScalingFactor[" + std::to_string(i) + "]").c_str());
     mUShadowLength[i] = glGetUniformLocation(
         shader.GetProgram(), ("uShadowLength[" + std::to_string(i) + "]").c_str());
     mUBodyShadowNormals[i] = glGetUniformLocation(
@@ -116,9 +114,6 @@ void EclipseShadowReceiver::setupRender(
         shader.SetUniform(mUShadowTextures[mNumBodies], mNumBodies + textureOffset);
         eclipseShadow->bind(GL_TEXTURE0 + mNumBodies + textureOffset);
         mEclipseShadows[mNumBodies] = eclipseShadow;
-
-        shader.SetUniform(
-            mUScalingFactor[mNumBodies], static_cast<float>(1.0 / eclipseShadow->mScalingExponent));
 
         shader.SetUniform(mUShadowLength[mNumBodies], static_cast<float>(shadowLength));
 

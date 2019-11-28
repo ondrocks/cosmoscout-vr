@@ -13,7 +13,7 @@
 #include <utility>
 
 namespace cs::graphics {
-std::pair<cs::utils::Texture4f, double> generateShadowTexture(Body const& body);
+cs::utils::Texture4f generateShadowTexture(Body const& body);
 
 class CS_GRAPHICS_EXPORT SimpleEclipseShadowCaster : public EclipseShadowCaster {
  public:
