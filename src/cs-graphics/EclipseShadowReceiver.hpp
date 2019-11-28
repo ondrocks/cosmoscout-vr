@@ -27,18 +27,18 @@ enum struct CS_GRAPHICS_EXPORT EclipseCalcType : int {
   OFF = 0,
 
   /// Uses a pre calculated texture to look up the shadow values.
-  TEXTURE_LOOKUP = 1,
+  CARTESIAN_TEXTURE_LOOKUP = 1,
+
+  ANGULAR_TEXTURE_LOOKUP = 2,
 
   /// Approximate with circles instead of spheres. It is probably the
   /// fastest and most precise method.
-  CIRCLE_APPROXIMATION = 2,
+  CIRCLE_APPROXIMATION = 3,
 
   /// The fastest, eclipse renderer. It is the most inaccurate.
   /// http://developer.amd.com/wordpress/media/2012/10/Oat-AmbientApetureLighting.pdf
-  AMD_APPROXIMIATION = 3,
+  AMD_APPROXIMIATION = 4,
 };
-
-class SimpleEclipseShadowCaster;
 
 class CS_GRAPHICS_EXPORT EclipseShadowReceiver {
  public:

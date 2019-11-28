@@ -304,9 +304,10 @@ vec3 calcEclipseTextureLookup(int i, vec3 fragmentPosition) {
     return texture(uShadowTextures[i], vec2(x, y)).rgb;
 }
 
-const int ECLIPSE_LOOKUP = 1;
-const int ECLIPSE_CIRCLE = 2;
-const int ECLIPSE_APPROX = 3;
+const int CARTESIAN_TEXTURE_LOOKUP = 1;
+const int ANGULAR_TEXTURE_LOOKUP = 2;
+const int CIRCLE_APPROXIMATION = 3;
+const int AMD_APPROXIMIATION = 4;
 
 vec3 applyEclipseShadows(vec3 fragmentPosition, vec3 fragmentNormal) {
     vec3 light = vec3(1.0);
@@ -315,15 +316,15 @@ vec3 applyEclipseShadows(vec3 fragmentPosition, vec3 fragmentNormal) {
     if (facingSun) {
         for (int i = 0; i < uNumOccludingBodies; ++i) {
             switch (uEclipseCalcType) {
-                case ECLIPSE_LOOKUP:
+                case CARTESIAN_TEXTURE_LOOKUP:
                 light *= calcEclipseTextureLookup(i, fragmentPosition);
                 break;
 
-                case ECLIPSE_CIRCLE:
+                case CIRCLE_APPROXIMATION:
                 light *= calcEclipseCircleDouble(uOccludingBodies[i], fragmentPosition);
                 break;
 
-                case ECLIPSE_APPROX:
+                case AMD_APPROXIMIATION:
                 light *= calcEclipseApprox(uOccludingBodies[i], fragmentPosition);
                 break;
 

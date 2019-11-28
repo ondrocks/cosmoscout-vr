@@ -109,7 +109,7 @@ void EclipseShadowReceiver::setupRender(
 
     if (glm::length(bodyPosition - planetPosition) < shadowLength && bodyDistToSun < distToSun) {
 
-      if (eclipseCalcType == EclipseCalcType::TEXTURE_LOOKUP) {
+      if (eclipseCalcType == EclipseCalcType::CARTESIAN_TEXTURE_LOOKUP) {
         shader.SetUniform(mUShadowTextures[mNumBodies], mNumBodies + textureOffset);
         eclipseShadow->bind(GL_TEXTURE0 + mNumBodies + textureOffset);
         mEclipseShadows[mNumBodies] = eclipseShadow.get();
@@ -133,7 +133,7 @@ void EclipseShadowReceiver::setupRender(
 }
 
 void EclipseShadowReceiver::cleanUpRender(EclipseCalcType eclipseCalcType, int textureOffset) {
-  if (eclipseCalcType == EclipseCalcType::TEXTURE_LOOKUP) {
+  if (eclipseCalcType == EclipseCalcType::CARTESIAN_TEXTURE_LOOKUP) {
     for (int i = 0; i < mNumBodies; ++i) {
       mEclipseShadows[i]->unbind(GL_TEXTURE0 + i + textureOffset);
     }
