@@ -15,6 +15,7 @@
 #include <atomic>
 #include <cmath>
 #include <glm/glm.hpp>
+#include <optional>
 
 namespace cs::graphics {
 

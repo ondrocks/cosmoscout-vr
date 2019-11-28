@@ -11,7 +11,7 @@
 #include "EclipseShadowCaster.hpp"
 
 namespace cs::graphics {
-class AtmosphereEclipseShadowCaster : public EclipseShadowCaster {
+class CS_GRAPHICS_EXPORT AtmosphereEclipseShadowCaster : public EclipseShadowCaster {
  public:
   explicit AtmosphereEclipseShadowCaster(BodyWithAtmosphere const& body);
   virtual ~AtmosphereEclipseShadowCaster();

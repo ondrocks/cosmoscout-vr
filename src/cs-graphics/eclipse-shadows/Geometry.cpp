@@ -6,6 +6,7 @@
 
 #include "Geometry.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <glm/ext/scalar_constants.hpp>
 #include <glm/glm.hpp>

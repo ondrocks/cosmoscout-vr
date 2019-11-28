@@ -15,7 +15,7 @@
 namespace cs::graphics {
 std::pair<cs::utils::Texture4f, double> generateShadowTexture(Body const& body);
 
-class SimpleEclipseShadowCaster : public EclipseShadowCaster {
+class CS_GRAPHICS_EXPORT SimpleEclipseShadowCaster : public EclipseShadowCaster {
  public:
   explicit SimpleEclipseShadowCaster(Body const& body);
   virtual ~SimpleEclipseShadowCaster();

@@ -10,12 +10,12 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <utility>
 
-#include "../cs-core/GraphicsEngine.hpp"
-#include "../cs-core/SolarSystem.hpp"
+#include "../cs-graphics/eclipse-shadows/EclipseConstants.hpp"
 #include "../cs-scene/CelestialObject.hpp"
-#include "eclipse-shadows/EclipseConstants.hpp"
+#include "GraphicsEngine.hpp"
+#include "SolarSystem.hpp"
 
-namespace cs::graphics {
+namespace cs::core {
 
 EclipseShadowReceiver::EclipseShadowReceiver(scene::CelestialObject const* const shadowReceiver,
     std::shared_ptr<core::GraphicsEngine>                                        graphicsEngine,
@@ -106,7 +106,8 @@ void EclipseShadowReceiver::setupRender(
 
     occludingBodies[mNumBodies] = glm::vec4(bodyPosition, bodyRadiusAdjusted);
 
-    const double shadowLength = TEX_SHADOW_LENGTH_FACTOR * (bodyDistToSun * bodyRadiusAdjusted) /
+    const double shadowLength = graphics::TEX_SHADOW_LENGTH_FACTOR *
+                                (bodyDistToSun * bodyRadiusAdjusted) /
                                 (sunRadiusAdjusted - bodyRadiusAdjusted);
 
     if (glm::length(bodyPosition - planetPosition) < shadowLength && bodyDistToSun < distToSun) {
@@ -114,7 +115,7 @@ void EclipseShadowReceiver::setupRender(
       if (eclipseCalcType == EclipseCalcType::TEXTURE_LOOKUP) {
         shader.SetUniform(mUShadowTextures[mNumBodies], mNumBodies + textureOffset);
         eclipseShadow->bind(GL_TEXTURE0 + mNumBodies + textureOffset);
-        mEclipseShadows[mNumBodies] = eclipseShadow.get();
+        mEclipseShadows[mNumBodies] = eclipseShadow;
 
         shader.SetUniform(
             mUScalingFactor[mNumBodies], static_cast<float>(1.0 / eclipseShadow->mScalingExponent));
@@ -144,4 +145,4 @@ void EclipseShadowReceiver::cleanUpRender(EclipseCalcType eclipseCalcType, int t
     }
   }
 }
-} // namespace cs::graphics
+} // namespace cs::core

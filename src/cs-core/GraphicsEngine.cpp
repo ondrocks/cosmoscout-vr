@@ -141,20 +141,20 @@ GraphicsEngine::GraphicsEngine(std::shared_ptr<const core::Settings> const& sett
               static_cast<float>(sellmeier[i].first), static_cast<float>(sellmeier[i].second)};
         }
 
-        mEclipseShadowCaster.emplace(name,
-            std::make_unique<graphics::AtmosphereEclipseShadowCaster>(graphics::BodyWithAtmosphere{
-                static_cast<float>(*props.gravity), static_cast<float>(props.meanRadius),
-                {static_cast<float>(props.orbit.semiMajorAxisSun)},
-                {static_cast<float>(props.atmosphere->seaLevelMolecularNumberDensity),
-                    static_cast<float>(props.atmosphere->molarMass),
-                    static_cast<float>(props.atmosphere->height), layers,
-                    {static_cast<float>(props.atmosphere->sellmeierCoefficients.a),
-                        sellmeierTerms}}}));
+        mEclipseShadowCaster.emplace(
+            name, new graphics::AtmosphereEclipseShadowCaster(graphics::BodyWithAtmosphere{
+                      static_cast<float>(*props.gravity), static_cast<float>(props.meanRadius),
+                      {static_cast<float>(props.orbit.semiMajorAxisSun)},
+                      {static_cast<float>(props.atmosphere->seaLevelMolecularNumberDensity),
+                          static_cast<float>(props.atmosphere->molarMass),
+                          static_cast<float>(props.atmosphere->height), layers,
+                          {static_cast<float>(props.atmosphere->sellmeierCoefficients.a),
+                              sellmeierTerms}}}));
 
       } else if (it != settings->mBodyProperties.end()) {
         auto props = it->second;
         mEclipseShadowCaster.emplace(
-            name, std::make_unique<graphics::SimpleEclipseShadowCaster>(
+            name, new graphics::SimpleEclipseShadowCaster(
                       graphics::Body{static_cast<float>(props.meanRadius),
                           {static_cast<float>(props.orbit.semiMajorAxisSun)}}));
       }
@@ -239,7 +239,7 @@ void GraphicsEngine::calculateCascades() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::unordered_map<std::string, std::unique_ptr<graphics::EclipseShadowCaster>> const&
+std::map<std::string, graphics::EclipseShadowCaster*> const&
 GraphicsEngine::getEclipseShadowCaster() const {
   return mEclipseShadowCaster;
 }

@@ -7,10 +7,12 @@
 #ifndef CS_GRAPHICS_ECLIPSE_SHADOW_CASTER_HPP
 #define CS_GRAPHICS_ECLIPSE_SHADOW_CASTER_HPP
 
+#include "cs_graphics_export.hpp"
+
 #include <GL/glew.h>
 
 namespace cs::graphics {
-class EclipseShadowCaster {
+class CS_GRAPHICS_EXPORT EclipseShadowCaster {
  public:
   double mScalingExponent;
   double mRadius;
