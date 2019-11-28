@@ -16,6 +16,7 @@
 #include <glm/geometric.hpp>
 #include <glm/gtc/constants.hpp>
 #include <iostream>
+#include <string>
 
 namespace {
 
@@ -56,7 +57,7 @@ std::vector<glm::vec4> guassianBlur(
 
   const auto filter = generateGaussianKernel<filterSize>();
 
-  auto filterWeight = [&filter](size_t x, size_t y) -> float {
+  auto filterWeight = [&filter, filterRadius](size_t x, size_t y) -> float {
     return filter[x + filterRadius][y + filterRadius];
   };
 

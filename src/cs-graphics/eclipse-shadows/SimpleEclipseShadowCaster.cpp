@@ -8,6 +8,7 @@
 #include <cmath>
 #include <fstream>
 #include <glm/glm.hpp>
+#include <string>
 
 #include "../../cs-utils/SimpleTexture.hpp"
 #include "../../cs-utils/ThreadPool.hpp"

@@ -65,8 +65,7 @@ class CS_CORE_EXPORT GraphicsEngine {
   void registerCaster(graphics::ShadowCaster* caster);
   void unregisterCaster(graphics::ShadowCaster* caster);
 
-  std::unordered_map<std::string, std::unique_ptr<graphics::EclipseShadowCaster>> const&
-  getEclipseShadowCaster() const;
+  std::map<std::string, graphics::EclipseShadowCaster*> const& getEclipseShadowCaster() const;
 
   /// The light direction in world space.
   void update(glm::vec3 const& sunDirection);
@@ -83,8 +82,7 @@ class CS_CORE_EXPORT GraphicsEngine {
   std::shared_ptr<graphics::ClearHDRBufferNode> mClearNode;
   std::shared_ptr<graphics::ToneMappingNode>    mToneMappingNode;
 
-  std::unordered_map<std::string, std::unique_ptr<graphics::EclipseShadowCaster>>
-      mEclipseShadowCaster;
+  std::map<std::string, graphics::EclipseShadowCaster*> mEclipseShadowCaster;
 };
 
 } // namespace cs::core

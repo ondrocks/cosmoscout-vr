@@ -4,25 +4,24 @@
 //                        Copyright: (c) 2019 German Aerospace Center (DLR)                       //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef CS_GRAPHICS_ECLIPSE_SHADOW_RECEIVER_HPP
-#define CS_GRAPHICS_ECLIPSE_SHADOW_RECEIVER_HPP
+#ifndef CS_CORE_ECLIPSE_SHADOW_RECEIVER_HPP
+#define CS_CORE_ECLIPSE_SHADOW_RECEIVER_HPP
 
-#include "../cs-core/GraphicsEngine.hpp"
-#include "../cs-core/SolarSystem.hpp"
-#include "eclipse-shadows/EclipseShadowCaster.hpp"
+#include "../cs-graphics/eclipse-shadows/EclipseShadowCaster.hpp"
+#include "GraphicsEngine.hpp"
+#include "SolarSystem.hpp"
 #include <VistaOGLExt/VistaGLSLShader.h>
 #include <memory>
 #include <vector>
 
 namespace cs::scene {
 class CelestialObject;
-
 class CelestialBody;
 } // namespace cs::scene
 
-namespace cs::graphics {
+namespace cs::core {
 
-enum struct CS_GRAPHICS_EXPORT EclipseCalcType : int {
+enum struct CS_CORE_EXPORT EclipseCalcType : int {
   /// No eclipse will be rendered.
   OFF = 0,
 
@@ -40,7 +39,7 @@ enum struct CS_GRAPHICS_EXPORT EclipseCalcType : int {
   AMD_APPROXIMIATION = 4,
 };
 
-class CS_GRAPHICS_EXPORT EclipseShadowReceiver {
+class CS_CORE_EXPORT EclipseShadowReceiver {
  public:
   EclipseShadowReceiver(scene::CelestialObject const* shadowReceiver,
       std::shared_ptr<core::GraphicsEngine>           graphicsEngine,
@@ -72,11 +71,11 @@ class CS_GRAPHICS_EXPORT EclipseShadowReceiver {
   std::array<int, MAX_BODIES> mUShadowLength{};
   std::array<int, MAX_BODIES> mUBodyShadowNormals{};
 
-  std::array<EclipseShadowCaster*, MAX_BODIES> mEclipseShadows{};
+  std::array<graphics::EclipseShadowCaster*, MAX_BODIES> mEclipseShadows{};
   int                                          mNumBodies = 0;
 
   std::shared_ptr<core::GraphicsEngine> mGraphicsEngine;
   std::shared_ptr<core::SolarSystem>    mSolarSystem;
 };
-} // namespace cs::graphics
-#endif // CS_GRAPHICS_ECLIPSE_SHADOW_RECEIVER_HPP
+} // namespace cs::core
+#endif // CS_CORE_ECLIPSE_SHADOW_RECEIVER_HPP

@@ -18,7 +18,7 @@
 namespace cs::utils {
 
 template <typename T>
-class CS_UTILS_EXPORT SimpleTexture {
+class SimpleTexture {
  public:
   size_t const mWidth;
   size_t const mHeight;
