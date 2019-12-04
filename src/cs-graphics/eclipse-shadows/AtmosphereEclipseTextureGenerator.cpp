@@ -185,14 +185,12 @@ utils::Texture4f AtmosphereEclipseTextureGenerator::createShadowMap(
   return resultTexture;
 }
 
-std::uniform_real_distribution<> angleGenerator(-glm::half_pi<double>(), glm::half_pi<double>());
+std::uniform_real_distribution<> sunSurfaceGenerator(-SUN_RADIUS, SUN_RADIUS);
 
 glm::dvec2 AtmosphereEclipseTextureGenerator::randomPointOnSunSurface(double sunPositionX) {
-  const double angle = angleGenerator(mRNG);
-  const double x     = std::cos(angle) * SUN_RADIUS;
-  const double y     = std::sin(angle) * SUN_RADIUS;
-
-  return glm::dvec2(x + sunPositionX, y);
+  const double y = sunSurfaceGenerator(mRNG);
+  const double x = std::sqrt((SUN_RADIUS * SUN_RADIUS) - (y * y));
+  return glm::dvec2((x * 1.0000001) + sunPositionX, y * 1.0000001);
 }
 
 PhotonF AtmosphereEclipseTextureGenerator::emitPhoton(BodyWithAtmosphere const& body) {
