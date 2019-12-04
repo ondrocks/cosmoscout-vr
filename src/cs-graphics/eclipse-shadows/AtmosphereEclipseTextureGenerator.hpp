@@ -31,8 +31,8 @@ class AtmosphereEclipseTextureGenerator {
   ///       o
   /// o  o
   glm::dvec2           randomPointOnSunSurface(double sunPositionX);
-  PhotonF              emitPhoton(BodyWithAtmosphere const& body);
-  std::vector<PhotonF> generatePhotons(uint32_t count, BodyWithAtmosphere const& body);
+  PhotonD              emitPhoton(BodyWithAtmosphere const& body);
+  std::vector<PhotonD> generatePhotons(uint32_t count, BodyWithAtmosphere const& body);
 
   std::mt19937_64                         mRNG;
   std::uniform_int_distribution<uint32_t> mDistributionWavelength;

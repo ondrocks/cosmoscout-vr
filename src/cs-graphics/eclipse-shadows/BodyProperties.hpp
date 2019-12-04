@@ -15,10 +15,10 @@ namespace cs::graphics {
 
 /// DocTODO
 struct AtmosphereLayer {
-  float altitude;             ///< m
-  float baseTemperature;      ///< K
-  float temperatureLapseRate; ///< K/m
-  float baseDensity;          ///< kg/m^3
+  double altitude;             ///< m
+  double baseTemperature;      ///< K
+  double temperatureLapseRate; ///< K/m
+  double baseDensity;          ///< kg/m^3
 
   friend std::ostream& operator<<(std::ostream& os, const AtmosphereLayer& layer) {
     os << "{altitude: " << layer.altitude << " baseTemperature: " << layer.baseTemperature
@@ -30,8 +30,8 @@ struct AtmosphereLayer {
 
 /// DocTODO
 struct SellmeierCoefficients {
-  float                                a;
-  std::vector<std::pair<float, float>> terms;
+  double                                 a;
+  std::vector<std::pair<double, double>> terms;
 
   friend std::ostream& operator<<(std::ostream& os, const SellmeierCoefficients& coefficients) {
     os << "{a: " << coefficients.a << " terms: [";
@@ -45,9 +45,9 @@ struct SellmeierCoefficients {
 
 /// DocTODO
 struct Atmosphere {
-  float                        seaLevelMolecularNumberDensity; ///< cm^-3
-  float                        molarMass;                      ///< kg/mol
-  float                        height;                         ///< m
+  double                        seaLevelMolecularNumberDensity; ///< cm^-3
+  double                        molarMass;                      ///< kg/mol
+  double                        height;                         ///< m
   std::vector<AtmosphereLayer> layers;
   SellmeierCoefficients        sellmeierCoefficients;
 
@@ -69,7 +69,7 @@ struct Atmosphere {
 struct Orbit {
   // double perihelion;    ///< m
   // double aphelion;      ///< m
-  float semiMajorAxisSun; ///< m
+  double semiMajorAxisSun; ///< m
   // double eccentricity;
 
   friend std::ostream& operator<<(std::ostream& os, const Orbit& orbit) {
@@ -79,13 +79,13 @@ struct Orbit {
 };
 
 struct Body {
-  float meanRadius;
-  Orbit orbit;
+  double meanRadius;
+  Orbit  orbit;
 };
 
 struct BodyWithAtmosphere {
-  float      gravity;
-  float      meanRadius;
+  double      gravity;
+  double      meanRadius;
   Orbit      orbit;
   Atmosphere atmosphere;
 

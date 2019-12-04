@@ -121,42 +121,28 @@ GraphicsEngine::GraphicsEngine(std::shared_ptr<const core::Settings> const& sett
 
         std::vector<graphics::AtmosphereLayer> layers(props.atmosphere->layers.size());
         for (size_t i = 0; i < props.atmosphere->layers.size(); ++i) {
-          layers[i] = {static_cast<float>(props.atmosphere->layers[i].altitude),
-              static_cast<float>(props.atmosphere->layers[i].baseTemperature),
-              static_cast<float>(props.atmosphere->layers[i].temperatureLapseRate),
-              static_cast<float>(props.atmosphere->layers[i].baseDensity)};
-        }
-
-        /*auto a = graphics::AtmosphereEclipseShadowCaster(
-            {*props.gravity, props.meanRadius, {props.orbit.semiMajorAxisSun},
-                {props.atmosphere->seaLevelMolecularNumberDensity, props.atmosphere->molarMass,
-                    props.atmosphere->height, layers,
-                    {props.atmosphere->sellmeierCoefficients.a,
-                        props.atmosphere->sellmeierCoefficients.terms}}});*/
-
-        const auto& sellmeier = props.atmosphere->sellmeierCoefficients.terms;
-        std::vector<std::pair<float, float>> sellmeierTerms(sellmeier.size());
-        for (size_t i = 0; i < sellmeier.size(); ++i) {
-          sellmeierTerms[i] = {
-              static_cast<float>(sellmeier[i].first), static_cast<float>(sellmeier[i].second)};
+          layers[i] = {props.atmosphere->layers[i].altitude,
+              props.atmosphere->layers[i].baseTemperature,
+              props.atmosphere->layers[i].temperatureLapseRate,
+              props.atmosphere->layers[i].baseDensity};
         }
 
         mEclipseShadowCaster.emplace(
             name, new graphics::AtmosphereEclipseShadowCaster(graphics::BodyWithAtmosphere{
-                      static_cast<float>(*props.gravity), static_cast<float>(props.meanRadius),
-                      {static_cast<float>(props.orbit.semiMajorAxisSun)},
-                      {static_cast<float>(props.atmosphere->seaLevelMolecularNumberDensity),
-                          static_cast<float>(props.atmosphere->molarMass),
-                          static_cast<float>(props.atmosphere->height), layers,
-                          {static_cast<float>(props.atmosphere->sellmeierCoefficients.a),
-                              sellmeierTerms}}}));
+                      *props.gravity, props.meanRadius,
+                      {props.orbit.semiMajorAxisSun},
+                      {props.atmosphere->seaLevelMolecularNumberDensity,
+                          props.atmosphere->molarMass,
+                          props.atmosphere->height, layers,
+                          {props.atmosphere->sellmeierCoefficients.a,
+                           props.atmosphere->sellmeierCoefficients.terms}}}));
 
       } else if (it != settings->mBodyProperties.end()) {
         auto props = it->second;
         mEclipseShadowCaster.emplace(
             name, new graphics::SimpleEclipseShadowCaster(
-                      graphics::Body{static_cast<float>(props.meanRadius),
-                          {static_cast<float>(props.orbit.semiMajorAxisSun)}}));
+                      graphics::Body{props.meanRadius,
+                          {props.orbit.semiMajorAxisSun}}));
       }
     }
   }

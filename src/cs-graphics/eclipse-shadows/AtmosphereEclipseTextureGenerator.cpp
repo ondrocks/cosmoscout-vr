@@ -153,13 +153,13 @@ void toPPMFile(const std::vector<glm::vec4>& data, size_t width, size_t height,
 
 utils::Texture4f AtmosphereEclipseTextureGenerator::createShadowMap(
     BodyWithAtmosphere const& body, size_t photonCount) {
-  std::vector<PhotonF> photons = generatePhotons(photonCount, body);
+  std::vector<PhotonD> photons = generatePhotons(photonCount, body);
 
   uint32_t ssboPhotons;
   glGenBuffers(1, &ssboPhotons);
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboPhotons);
   glBufferData(
-      GL_SHADER_STORAGE_BUFFER, sizeof(PhotonF) * photons.size(), photons.data(), GL_DYNAMIC_COPY);
+      GL_SHADER_STORAGE_BUFFER, sizeof(PhotonD) * photons.size(), photons.data(), GL_DYNAMIC_COPY);
 
   mPhotonAtmosphereTracer.traceThroughAtmosphere(ssboPhotons, photons.size(), body);
   auto result = mTextureTracer->traceThroughTexture(ssboPhotons, photons.size(), body);
@@ -193,8 +193,8 @@ glm::dvec2 AtmosphereEclipseTextureGenerator::randomPointOnSunSurface(double sun
   return glm::dvec2((x * 1.0000001) + sunPositionX, y * 1.0000001);
 }
 
-PhotonF AtmosphereEclipseTextureGenerator::emitPhoton(BodyWithAtmosphere const& body) {
-  std::uniform_real_distribution<> distributionEarth(0.0, body.atmosphere.height);
+PhotonD AtmosphereEclipseTextureGenerator::emitPhoton(BodyWithAtmosphere const& body) {
+  /*std::uniform_real_distribution<> distributionEarth(0.0, body.atmosphere.height);
   glm::dvec2                       target = {0.0, body.meanRadius + distributionEarth(mRNG)};
 
   glm::dvec2 startPosition;
@@ -209,14 +209,49 @@ PhotonF AtmosphereEclipseTextureGenerator::emitPhoton(BodyWithAtmosphere const& 
                                    body.meanRadius + body.atmosphere.height);
   uint32_t wavelength = mDistributionWavelength(mRNG);
   float    intensity  = INTENSITY_LUT[wavelength - MIN_WAVELENGTH];
-  return {glm::vec2(startPosition), glm::vec2(direction), wavelength, intensity};
+  return {glm::dvec3(startPosition), glm::dvec3(direction), intensity, wavelength, {}};*/
 }
 
-std::vector<PhotonF> AtmosphereEclipseTextureGenerator::generatePhotons(
+std::vector<PhotonD> AtmosphereEclipseTextureGenerator::generatePhotons(
     uint32_t count, BodyWithAtmosphere const& body) {
-  std::vector<PhotonF> photons(count);
+  std::vector<PhotonD> photons(count);
 
-  cs::utils::ThreadPool          tp(std::thread::hardware_concurrency());
+  // 1. calculate target area
+  double rOcc = body.meanRadius + body.atmosphere.height;
+  double rOcc2 = rOcc * rOcc;
+
+  double r2   = (rOcc + SUN_RADIUS) * (rOcc + SUN_RADIUS);
+
+  double d = body.orbit.semiMajorAxisSun;
+  double d2   = d * d;
+
+  double a = (rOcc2 * std::sqrt(d2 - r2) * d) / (-rOcc * r2 + d2 * rOcc) - body.meanRadius;
+  double xOcc = (rOcc * (SUN_RADIUS + rOcc)) / d;
+
+  double yLower = body.meanRadius;
+  double yUpper = body.meanRadius + a;
+
+  std::uniform_real_distribution<double> targetDistribution(yLower, yUpper);
+
+  // 2. for each i in count
+  for (size_t i = 0; i < count; ++i) {
+    //    3. sample random point in target area,
+    glm::dvec3 target(xOcc, targetDistribution(mRNG), 0.0);
+
+    //    4. sample random point on suns surface
+
+
+    //    5. validate resulting ray to ensure it can pass through atmosphere
+    //    6. calculate limb darkening for start point
+    //    7. get random wavelength in visible spectrum
+    //    8. from wavelength and limb darkening get an intensity
+    //    9. shoot photon on to atmosphere
+    //   10. add photon to list
+  }
+
+
+
+  /*cs::utils::ThreadPool          tp(std::thread::hardware_concurrency());
   std::vector<std::future<void>> tasks(count);
 
   for (size_t i = 0; i < count; ++i) {
@@ -225,7 +260,7 @@ std::vector<PhotonF> AtmosphereEclipseTextureGenerator::generatePhotons(
 
   for (auto&& task : tasks) {
     task.get();
-  }
+  }*/
 
   return photons;
 }

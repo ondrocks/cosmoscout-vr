@@ -114,12 +114,12 @@ std::vector<FloatPixel> TextureTracerCPU::traceThroughTexture(
       return glm::ivec2(TEX_WIDTH, TEX_HEIGHT);
   };
 
-  auto getRayIntersectAtX = [](PhotonF const& ray, double x) -> double {
+  auto getRayIntersectAtX = [](Photon2F const& ray, double x) -> double {
     double slope = ray.direction.y / ray.direction.x;
     return slope * (x - ray.position.x) + ray.position.y;
   };
 
-  auto getRayRectangleExitEdge = [&](PhotonF const& ray, Rectangle const& rect) -> glm::ivec2 {
+  auto getRayRectangleExitEdge = [&](Photon2F const& ray, Rectangle const& rect) -> glm::ivec2 {
     double intersectHeight = getRayIntersectAtX(ray, rect.x + rect.w);
     if (intersectHeight < rect.y) {
       return glm::ivec2(0, -1);
@@ -135,7 +135,7 @@ std::vector<FloatPixel> TextureTracerCPU::traceThroughTexture(
     glm::dvec2 end;
   };
 
-  auto rayLineIntersection = [](PhotonF const& ray, Line const& line) -> std::optional<glm::dvec2> {
+  auto rayLineIntersection = [](Photon2F const& ray, Line const& line) -> std::optional<glm::dvec2> {
     glm::dvec2 v1 = glm::dvec2(ray.position) - line.start;
     glm::dvec2 v2 = line.end - line.start;
     glm::dvec2 v3 = glm::dvec2(-ray.direction.y, ray.direction.x);
@@ -156,7 +156,7 @@ std::vector<FloatPixel> TextureTracerCPU::traceThroughTexture(
       return std::nullopt;
   };
 
-  auto rayRectangleIntersection = [&](PhotonF const&   ray,
+  auto rayRectangleIntersection = [&](Photon2F const&   ray,
                                       Rectangle const& rect) -> std::pair<glm::dvec2, glm::dvec2> {
     glm::dvec2 topLeft(rect.x, rect.y), topRight(rect.x + rect.w, rect.y);
     glm::dvec2 botLeft(rect.x, rect.y + rect.h), botRight(rect.x + rect.w, rect.y + rect.h);
@@ -183,14 +183,14 @@ std::vector<FloatPixel> TextureTracerCPU::traceThroughTexture(
     return std::pair<glm::dvec2, glm::dvec2>(entry, exit);
   };
 
-  auto rayDistanceInRectangle = [&](PhotonF const& ray, Rectangle const& rect) -> double {
+  auto rayDistanceInRectangle = [&](Photon2F const& ray, Rectangle const& rect) -> double {
     auto [entry, exit] = rayRectangleIntersection(ray, rect);
     return glm::length(exit - entry);
   };
 
-  std::vector<PhotonF> photons(numPhotons);
+  std::vector<Photon2F> photons(numPhotons);
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboPhotons);
-  glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(PhotonF) * photons.size(), photons.data());
+  glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(Photon2F) * photons.size(), photons.data());
 
   const double pixelInAtmosphere = body.atmosphere.height / rectangleHeight;
   const double photonsPerPixel   = photons.size() / pixelInAtmosphere;
@@ -199,7 +199,7 @@ std::vector<FloatPixel> TextureTracerCPU::traceThroughTexture(
 
   for (size_t gid = 0; gid < photons.size(); ++gid) {
     photonTasks[gid] = tp.enqueue([&, gid] {
-      PhotonF localPhoton = photons[gid];
+      Photon2F localPhoton = photons[gid];
 
       if (localPhoton.intensity > 0.0) {
         glm::ivec2 photonTexIndices = getRectangleIdxAt(localPhoton.position);
