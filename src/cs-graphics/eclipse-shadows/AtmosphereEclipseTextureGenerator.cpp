@@ -13,8 +13,10 @@
 #include "TextureTracerCPU.hpp"
 #include <GL/glew.h>
 #include <fstream>
+#include <glm/detail/type_quat.hpp>
 #include <glm/geometric.hpp>
 #include <glm/gtc/constants.hpp>
+#include <iomanip>
 #include <iostream>
 #include <string>
 
@@ -212,6 +214,10 @@ PhotonD AtmosphereEclipseTextureGenerator::emitPhoton(BodyWithAtmosphere const& 
   return {glm::dvec3(startPosition), glm::dvec3(direction), intensity, wavelength, {}};*/
 }
 
+double calculateLimbDarkening(double distance, double angle) {
+  return 1.0;
+}
+
 std::vector<PhotonD> AtmosphereEclipseTextureGenerator::generatePhotons(
     uint32_t count, BodyWithAtmosphere const& body) {
   std::vector<PhotonD> photons(count);
@@ -239,7 +245,19 @@ std::vector<PhotonD> AtmosphereEclipseTextureGenerator::generatePhotons(
     glm::dvec3 target(xOcc, targetDistribution(mRNG), 0.0);
 
     //    4. sample random point on suns surface
+    double xSun = xOcc - d;
+    glm::dvec3 sunCenter(-xSun, 0.0, 0.0);
+    double angularRadSun = std::asin(SUN_RADIUS / glm::length(target - sunCenter));
 
+    std::uniform_real_distribution<double> angleRng(-angularRadSun, angularRadSun);
+    glm::dvec3 randYawPitch{};
+    do {
+      randYawPitch = glm::dvec3(angleRng(mRNG), angleRng(mRNG), 0.0);
+    } while (glm::length(randYawPitch) > angularRadSun);
+
+    glm::dvec3 aimingVector = target - sunCenter;
+    glm::dquat rotation(randYawPitch);
+    aimingVector = rotation * aimingVector;
 
     //    5. validate resulting ray to ensure it can pass through atmosphere
     //    6. calculate limb darkening for start point
