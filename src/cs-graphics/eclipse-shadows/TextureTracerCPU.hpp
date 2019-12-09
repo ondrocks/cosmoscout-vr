@@ -17,7 +17,7 @@
 namespace cs::graphics {
 class TextureTracerCPU : public TextureTracer {
  public:
-  std::vector<FloatPixel> traceThroughTexture(
+  std::vector<DoublePixel> traceThroughTexture(
       uint32_t ssboPhotons, size_t numPhotons, BodyWithAtmosphere const& body) override;
 };
 } // namespace cs::graphics

@@ -23,7 +23,7 @@ class AtmosphereEclipseTextureGenerator {
   cs::utils::Texture4f createShadowMap(BodyWithAtmosphere const& body, size_t photonCount);
 
  private:
-  std::vector<PhotonD> generatePhotons(uint32_t count, BodyWithAtmosphere const& body);
+  std::vector<Photon> generatePhotons(uint32_t count, BodyWithAtmosphere const& body);
 
   std::mt19937_64                         mRNG;
   std::uniform_int_distribution<uint32_t> mDistributionWavelength;

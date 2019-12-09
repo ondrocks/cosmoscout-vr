@@ -26,7 +26,7 @@ const uint MAX_WAVELENGTH = 749;
 const uint NUM_WAVELENGTHS = MAX_WAVELENGTH - MIN_WAVELENGTH + 1;
 
 const double DX = 1.0LF;// m
-const double IDEAL_UNIVERSAL_GAS_CONSTANT = 8.3144626181532LF;// J / (mol * K)
+const double IDEAL_UNIVERSAL_GAS_CONSTANT = 8.31446261815324LF;// J / (mol * K)
 
 uniform Planet planet;
 uniform SellmeierCoefficients sellmeierCoefficients;
@@ -65,6 +65,69 @@ AtmosphericLayer layerAtAltitude(double altitude) {
         return AtmosphericLayer(32000.0, 228.65, 0.0028, 0.01322);
     }*/
 }
+
+const double EPSILON = 0.00000001;
+
+double pow(double base, int power) {
+    double res = 1.0;// Initialize result
+
+    while (power > 0.0) {
+        // If power is odd, multiply x with result
+        if (power % 2 == 1) {
+            res *= base;
+        }
+
+        // n must be even now
+        power /= 2;
+        base *= base;// Change x to x^2
+    }
+
+    return res;
+}
+
+double pow(double base, double power) {
+    bool negative = power < 0.0LF;
+    if (negative) {
+        power *= -1.0LF;
+    }
+
+    double fraction = power - int(power);
+    int integer = int(power - fraction);
+
+    double intPow = pow(base, integer);
+
+    double low = 0.0LF;
+    double high = 1.0LF;
+
+    double sqr = sqrt(base);
+    double acc = sqr;
+    double mid = high / 2.0LF;
+
+    while (abs(mid - fraction) > EPSILON) {
+        sqr = sqrt(sqr);
+
+        if (mid <= fraction) {
+            low = mid;
+            acc *= sqr;
+        } else {
+            high = mid;
+            acc *= (1.0LF / sqr);
+        }
+
+        mid = (low + high) / 2.0LF;
+    }
+
+    double result = intPow * acc;
+    if (negative) {
+        return 1.0LF / result;
+    }
+
+    return result;
+}
+
+const double E = 2.7182818284590452353602874LF;
+
+double exp(double power) { return pow(E, power); }
 
 double densityAtAltitude(double altitude) {
     AtmosphericLayer layer = layerAtAltitude(altitude);

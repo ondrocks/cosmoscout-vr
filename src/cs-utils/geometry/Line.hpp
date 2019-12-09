@@ -4,30 +4,25 @@
 //                        Copyright: (c) 2019 German Aerospace Center (DLR)                       //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef CS_GRAPHICS_COLOR_CONVERTER_HPP
-#define CS_GRAPHICS_COLOR_CONVERTER_HPP
+#ifndef CS_UTIL_GEOMETRY_LINE_HPP
+#define CS_UTIL_GEOMETRY_LINE_HPP
 
-#include <cstdint>
-#include <glm/vec4.hpp>
-#include <vector>
+#include <glm/glm.hpp>
 
-namespace cs::graphics {
+namespace cs::utils::geom {
 
-struct DoublePixel;
-
-class ColorConverter {
- public:
-  ColorConverter() = default;
-
-  void init();
-
-  std::vector<glm::dvec4> convert(std::vector<DoublePixel> const& pixel);
-
-  ~ColorConverter();
-
- private:
-  uint32_t mProgram;
+template <uint8_t Dimension, typename T>
+struct Line {
+  glm::vec<Dimension, T> start;
+  glm::vec<Dimension, T> end;
 };
-} // namespace cs::graphics
 
-#endif // CS_GRAPHICS_COLOR_CONVERTER_HPP
+using DLine2 = Line<2, double>;
+using DLine3 = Line<3, double>;
+
+using FLine2 = Line<2, float>;
+using FLine3 = Line<3, float>;
+
+} // namespace cs::utils::geom
+
+#endif // CS_UTIL_GEOMETRY_LINE_HPP

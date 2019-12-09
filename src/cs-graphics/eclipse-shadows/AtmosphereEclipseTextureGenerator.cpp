@@ -23,7 +23,7 @@
 namespace {
 
 template <size_t SIZE>
-std::array<std::array<float, SIZE>, SIZE> generateGaussianKernel() {
+std::array<std::array<double, SIZE>, SIZE> generateGaussianKernel() {
   // intialising standard deviation to 1.0
   double sigma = (SIZE / 2) / 2.0;
   double s     = 2.0 * sigma * sigma;
@@ -31,8 +31,8 @@ std::array<std::array<float, SIZE>, SIZE> generateGaussianKernel() {
   // sum is for normalization
   double sum = 0.0;
 
-  std::array<std::array<float, SIZE>, SIZE> kernel{};
-  int                                       halfSize = SIZE / 2;
+  std::array<std::array<double, SIZE>, SIZE> kernel{};
+  int                                        halfSize = SIZE / 2;
 
   // generating 5x5 kernel
   for (int x = -halfSize; x <= halfSize; x++) {
@@ -52,18 +52,18 @@ std::array<std::array<float, SIZE>, SIZE> generateGaussianKernel() {
 }
 
 template <size_t RADIUS>
-std::vector<glm::vec4> guassianBlur(
-    const std::vector<glm::vec4>& image, int64_t width, int64_t height) {
+std::vector<glm::dvec4> guassianBlur(
+    const std::vector<glm::dvec4>& image, int64_t width, int64_t height) {
   const int64_t filterSize   = RADIUS * 2 + 1;
   const int64_t filterRadius = RADIUS;
 
   const auto filter = generateGaussianKernel<filterSize>();
 
-  auto filterWeight = [&filter, filterRadius](size_t x, size_t y) -> float {
+  auto filterWeight = [&filter, filterRadius](size_t x, size_t y) -> double {
     return filter[x + filterRadius][y + filterRadius];
   };
 
-  std::vector<glm::vec4> output(image.size());
+  std::vector<glm::dvec4> output(image.size());
 
   cs::utils::ThreadPool          tp(std::thread::hardware_concurrency());
   std::vector<std::future<void>> tasks(height);
@@ -71,11 +71,11 @@ std::vector<glm::vec4> guassianBlur(
   for (int64_t y = 0; y < height; ++y) {
     tasks[y] = tp.enqueue([&, y] {
       for (int64_t x = 0; x < width; ++x) {
-        glm::vec4 sum(0.0);
+        glm::dvec4 sum(0.0);
 
         for (int64_t i = -filterRadius; i <= filterRadius; ++i) {
           for (int64_t j = -filterRadius; j <= filterRadius; ++j) {
-            float weight = filterWeight(i, j);
+            double weight = filterWeight(i, j);
 
             int64_t dx = glm::abs(x + i);
             if (dx >= width) {
@@ -87,7 +87,7 @@ std::vector<glm::vec4> guassianBlur(
               dy = height - 1;
             }
 
-            glm::vec4 value = image[dy * width + dx];
+            glm::dvec4 value = image[dy * width + dx];
             sum.r += weight * value.r;
             sum.g += weight * value.g;
             sum.b += weight * value.b;
@@ -122,18 +122,16 @@ AtmosphereEclipseTextureGenerator::AtmosphereEclipseTextureGenerator()
   mColorConverter.init();
 }
 
-std::string toPPMString(const std::vector<glm::vec4>& data, size_t width, size_t height) {
+std::string toPPMString(const std::vector<glm::dvec4>& data, size_t width, size_t height) {
   std::string output = "P3\n";
   output.append(std::to_string(width) + " " + std::to_string(height) + "\n");
   output.append("65535\n");
 
   size_t counter = 0;
   for (auto&& pixel : data) {
-    output.append(
-        std::to_string(lroundf(std::clamp(pixel.x * 25.0f, 0.0f, 1.0f) * 65535.0f)) + " ");
-    output.append(
-        std::to_string(lroundf(std::clamp(pixel.y * 25.0f, 0.0f, 1.0f) * 65535.0f)) + " ");
-    output.append(std::to_string(lroundf(std::clamp(pixel.z * 25.0f, 0.0f, 1.0f) * 65535.0f)));
+    output.append(std::to_string(lround(std::clamp(pixel.x * 25.0, 0.0, 1.0) * 65535.0)) + " ");
+    output.append(std::to_string(lround(std::clamp(pixel.y * 25.0, 0.0, 1.0) * 65535.0)) + " ");
+    output.append(std::to_string(lround(std::clamp(pixel.z * 25.0, 0.0, 1.0) * 65535.0)));
 
     if (counter++ == 5) {
       output.append("\n");
@@ -145,7 +143,7 @@ std::string toPPMString(const std::vector<glm::vec4>& data, size_t width, size_t
   return output;
 }
 
-void toPPMFile(const std::vector<glm::vec4>& data, size_t width, size_t height,
+void toPPMFile(const std::vector<glm::dvec4>& data, size_t width, size_t height,
     const std::string_view fileName) {
   std::string   output = toPPMString(data, width, height);
   std::ofstream ofStream(fileName.data(), std::ios::out);
@@ -155,22 +153,22 @@ void toPPMFile(const std::vector<glm::vec4>& data, size_t width, size_t height,
 
 utils::Texture4f AtmosphereEclipseTextureGenerator::createShadowMap(
     BodyWithAtmosphere const& body, size_t photonCount) {
-  std::vector<PhotonD> photons = generatePhotons(photonCount, body);
+  std::vector<Photon> photons = generatePhotons(photonCount, body);
 
   uint32_t ssboPhotons;
   glGenBuffers(1, &ssboPhotons);
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboPhotons);
   glBufferData(
-      GL_SHADER_STORAGE_BUFFER, sizeof(PhotonD) * photons.size(), photons.data(), GL_DYNAMIC_COPY);
+      GL_SHADER_STORAGE_BUFFER, sizeof(Photon) * photons.size(), photons.data(), GL_DYNAMIC_COPY);
 
   mPhotonAtmosphereTracer.traceThroughAtmosphere(ssboPhotons, photons.size(), body);
   auto result = mTextureTracer->traceThroughTexture(ssboPhotons, photons.size(), body);
-  std::vector<glm::vec4> texture = mColorConverter.convert(result);
+  std::vector<glm::dvec4> texture = mColorConverter.convert(result);
 
   toPPMFile(texture, TEX_WIDTH, TEX_HEIGHT,
       "eclipse_shadow_" + std::to_string(body.gravity) + ".raw.ppm");
 
-  std::vector<glm::vec4> outputTexture =
+  std::vector<glm::dvec4> outputTexture =
       guassianBlur<static_cast<size_t>(TEX_WIDTH * 0.01)>(texture, TEX_WIDTH, TEX_HEIGHT);
 
   auto shadowTexture = generateShadowTexture({body.meanRadius, body.orbit});
@@ -179,7 +177,7 @@ utils::Texture4f AtmosphereEclipseTextureGenerator::createShadowMap(
   utils::Texture4f resultTexture(TEX_WIDTH, TEX_HEIGHT);
 
   for (size_t i = 0; i < outputTexture.size(); ++i) {
-    resultTexture.dataPtr()[i] = glm::vec4(outputTexture[i].rgb() + data[i].rgb(), 1.0f);
+    resultTexture.dataPtr()[i] = glm::vec4(outputTexture[i].rgb() + glm::dvec3(data[i].rgb()), 1.0f);
   }
 
   glDeleteBuffers(1, &ssboPhotons);
@@ -192,9 +190,9 @@ double calculateLimbDarkening(double radius) {
   return (1.0 - 0.6 * (1.0 - std::sqrt(1.0 - radius * radius))) / 0.8;
 }
 
-std::vector<PhotonD> AtmosphereEclipseTextureGenerator::generatePhotons(
+std::vector<Photon> AtmosphereEclipseTextureGenerator::generatePhotons(
     uint32_t count, BodyWithAtmosphere const& body) {
-  std::vector<PhotonD> photons;
+  std::vector<Photon> photons;
   photons.reserve(count);
 
   // 1. calculate target area
@@ -265,7 +263,7 @@ std::vector<PhotonD> AtmosphereEclipseTextureGenerator::generatePhotons(
                                    photonRay, utils::geom::DSphere(sphereBody.center,
                                                   body.meanRadius + body.atmosphere.height));
 
-      PhotonD photon = {startPosition, direction, intensityAdjusted, wavelength, 0};
+      Photon photon = {startPosition, direction, intensityAdjusted, wavelength, 0};
       photons.push_back(photon);
     });
   }
