@@ -16,8 +16,6 @@
 #include <GL/glew.h>
 #include <fstream>
 #include <glm/detail/type_quat.hpp>
-#include <glm/geometric.hpp>
-#include <glm/gtc/constants.hpp>
 #include <iomanip>
 #include <iostream>
 #include <string>
@@ -218,53 +216,62 @@ std::vector<PhotonD> AtmosphereEclipseTextureGenerator::generatePhotons(
 
   std::uniform_real_distribution<double> targetDistribution(yLower, yUpper);
 
+  utils::ThreadPool              tp(std::thread::hardware_concurrency());
+  std::vector<std::future<void>> tasks(count);
+
   // 2. for each i in count
   for (size_t i = 0; i < count; ++i) {
-    //    3. sample random point in target area,
-    glm::dvec3 target(xOcc, targetDistribution(mRNG), 0.0);
+    tasks[i] = tp.enqueue([&] {
+      // 3. sample random point in target area,
+      glm::dvec3 target(xOcc, targetDistribution(mRNG), 0.0);
 
-    //    4. sample random point on suns surface
-    double     xSun = xOcc - d;
-    glm::dvec3 sunCenter(-xSun, 0.0, 0.0);
-    double     angularRadSun = std::asin(SUN_RADIUS / glm::length(target - sunCenter));
+      // 4. sample random point on suns surface
+      double     xSun = xOcc - d;
+      glm::dvec3 sunCenter(-xSun, 0.0, 0.0);
+      double     angularRadSun = std::asin(SUN_RADIUS / glm::length(target - sunCenter));
 
-    std::uniform_real_distribution<double> angleRng(-angularRadSun, angularRadSun);
-    glm::dvec3                             randYawPitch{};
-    do {
-      randYawPitch = glm::dvec3(0.0, angleRng(mRNG), angleRng(mRNG));
-    } while (glm::length(randYawPitch) > angularRadSun);
+      std::uniform_real_distribution<double> angleRng(-angularRadSun, angularRadSun);
+      glm::dvec3                             randYawPitch{};
+      do {
+        randYawPitch = glm::dvec3(0.0, angleRng(mRNG), angleRng(mRNG));
+      } while (glm::length(randYawPitch) > angularRadSun);
 
-    glm::dvec3 aimingVector = target - sunCenter;
-    glm::dquat rotation(randYawPitch);
-    aimingVector         = rotation * aimingVector;
-    glm::dvec3 direction = -glm::normalize(aimingVector);
-    glm::dvec3 origin    = target + aimingVector;
+      glm::dvec3 aimingVector = target - sunCenter;
+      glm::dquat rotation(randYawPitch);
+      aimingVector         = rotation * aimingVector;
+      glm::dvec3 direction = -glm::normalize(aimingVector);
+      glm::dvec3 origin    = target + aimingVector;
 
-    utils::geom::DRay3 photonRay(origin, direction);
+      utils::geom::DRay3 photonRay(origin, direction);
 
-    //    5. validate resulting ray to ensure it can pass through atmosphere
-    if (utils::geom::rayHitSphere(photonRay, sphereBody)) {
-      continue;
-    }
+      // 5. validate resulting ray to ensure it can pass through atmosphere
+      if (utils::geom::rayHitSphere(photonRay, sphereBody)) {
+        return;
+      }
 
-    //    6. calculate limb darkening for start point
-    double limbDarkening = calculateLimbDarkening(glm::length(randYawPitch) / angularRadSun);
+      // 6. calculate limb darkening for start point
+      double limbDarkening = calculateLimbDarkening(glm::length(randYawPitch) / angularRadSun);
 
-    //    7. get random wavelength in visible spectrum
-    uint32_t wavelength = mDistributionWavelength(mRNG);
-    double   intensity  = INTENSITY_LUT[wavelength - MIN_WAVELENGTH];
+      // 7. get random wavelength in visible spectrum
+      uint32_t wavelength = mDistributionWavelength(mRNG);
+      double   intensity  = INTENSITY_LUT[wavelength - MIN_WAVELENGTH];
 
-    //    8. from wavelength and limb darkening get an intensity
-    double intensityAdjusted = limbDarkening * intensity;
+      // 8. from wavelength and limb darkening get an intensity
+      double intensityAdjusted = limbDarkening * intensity;
 
-    //    9. shoot photon on to atmosphere
-    glm::dvec3 startPosition =
-        origin + direction * utils::geom::raySphereDistance(
-                                 photonRay, utils::geom::DSphere(sphereBody.center,
-                                                body.meanRadius + body.atmosphere.height));
+      // 9. shoot photon on to atmosphere
+      glm::dvec3 startPosition =
+          origin + direction * utils::geom::raySphereDistance(
+                                   photonRay, utils::geom::DSphere(sphereBody.center,
+                                                  body.meanRadius + body.atmosphere.height));
 
-    PhotonD photon = {startPosition, direction, intensityAdjusted, wavelength, 0};
-    photons.push_back(photon);
+      PhotonD photon = {startPosition, direction, intensityAdjusted, wavelength, 0};
+      photons.push_back(photon);
+    });
+  }
+
+  for (auto&& task : tasks) {
+    task.get();
   }
 
   return photons;
