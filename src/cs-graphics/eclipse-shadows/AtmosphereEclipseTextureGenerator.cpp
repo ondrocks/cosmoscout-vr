@@ -6,6 +6,8 @@
 
 #include "AtmosphereEclipseTextureGenerator.hpp"
 #include "../../cs-utils/ThreadPool.hpp"
+#include "../../cs-utils/geometry/Algortithms.hpp"
+#include "../../cs-utils/utils.hpp"
 #include "BlackBodySpectrum.hpp"
 #include "EclipseConstants.hpp"
 #include "Geometry.hpp"
@@ -187,52 +189,29 @@ utils::Texture4f AtmosphereEclipseTextureGenerator::createShadowMap(
   return resultTexture;
 }
 
-std::uniform_real_distribution<> sunSurfaceGenerator(-SUN_RADIUS, SUN_RADIUS);
-
-glm::dvec2 AtmosphereEclipseTextureGenerator::randomPointOnSunSurface(double sunPositionX) {
-  const double y = sunSurfaceGenerator(mRNG);
-  const double x = std::sqrt((SUN_RADIUS * SUN_RADIUS) - (y * y));
-  return glm::dvec2((x * 1.0000001) + sunPositionX, y * 1.0000001);
-}
-
-PhotonD AtmosphereEclipseTextureGenerator::emitPhoton(BodyWithAtmosphere const& body) {
-  /*std::uniform_real_distribution<> distributionEarth(0.0, body.atmosphere.height);
-  glm::dvec2                       target = {0.0, body.meanRadius + distributionEarth(mRNG)};
-
-  glm::dvec2 startPosition;
-  glm::dvec2 direction;
-  do {
-    startPosition = randomPointOnSunSurface(-body.orbit.semiMajorAxisSun);
-    direction     = glm::normalize(target - startPosition);
-  } while (raySphereIntersect(
-      startPosition, direction, glm::dvec2(-body.orbit.semiMajorAxisSun, 0.0), SUN_RADIUS));
-
-  startPosition += direction * raySphereDistance(startPosition, direction, {0.0, 0.0},
-                                   body.meanRadius + body.atmosphere.height);
-  uint32_t wavelength = mDistributionWavelength(mRNG);
-  float    intensity  = INTENSITY_LUT[wavelength - MIN_WAVELENGTH];
-  return {glm::dvec3(startPosition), glm::dvec3(direction), intensity, wavelength, {}};*/
-}
-
-double calculateLimbDarkening(double distance, double angle) {
-  return 1.0;
+/// Calculates the limb darkening between the radii 0 - 1.
+double calculateLimbDarkening(double radius) {
+  return (1.0 - 0.6 * (1.0 - std::sqrt(1.0 - radius * radius))) / 0.8;
 }
 
 std::vector<PhotonD> AtmosphereEclipseTextureGenerator::generatePhotons(
     uint32_t count, BodyWithAtmosphere const& body) {
-  std::vector<PhotonD> photons(count);
+  std::vector<PhotonD> photons;
+  photons.reserve(count);
 
   // 1. calculate target area
-  double rOcc = body.meanRadius + body.atmosphere.height;
+  double rOcc  = body.meanRadius + body.atmosphere.height;
   double rOcc2 = rOcc * rOcc;
 
-  double r2   = (rOcc + SUN_RADIUS) * (rOcc + SUN_RADIUS);
+  double r2 = (rOcc + SUN_RADIUS) * (rOcc + SUN_RADIUS);
 
-  double d = body.orbit.semiMajorAxisSun;
-  double d2   = d * d;
+  double d  = body.orbit.semiMajorAxisSun;
+  double d2 = d * d;
 
-  double a = (rOcc2 * std::sqrt(d2 - r2) * d) / (-rOcc * r2 + d2 * rOcc) - body.meanRadius;
+  double a    = (rOcc2 * std::sqrt(d2 - r2) * d) / (-rOcc * r2 + d2 * rOcc) - body.meanRadius;
   double xOcc = (rOcc * (SUN_RADIUS + rOcc)) / d;
+
+  utils::geom::DSphere sphereBody({xOcc, 0.0, 0.0}, body.meanRadius);
 
   double yLower = body.meanRadius;
   double yUpper = body.meanRadius + a;
@@ -245,40 +224,48 @@ std::vector<PhotonD> AtmosphereEclipseTextureGenerator::generatePhotons(
     glm::dvec3 target(xOcc, targetDistribution(mRNG), 0.0);
 
     //    4. sample random point on suns surface
-    double xSun = xOcc - d;
+    double     xSun = xOcc - d;
     glm::dvec3 sunCenter(-xSun, 0.0, 0.0);
-    double angularRadSun = std::asin(SUN_RADIUS / glm::length(target - sunCenter));
+    double     angularRadSun = std::asin(SUN_RADIUS / glm::length(target - sunCenter));
 
     std::uniform_real_distribution<double> angleRng(-angularRadSun, angularRadSun);
-    glm::dvec3 randYawPitch{};
+    glm::dvec3                             randYawPitch{};
     do {
-      randYawPitch = glm::dvec3(angleRng(mRNG), angleRng(mRNG), 0.0);
+      randYawPitch = glm::dvec3(0.0, angleRng(mRNG), angleRng(mRNG));
     } while (glm::length(randYawPitch) > angularRadSun);
 
     glm::dvec3 aimingVector = target - sunCenter;
     glm::dquat rotation(randYawPitch);
-    aimingVector = rotation * aimingVector;
+    aimingVector         = rotation * aimingVector;
+    glm::dvec3 direction = -glm::normalize(aimingVector);
+    glm::dvec3 origin    = target + aimingVector;
+
+    utils::geom::DRay3 photonRay(origin, direction);
 
     //    5. validate resulting ray to ensure it can pass through atmosphere
+    if (utils::geom::rayHitSphere(photonRay, sphereBody)) {
+      continue;
+    }
+
     //    6. calculate limb darkening for start point
+    double limbDarkening = calculateLimbDarkening(glm::length(randYawPitch) / angularRadSun);
+
     //    7. get random wavelength in visible spectrum
+    uint32_t wavelength = mDistributionWavelength(mRNG);
+    double   intensity  = INTENSITY_LUT[wavelength - MIN_WAVELENGTH];
+
     //    8. from wavelength and limb darkening get an intensity
+    double intensityAdjusted = limbDarkening * intensity;
+
     //    9. shoot photon on to atmosphere
-    //   10. add photon to list
+    glm::dvec3 startPosition =
+        origin + direction * utils::geom::raySphereDistance(
+                                 photonRay, utils::geom::DSphere(sphereBody.center,
+                                                body.meanRadius + body.atmosphere.height));
+
+    PhotonD photon = {startPosition, direction, intensityAdjusted, wavelength, 0};
+    photons.push_back(photon);
   }
-
-
-
-  /*cs::utils::ThreadPool          tp(std::thread::hardware_concurrency());
-  std::vector<std::future<void>> tasks(count);
-
-  for (size_t i = 0; i < count; ++i) {
-    tasks[i] = tp.enqueue([&, i] { photons[i] = emitPhoton(body); });
-  }
-
-  for (auto&& task : tasks) {
-    task.get();
-  }*/
 
   return photons;
 }

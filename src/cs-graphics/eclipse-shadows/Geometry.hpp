@@ -15,8 +15,8 @@ double areaOfCircle(double radius);
 double areaOfCircleIntersection(double radiusSun, double radiusPlanet, double centerDistance);
 double enclosingAngle(glm::dvec2 v1, glm::dvec2 v2);
 
-double raySphereDistance(glm::dvec2 origin, glm::dvec2 direction, glm::dvec2 center, double radius);
-bool raySphereIntersect(glm::dvec2 origin, glm::dvec2 direction, glm::dvec2 center, double radius);
+double rayCircleDistance(glm::dvec2 origin, glm::dvec2 direction, glm::dvec2 center, double radius);
+bool rayCircleIntersect(glm::dvec2 origin, glm::dvec2 direction, glm::dvec2 center, double radius);
 } // namespace cs::graphics
 
 #endif // CS_GRAPHICS_GEOMETRY_HPP

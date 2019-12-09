@@ -23,15 +23,6 @@ class AtmosphereEclipseTextureGenerator {
   cs::utils::Texture4f createShadowMap(BodyWithAtmosphere const& body, size_t photonCount);
 
  private:
-  /// Generates a point on one half of the suns surface:
-  /// o  o
-  ///       o
-  ///        o
-  ///        o
-  ///       o
-  /// o  o
-  glm::dvec2           randomPointOnSunSurface(double sunPositionX);
-  PhotonD              emitPhoton(BodyWithAtmosphere const& body);
   std::vector<PhotonD> generatePhotons(uint32_t count, BodyWithAtmosphere const& body);
 
   std::mt19937_64                         mRNG;
