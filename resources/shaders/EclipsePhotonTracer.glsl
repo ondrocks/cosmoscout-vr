@@ -65,9 +65,9 @@ double partialRefractiveIndex(double altitude, double altitudeDelta, uint wavele
 /// Moves the photon to its next location.
 void traceRay(inout Photon photon) {
     double altitude = length(photon.position) - planet.radius;
-    double altDx = length(photon.position + vec3(DX, 0.0LF, 0.0LF)) - planet.radius;
-    double altDy = length(photon.position + vec3(0.0LF, DX, 0.0LF)) - planet.radius;
-    double altDz = length(photon.position + vec3(0.0LF, 0.0LF, DX)) - planet.radius;
+    double altDx = length(photon.position + dvec3(DX, 0.0LF, 0.0LF)) - planet.radius;
+    double altDy = length(photon.position + dvec3(0.0LF, DX, 0.0LF)) - planet.radius;
+    double altDz = length(photon.position + dvec3(0.0LF, 0.0LF, DX)) - planet.radius;
     double altD1Approx = length(photon.position + DL * photon.direction) - planet.radius;
 
     if (altitude < planet.atmosphericHeight
