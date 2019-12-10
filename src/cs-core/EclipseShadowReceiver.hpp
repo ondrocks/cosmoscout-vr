@@ -28,15 +28,13 @@ enum struct CS_CORE_EXPORT EclipseCalcType : int {
   /// Uses a pre calculated texture to look up the shadow values.
   CARTESIAN_TEXTURE_LOOKUP = 1,
 
-  ANGULAR_TEXTURE_LOOKUP = 2,
-
   /// Approximate with circles instead of spheres. It is probably the
   /// fastest and most precise method.
-  CIRCLE_APPROXIMATION = 3,
+  CIRCLE_APPROXIMATION = 2,
 
   /// The fastest, eclipse renderer. It is the most inaccurate.
   /// http://developer.amd.com/wordpress/media/2012/10/Oat-AmbientApetureLighting.pdf
-  AMD_APPROXIMIATION = 4,
+  AMD_APPROXIMIATION = 3,
 };
 
 class CS_CORE_EXPORT EclipseShadowReceiver {
@@ -72,7 +70,7 @@ class CS_CORE_EXPORT EclipseShadowReceiver {
   std::array<int, MAX_BODIES> mUBodyShadowNormals{};
 
   std::array<graphics::EclipseShadowCaster*, MAX_BODIES> mEclipseShadows{};
-  int                                          mNumBodies = 0;
+  int                                                    mNumBodies = 0;
 
   std::shared_ptr<core::GraphicsEngine> mGraphicsEngine;
   std::shared_ptr<core::SolarSystem>    mSolarSystem;

@@ -305,9 +305,8 @@ vec3 calcEclipseTextureLookup(int i, vec3 fragmentPosition) {
 }
 
 const int CARTESIAN_TEXTURE_LOOKUP = 1;
-const int ANGULAR_TEXTURE_LOOKUP = 2;
-const int CIRCLE_APPROXIMATION = 3;
-const int AMD_APPROXIMIATION = 4;
+const int CIRCLE_APPROXIMATION = 2;
+const int AMD_APPROXIMIATION = 3;
 
 vec3 applyEclipseShadows(vec3 fragmentPosition, vec3 fragmentNormal) {
     vec3 light = vec3(1.0);
