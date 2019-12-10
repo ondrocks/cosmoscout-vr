@@ -64,20 +64,20 @@ void ColorConverter::init() {
   glDeleteShader(computeShader);
 }
 
-std::vector<glm::vec4> ColorConverter::convert(std::vector<FloatPixel> const& pixel) {
+std::vector<glm::dvec4> ColorConverter::convert(std::vector<DoublePixel> const& pixel) {
   glUseProgram(mProgram);
 
   uint32_t ssboPixelBuffer;
   glGenBuffers(1, &ssboPixelBuffer);
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboPixelBuffer);
   glBufferData(
-      GL_SHADER_STORAGE_BUFFER, pixel.size() * sizeof(FloatPixel), pixel.data(), GL_STATIC_READ);
+      GL_SHADER_STORAGE_BUFFER, pixel.size() * sizeof(DoublePixel), pixel.data(), GL_STATIC_READ);
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssboPixelBuffer);
 
   uint32_t ssboOutput;
   glGenBuffers(1, &ssboOutput);
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboOutput);
-  glBufferData(GL_SHADER_STORAGE_BUFFER, pixel.size() * sizeof(glm::vec4), nullptr, GL_STATIC_DRAW);
+  glBufferData(GL_SHADER_STORAGE_BUFFER, pixel.size() * sizeof(glm::dvec4), nullptr, GL_STATIC_DRAW);
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssboOutput);
 
   uint32_t numThreads = 32u;
@@ -89,9 +89,9 @@ std::vector<glm::vec4> ColorConverter::convert(std::vector<FloatPixel> const& pi
   glFlush();
   glFinish();
 
-  std::vector<glm::vec4> output(TEX_WIDTH * TEX_HEIGHT);
+  std::vector<glm::dvec4> output(TEX_WIDTH * TEX_HEIGHT);
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboOutput);
-  glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, output.size() * sizeof(glm::vec4), output.data());
+  glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, output.size() * sizeof(glm::dvec4), output.data());
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
   glDeleteBuffers(1, &ssboPixelBuffer);

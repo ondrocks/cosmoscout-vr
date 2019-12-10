@@ -26,8 +26,8 @@ uint32_t const TEX_WIDTH   = 256u;
 uint32_t const TEX_HEIGHT  = TEX_WIDTH;
 uint32_t const NUM_PHOTONS = 100'000;
 
-struct FloatPixel {
-  std::array<float, NUM_WAVELENGTHS> intensitiesAtWavelengths;
+struct DoublePixel {
+  std::array<double, NUM_WAVELENGTHS> intensitiesAtWavelengths;
 };
 } // namespace cs::graphics
 

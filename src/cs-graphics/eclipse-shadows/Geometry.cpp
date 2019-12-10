@@ -64,7 +64,7 @@ double enclosingAngle(glm::dvec2 v1, glm::dvec2 v2) {
   return 2.0 * glm::atan(std::sqrt(top), std::sqrt(bot));
 }
 
-double raySphereDistance(
+double rayCircleDistance(
     glm::dvec2 origin, glm::dvec2 direction, glm::dvec2 center, double radius) {
   glm::dvec2 m = origin - center;
   double     b = dot(m, direction);
@@ -82,7 +82,7 @@ double raySphereDistance(
   return std::max(0.0, -b - std::sqrt(discriminant));
 }
 
-bool raySphereIntersect(glm::dvec2 origin, glm::dvec2 direction, glm::dvec2 center, double radius) {
+bool rayCircleIntersect(glm::dvec2 origin, glm::dvec2 direction, glm::dvec2 center, double radius) {
   glm::dvec2 m = origin - center;
   double     b = glm::dot(m, direction);
   double     c = glm::dot(m, m) - (radius * radius);
@@ -93,6 +93,10 @@ bool raySphereIntersect(glm::dvec2 origin, glm::dvec2 direction, glm::dvec2 cent
 
   // A negative discriminant corresponds to ray missing sphere
   return discriminant >= 0.0;
+}
+
+bool raySphereIntersect(glm::dvec3 origin, glm::dvec3 direction, glm::dvec3 center, double radius) {
+
 }
 
 } // namespace cs::graphics

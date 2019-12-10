@@ -6,6 +6,8 @@
 
 #include "AtmosphereEclipseTextureGenerator.hpp"
 #include "../../cs-utils/ThreadPool.hpp"
+#include "../../cs-utils/geometry/Algortithms.hpp"
+#include "../../cs-utils/utils.hpp"
 #include "BlackBodySpectrum.hpp"
 #include "EclipseConstants.hpp"
 #include "Geometry.hpp"
@@ -13,15 +15,15 @@
 #include "TextureTracerCPU.hpp"
 #include <GL/glew.h>
 #include <fstream>
-#include <glm/geometric.hpp>
-#include <glm/gtc/constants.hpp>
+#include <glm/detail/type_quat.hpp>
+#include <iomanip>
 #include <iostream>
 #include <string>
 
 namespace {
 
 template <size_t SIZE>
-std::array<std::array<float, SIZE>, SIZE> generateGaussianKernel() {
+std::array<std::array<double, SIZE>, SIZE> generateGaussianKernel() {
   // intialising standard deviation to 1.0
   double sigma = (SIZE / 2) / 2.0;
   double s     = 2.0 * sigma * sigma;
@@ -29,8 +31,8 @@ std::array<std::array<float, SIZE>, SIZE> generateGaussianKernel() {
   // sum is for normalization
   double sum = 0.0;
 
-  std::array<std::array<float, SIZE>, SIZE> kernel{};
-  int                                       halfSize = SIZE / 2;
+  std::array<std::array<double, SIZE>, SIZE> kernel{};
+  int                                        halfSize = SIZE / 2;
 
   // generating 5x5 kernel
   for (int x = -halfSize; x <= halfSize; x++) {
@@ -50,18 +52,18 @@ std::array<std::array<float, SIZE>, SIZE> generateGaussianKernel() {
 }
 
 template <size_t RADIUS>
-std::vector<glm::vec4> guassianBlur(
-    const std::vector<glm::vec4>& image, int64_t width, int64_t height) {
+std::vector<glm::dvec4> guassianBlur(
+    const std::vector<glm::dvec4>& image, int64_t width, int64_t height) {
   const int64_t filterSize   = RADIUS * 2 + 1;
   const int64_t filterRadius = RADIUS;
 
   const auto filter = generateGaussianKernel<filterSize>();
 
-  auto filterWeight = [&filter, filterRadius](size_t x, size_t y) -> float {
+  auto filterWeight = [&filter, filterRadius](size_t x, size_t y) -> double {
     return filter[x + filterRadius][y + filterRadius];
   };
 
-  std::vector<glm::vec4> output(image.size());
+  std::vector<glm::dvec4> output(image.size());
 
   cs::utils::ThreadPool          tp(std::thread::hardware_concurrency());
   std::vector<std::future<void>> tasks(height);
@@ -69,11 +71,11 @@ std::vector<glm::vec4> guassianBlur(
   for (int64_t y = 0; y < height; ++y) {
     tasks[y] = tp.enqueue([&, y] {
       for (int64_t x = 0; x < width; ++x) {
-        glm::vec4 sum(0.0);
+        glm::dvec4 sum(0.0);
 
         for (int64_t i = -filterRadius; i <= filterRadius; ++i) {
           for (int64_t j = -filterRadius; j <= filterRadius; ++j) {
-            float weight = filterWeight(i, j);
+            double weight = filterWeight(i, j);
 
             int64_t dx = glm::abs(x + i);
             if (dx >= width) {
@@ -85,7 +87,7 @@ std::vector<glm::vec4> guassianBlur(
               dy = height - 1;
             }
 
-            glm::vec4 value = image[dy * width + dx];
+            glm::dvec4 value = image[dy * width + dx];
             sum.r += weight * value.r;
             sum.g += weight * value.g;
             sum.b += weight * value.b;
@@ -120,18 +122,16 @@ AtmosphereEclipseTextureGenerator::AtmosphereEclipseTextureGenerator()
   mColorConverter.init();
 }
 
-std::string toPPMString(const std::vector<glm::vec4>& data, size_t width, size_t height) {
+std::string toPPMString(const std::vector<glm::dvec4>& data, size_t width, size_t height) {
   std::string output = "P3\n";
   output.append(std::to_string(width) + " " + std::to_string(height) + "\n");
   output.append("65535\n");
 
   size_t counter = 0;
   for (auto&& pixel : data) {
-    output.append(
-        std::to_string(lroundf(std::clamp(pixel.x * 25.0f, 0.0f, 1.0f) * 65535.0f)) + " ");
-    output.append(
-        std::to_string(lroundf(std::clamp(pixel.y * 25.0f, 0.0f, 1.0f) * 65535.0f)) + " ");
-    output.append(std::to_string(lroundf(std::clamp(pixel.z * 25.0f, 0.0f, 1.0f) * 65535.0f)));
+    output.append(std::to_string(lround(std::clamp(pixel.x * 25.0, 0.0, 1.0) * 65535.0)) + " ");
+    output.append(std::to_string(lround(std::clamp(pixel.y * 25.0, 0.0, 1.0) * 65535.0)) + " ");
+    output.append(std::to_string(lround(std::clamp(pixel.z * 25.0, 0.0, 1.0) * 65535.0)));
 
     if (counter++ == 5) {
       output.append("\n");
@@ -143,7 +143,7 @@ std::string toPPMString(const std::vector<glm::vec4>& data, size_t width, size_t
   return output;
 }
 
-void toPPMFile(const std::vector<glm::vec4>& data, size_t width, size_t height,
+void toPPMFile(const std::vector<glm::dvec4>& data, size_t width, size_t height,
     const std::string_view fileName) {
   std::string   output = toPPMString(data, width, height);
   std::ofstream ofStream(fileName.data(), std::ios::out);
@@ -153,22 +153,22 @@ void toPPMFile(const std::vector<glm::vec4>& data, size_t width, size_t height,
 
 utils::Texture4f AtmosphereEclipseTextureGenerator::createShadowMap(
     BodyWithAtmosphere const& body, size_t photonCount) {
-  std::vector<PhotonD> photons = generatePhotons(photonCount, body);
+  std::vector<Photon> photons = generatePhotons(photonCount, body);
 
   uint32_t ssboPhotons;
   glGenBuffers(1, &ssboPhotons);
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboPhotons);
   glBufferData(
-      GL_SHADER_STORAGE_BUFFER, sizeof(PhotonD) * photons.size(), photons.data(), GL_DYNAMIC_COPY);
+      GL_SHADER_STORAGE_BUFFER, sizeof(Photon) * photons.size(), photons.data(), GL_DYNAMIC_COPY);
 
   mPhotonAtmosphereTracer.traceThroughAtmosphere(ssboPhotons, photons.size(), body);
   auto result = mTextureTracer->traceThroughTexture(ssboPhotons, photons.size(), body);
-  std::vector<glm::vec4> texture = mColorConverter.convert(result);
+  std::vector<glm::dvec4> texture = mColorConverter.convert(result);
 
   toPPMFile(texture, TEX_WIDTH, TEX_HEIGHT,
       "eclipse_shadow_" + std::to_string(body.gravity) + ".raw.ppm");
 
-  std::vector<glm::vec4> outputTexture =
+  std::vector<glm::dvec4> outputTexture =
       guassianBlur<static_cast<size_t>(TEX_WIDTH * 0.01)>(texture, TEX_WIDTH, TEX_HEIGHT);
 
   auto shadowTexture = generateShadowTexture({body.meanRadius, body.orbit});
@@ -177,7 +177,7 @@ utils::Texture4f AtmosphereEclipseTextureGenerator::createShadowMap(
   utils::Texture4f resultTexture(TEX_WIDTH, TEX_HEIGHT);
 
   for (size_t i = 0; i < outputTexture.size(); ++i) {
-    resultTexture.dataPtr()[i] = glm::vec4(outputTexture[i].rgb() + data[i].rgb(), 1.0f);
+    resultTexture.dataPtr()[i] = glm::vec4(outputTexture[i].rgb() + glm::dvec3(data[i].rgb()), 1.0f);
   }
 
   glDeleteBuffers(1, &ssboPhotons);
@@ -185,82 +185,92 @@ utils::Texture4f AtmosphereEclipseTextureGenerator::createShadowMap(
   return resultTexture;
 }
 
-std::uniform_real_distribution<> sunSurfaceGenerator(-SUN_RADIUS, SUN_RADIUS);
-
-glm::dvec2 AtmosphereEclipseTextureGenerator::randomPointOnSunSurface(double sunPositionX) {
-  const double y = sunSurfaceGenerator(mRNG);
-  const double x = std::sqrt((SUN_RADIUS * SUN_RADIUS) - (y * y));
-  return glm::dvec2((x * 1.0000001) + sunPositionX, y * 1.0000001);
+/// Calculates the limb darkening between the radii 0 - 1.
+double calculateLimbDarkening(double radius) {
+  return (1.0 - 0.6 * (1.0 - std::sqrt(1.0 - radius * radius))) / 0.8;
 }
 
-PhotonD AtmosphereEclipseTextureGenerator::emitPhoton(BodyWithAtmosphere const& body) {
-  /*std::uniform_real_distribution<> distributionEarth(0.0, body.atmosphere.height);
-  glm::dvec2                       target = {0.0, body.meanRadius + distributionEarth(mRNG)};
-
-  glm::dvec2 startPosition;
-  glm::dvec2 direction;
-  do {
-    startPosition = randomPointOnSunSurface(-body.orbit.semiMajorAxisSun);
-    direction     = glm::normalize(target - startPosition);
-  } while (raySphereIntersect(
-      startPosition, direction, glm::dvec2(-body.orbit.semiMajorAxisSun, 0.0), SUN_RADIUS));
-
-  startPosition += direction * raySphereDistance(startPosition, direction, {0.0, 0.0},
-                                   body.meanRadius + body.atmosphere.height);
-  uint32_t wavelength = mDistributionWavelength(mRNG);
-  float    intensity  = INTENSITY_LUT[wavelength - MIN_WAVELENGTH];
-  return {glm::dvec3(startPosition), glm::dvec3(direction), intensity, wavelength, {}};*/
-}
-
-std::vector<PhotonD> AtmosphereEclipseTextureGenerator::generatePhotons(
+std::vector<Photon> AtmosphereEclipseTextureGenerator::generatePhotons(
     uint32_t count, BodyWithAtmosphere const& body) {
-  std::vector<PhotonD> photons(count);
+  std::vector<Photon> photons;
+  photons.reserve(count);
 
   // 1. calculate target area
-  double rOcc = body.meanRadius + body.atmosphere.height;
+  double rOcc  = body.meanRadius + body.atmosphere.height;
   double rOcc2 = rOcc * rOcc;
 
-  double r2   = (rOcc + SUN_RADIUS) * (rOcc + SUN_RADIUS);
+  double r2 = (rOcc + SUN_RADIUS) * (rOcc + SUN_RADIUS);
 
-  double d = body.orbit.semiMajorAxisSun;
-  double d2   = d * d;
+  double d  = body.orbit.semiMajorAxisSun;
+  double d2 = d * d;
 
-  double a = (rOcc2 * std::sqrt(d2 - r2) * d) / (-rOcc * r2 + d2 * rOcc) - body.meanRadius;
+  double a    = (rOcc2 * std::sqrt(d2 - r2) * d) / (-rOcc * r2 + d2 * rOcc) - body.meanRadius;
   double xOcc = (rOcc * (SUN_RADIUS + rOcc)) / d;
+
+  utils::geom::DSphere sphereBody({xOcc, 0.0, 0.0}, body.meanRadius);
 
   double yLower = body.meanRadius;
   double yUpper = body.meanRadius + a;
 
   std::uniform_real_distribution<double> targetDistribution(yLower, yUpper);
 
-  // 2. for each i in count
-  for (size_t i = 0; i < count; ++i) {
-    //    3. sample random point in target area,
-    glm::dvec3 target(xOcc, targetDistribution(mRNG), 0.0);
-
-    //    4. sample random point on suns surface
-
-
-    //    5. validate resulting ray to ensure it can pass through atmosphere
-    //    6. calculate limb darkening for start point
-    //    7. get random wavelength in visible spectrum
-    //    8. from wavelength and limb darkening get an intensity
-    //    9. shoot photon on to atmosphere
-    //   10. add photon to list
-  }
-
-
-
-  /*cs::utils::ThreadPool          tp(std::thread::hardware_concurrency());
+  utils::ThreadPool              tp(std::thread::hardware_concurrency());
   std::vector<std::future<void>> tasks(count);
 
+  // 2. for each i in count
   for (size_t i = 0; i < count; ++i) {
-    tasks[i] = tp.enqueue([&, i] { photons[i] = emitPhoton(body); });
+    tasks[i] = tp.enqueue([&] {
+      // 3. sample random point in target area,
+      glm::dvec3 target(xOcc, targetDistribution(mRNG), 0.0);
+
+      // 4. sample random point on suns surface
+      double     xSun = xOcc - d;
+      glm::dvec3 sunCenter(-xSun, 0.0, 0.0);
+      double     angularRadSun = std::asin(SUN_RADIUS / glm::length(target - sunCenter));
+
+      std::uniform_real_distribution<double> angleRng(-angularRadSun, angularRadSun);
+      glm::dvec3                             randYawPitch{};
+      do {
+        randYawPitch = glm::dvec3(0.0, angleRng(mRNG), angleRng(mRNG));
+      } while (glm::length(randYawPitch) > angularRadSun);
+
+      glm::dvec3 aimingVector = target - sunCenter;
+      glm::dquat rotation(randYawPitch);
+      aimingVector         = rotation * aimingVector;
+      glm::dvec3 direction = -glm::normalize(aimingVector);
+      glm::dvec3 origin    = target + aimingVector;
+
+      utils::geom::DRay3 photonRay(origin, direction);
+
+      // 5. validate resulting ray to ensure it can pass through atmosphere
+      if (utils::geom::rayHitSphere(photonRay, sphereBody)) {
+        return;
+      }
+
+      // 6. calculate limb darkening for start point
+      double limbDarkening = calculateLimbDarkening(glm::length(randYawPitch) / angularRadSun);
+
+      // 7. get random wavelength in visible spectrum
+      uint32_t wavelength = mDistributionWavelength(mRNG);
+      double   intensity  = INTENSITY_LUT[wavelength - MIN_WAVELENGTH];
+
+      // 8. from wavelength and limb darkening get an intensity
+      double intensityAdjusted = limbDarkening * intensity;
+
+      // 9. shoot photon on to atmosphere
+      glm::dvec3 startPosition =
+          origin + direction * utils::geom::raySphereDistance(
+                                   photonRay, utils::geom::DSphere(sphereBody.center,
+                                                  body.meanRadius + body.atmosphere.height));
+
+      Photon photon = {startPosition, direction, intensityAdjusted, wavelength, 0};
+      photons.push_back(photon);
+    });
   }
 
   for (auto&& task : tasks) {
     task.get();
-  }*/
+  }
 
   return photons;
 }

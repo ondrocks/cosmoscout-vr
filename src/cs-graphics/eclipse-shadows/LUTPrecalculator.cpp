@@ -80,34 +80,34 @@ LUTPrecalculator::LUTPrecalculator() {
 }
 
 std::pair<uint32_t, uint32_t> LUTPrecalculator::createLUT(BodyWithAtmosphere const& body) {
-  const float DX        = 1.0;
-  auto        heightDim = static_cast<uint32_t>(body.atmosphere.height / DX);
+  const double DX        = 1.0;
+  auto         heightDim = static_cast<uint32_t>(body.atmosphere.height / DX);
 
   size_t bufferSize = heightDim * NUM_WAVELENGTHS;
-  auto   data       = std::vector<float>(bufferSize);
-  auto   densities  = std::vector<float>(heightDim);
+  auto   data       = std::vector<double>(bufferSize);
+  auto   densities  = std::vector<double>(heightDim);
 
   glUseProgram(mProgram);
 
   uint32_t ssboRefractiveIndices;
   glGenBuffers(1, &ssboRefractiveIndices);
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboRefractiveIndices);
-  glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float) * bufferSize, nullptr, GL_STATIC_READ);
+  glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(double) * bufferSize, nullptr, GL_STATIC_READ);
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssboRefractiveIndices);
 
   uint32_t ssboDensities;
   glGenBuffers(1, &ssboDensities);
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboDensities);
-  glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float) * heightDim, nullptr, GL_STATIC_READ);
+  glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(double) * heightDim, nullptr, GL_STATIC_READ);
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssboDensities);
 
-  glUniform1f(mUniforms.planet.uAtmosphericHeight, body.atmosphere.height);
-  glUniform1f(mUniforms.planet.uGravity, static_cast<float>(body.gravity));
-  glUniform1f(mUniforms.planet.uMolarMass, body.atmosphere.molarMass);
+  glUniform1d(mUniforms.planet.uAtmosphericHeight, body.atmosphere.height);
+  glUniform1d(mUniforms.planet.uGravity, static_cast<double>(body.gravity));
+  glUniform1d(mUniforms.planet.uMolarMass, body.atmosphere.molarMass);
 
   auto& coefficients = body.atmosphere.sellmeierCoefficients;
   // glUniform1f(mUniforms.sellmeierCoefficients.uA, 8.06051 * 1e-5);
-  glUniform1f(mUniforms.sellmeierCoefficients.uA, coefficients.a);
+  glUniform1d(mUniforms.sellmeierCoefficients.uA, coefficients.a);
 
   // std::array<glm::vec2, 2> coefficients = {
   // glm::vec2{2.480990e-2f, 132.274f}, glm::vec2{1.74557e-4f, 39.32957f}};
@@ -116,7 +116,7 @@ std::pair<uint32_t, uint32_t> LUTPrecalculator::createLUT(BodyWithAtmosphere con
   glUniform1ui(mUniforms.sellmeierCoefficients.uNumTerms, coefficients.terms.size());
 
   for (size_t i = 0; i < coefficients.terms.size(); ++i) {
-    glUniform2f(mUniforms.sellmeierCoefficients.uTerms[i], coefficients.terms[i].first,
+    glUniform2d(mUniforms.sellmeierCoefficients.uTerms[i], coefficients.terms[i].first,
         coefficients.terms[i].second);
   }
 
@@ -135,10 +135,10 @@ std::pair<uint32_t, uint32_t> LUTPrecalculator::createLUT(BodyWithAtmosphere con
   glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboRefractiveIndices);
-  glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(float) * bufferSize, data.data());
+  glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(double) * bufferSize, data.data());
 
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboDensities);
-  glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(float) * heightDim, densities.data());
+  glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(double) * heightDim, densities.data());
 
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
   glUseProgram(0);

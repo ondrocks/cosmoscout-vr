@@ -4,30 +4,27 @@
 //                        Copyright: (c) 2019 German Aerospace Center (DLR)                       //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef CS_GRAPHICS_COLOR_CONVERTER_HPP
-#define CS_GRAPHICS_COLOR_CONVERTER_HPP
+#ifndef CS_UTIL_GEOMETRY_SPHERE_HPP
+#define CS_UTIL_GEOMETRY_SPHERE_HPP
 
-#include <cstdint>
-#include <glm/vec4.hpp>
-#include <vector>
+#include <glm/glm.hpp>
 
-namespace cs::graphics {
+namespace cs::utils::geom {
 
-struct DoublePixel;
+template <typename T>
+struct Sphere {
+  Sphere(glm::tvec3<T> const& center, T radius)
+      : center(center)
+      , radius(radius) {
+  }
 
-class ColorConverter {
- public:
-  ColorConverter() = default;
-
-  void init();
-
-  std::vector<glm::dvec4> convert(std::vector<DoublePixel> const& pixel);
-
-  ~ColorConverter();
-
- private:
-  uint32_t mProgram;
+  glm::tvec3<T> center;
+  T             radius;
 };
-} // namespace cs::graphics
 
-#endif // CS_GRAPHICS_COLOR_CONVERTER_HPP
+using FSphere = Sphere<float>;
+using DSphere = Sphere<double>;
+
+} // namespace cs::utils::geom
+
+#endif // CS_UTIL_GEOMETRY_SPHERE_HPP
