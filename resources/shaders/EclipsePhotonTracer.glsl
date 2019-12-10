@@ -30,6 +30,7 @@ layout(std430, binding = 2) buffer Densities {
 };
 
 struct Planet {
+    double xPosition;
     double radius;// m
     double atmosphericHeight;// m
     double seaLevelMolecularNumberDensity;// cm^−3
@@ -52,7 +53,10 @@ double refractiveIndexAtSeaLevel(uint wavelength) {
 }
 
 double refractiveIndexAtAltitude(double altitude, uint wavelength) {
-    return refractiveIndicesAtAltitudes[uint(altitude)][wavelength - MIN_WAVELENGTH];
+    if (altitude < planet.atmosphericHeight) {
+        return refractiveIndicesAtAltitudes[uint(altitude)][wavelength - MIN_WAVELENGTH];
+    }
+    return 0.0;
 }
 
 double partialRefractiveIndex(double altitude, double altitudeDelta, uint wavelength) {
@@ -62,19 +66,23 @@ double partialRefractiveIndex(double altitude, double altitudeDelta, uint wavele
     return (refrIndexPlusDelta - refrIndex) / DX;
 }
 
+double calcAltitude(dvec3 position) {
+    return length(position - dvec3(planet.xPosition, 0.0LF, 0.0LF)) - planet.radius;
+}
+
 /// Moves the photon to its next location.
 void traceRay(inout Photon photon) {
-    double altitude = length(photon.position) - planet.radius;
-    double altDx = length(photon.position + dvec3(DX, 0.0LF, 0.0LF)) - planet.radius;
-    double altDy = length(photon.position + dvec3(0.0LF, DX, 0.0LF)) - planet.radius;
-    double altDz = length(photon.position + dvec3(0.0LF, 0.0LF, DX)) - planet.radius;
-    double altD1Approx = length(photon.position + DL * photon.direction) - planet.radius;
+    double altitude = calcAltitude(photon.position);
+    double altDx = calcAltitude(photon.position + dvec3(DX, 0.0LF, 0.0LF));
+    double altDy = calcAltitude(photon.position + dvec3(0.0LF, DX, 0.0LF));
+    double altDz = calcAltitude(photon.position + dvec3(0.0LF, 0.0LF, DX));
+    double altD1Approx = calcAltitude(photon.position + DL * photon.direction);
 
     if (altitude < planet.atmosphericHeight
-        && altDx < planet.atmosphericHeight
-        && altDy < planet.atmosphericHeight
-        && altDz < planet.atmosphericHeight
-        && altD1Approx < planet.atmosphericHeight) {
+    && altDx < planet.atmosphericHeight
+    && altDy < planet.atmosphericHeight
+    && altDz < planet.atmosphericHeight
+    && altD1Approx < planet.atmosphericHeight) {
 
         double ni = refractiveIndexAtAltitude(altitude, photon.wavelength);
         double pnx = partialRefractiveIndex(altitude, altDx, photon.wavelength);
@@ -137,7 +145,7 @@ double approxE(double x) {
 
 /// Applies rayleigh scattering to the photon for this step.
 void attenuateLight(inout Photon photon, dvec3 oldPosition) {
-    double altitude = length(oldPosition) - planet.radius;
+    double altitude = calcAltitude(oldPosition);
 
     double beta = rayleighVolumeScatteringCoefficient(altitude, photon.wavelength);
 
@@ -173,10 +181,10 @@ void main() {
 
     double atmosphereRadius = planet.radius + planet.atmosphericHeight;
 
-    double distFromCenter = length(photon.position);
+    double distFromCenter = length(photon.position - dvec3(planet.xPosition, 0.0LF, 0.0LF));
     while (!exitedAtmosphere && distFromCenter > planet.radius) {
         tracePhoton(photon);
-        distFromCenter = length(photon.position);
+        distFromCenter = length(photon.position - dvec3(planet.xPosition, 0.0LF, 0.0LF));
 
         if (!enteredAtmosphere && distFromCenter < atmosphereRadius) {
             enteredAtmosphere = true;

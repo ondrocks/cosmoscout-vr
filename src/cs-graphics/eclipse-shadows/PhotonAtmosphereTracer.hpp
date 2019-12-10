@@ -21,7 +21,7 @@ class PhotonAtmosphereTracer {
   void init();
 
   void traceThroughAtmosphere(
-      uint32_t ssboPhotons, size_t numPhotons, BodyWithAtmosphere const& body);
+      uint32_t ssboPhotons, size_t numPhotons, BodyWithAtmosphere const& body, double xPosition);
 
   virtual ~PhotonAtmosphereTracer();
 
@@ -29,6 +29,7 @@ class PhotonAtmosphereTracer {
   uint32_t mProgram;
 
   struct {
+    uint32_t planetXPosition;
     uint32_t planetRadius;
     uint32_t planetAtmosphericHeight;
     uint32_t planetSeaLevelMolecularNumberDensity;

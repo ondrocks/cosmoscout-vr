@@ -41,6 +41,7 @@ void PhotonAtmosphereTracer::init() {
   glAttachShader(mProgram, computeShader);
   glLinkProgram(mProgram);
 
+  mUniforms.planetXPosition         = glGetUniformLocation(mProgram, "planet.xPosition");
   mUniforms.planetRadius            = glGetUniformLocation(mProgram, "planet.radius");
   mUniforms.planetAtmosphericHeight = glGetUniformLocation(mProgram, "planet.atmosphericHeight");
   mUniforms.planetSeaLevelMolecularNumberDensity =
@@ -58,11 +59,12 @@ PhotonAtmosphereTracer::~PhotonAtmosphereTracer() {
 }
 
 void PhotonAtmosphereTracer::traceThroughAtmosphere(
-    uint32_t ssboPhotons, size_t numPhotons, BodyWithAtmosphere const& body) {
+    uint32_t ssboPhotons, size_t numPhotons, BodyWithAtmosphere const& body, double xPosition) {
   auto [ssboRefractiveIndices, ssboDensities] = mLutPrecalculator->createLUT(body);
 
   glUseProgram(mProgram);
 
+  glUniform1d(mUniforms.planetXPosition, xPosition);
   glUniform1d(mUniforms.planetAtmosphericHeight, body.atmosphere.height);
   glUniform1d(mUniforms.planetSeaLevelMolecularNumberDensity,
       body.atmosphere.seaLevelMolecularNumberDensity);

@@ -161,7 +161,10 @@ utils::Texture4f AtmosphereEclipseTextureGenerator::createShadowMap(
   glBufferData(
       GL_SHADER_STORAGE_BUFFER, sizeof(Photon) * photons.size(), photons.data(), GL_DYNAMIC_COPY);
 
-  mPhotonAtmosphereTracer.traceThroughAtmosphere(ssboPhotons, photons.size(), body);
+  double rOcc = body.meanRadius + body.atmosphere.height;
+  double xOcc = (rOcc * (SUN_RADIUS + rOcc)) / body.orbit.semiMajorAxisSun;
+  mPhotonAtmosphereTracer.traceThroughAtmosphere(ssboPhotons, photons.size(), body, xOcc);
+
   auto result = mTextureTracer->traceThroughTexture(ssboPhotons, photons.size(), body);
   std::vector<glm::dvec4> texture = mColorConverter.convert(result);
 
