@@ -7,17 +7,40 @@
 #ifndef CS_GRAPHICS_PHOTON_HPP
 #define CS_GRAPHICS_PHOTON_HPP
 
+#include "../../cs-utils/utils.hpp"
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <ostream>
 
 namespace cs::graphics {
 
 struct Photon {
-  glm::dvec3 position;   ///< m              3 * 8 = 24 -> 24
-  glm::dvec3 direction;  ///< normalized     3 * 8 = 24 -> 48
-  double     intensity;  //                  1 * 8 =  8 -> 56
-  uint32_t   wavelength; ///< nm             1 * 4 =  4 -> 60
-  uint32_t   _padding;   //                  1 * 4 =  4 -> 64
+  Photon() = default;
+
+  Photon(const glm::dvec3& position, const glm::dvec3& direction, double intensity,
+      uint32_t wavelength)
+      : position(position)
+      , direction(direction)
+      , intensity(intensity)
+      , wavelength(wavelength) {
+  }
+
+  // ###############################################################################################
+  // DO NOT CHANGE THIS LAYOUT! IT IS REQUIRED TO BE LIKE THIS FOR GPU PADDING REASONS!
+
+  glm::dvec3 position; ///< m
+  double   intensity;
+  glm::dvec3 direction; ///< normalized
+  uint64_t wavelength; ///< nm
+
+  // DO NOT CHANGE THIS LAYOUT! IT IS REQUIRED TO BE LIKE THIS FOR GPU PADDING REASONS!
+  // ###############################################################################################
+
+  friend std::ostream& operator<<(std::ostream& os, const Photon& photon) {
+    os << "position: " << photon.position << " direction: " << photon.direction
+       << " intensity: " << photon.intensity << " wavelength: " << photon.wavelength;
+    return os;
+  }
 };
 
 } // namespace cs::graphics

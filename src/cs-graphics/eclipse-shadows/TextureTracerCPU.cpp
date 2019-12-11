@@ -29,7 +29,8 @@ void operator+=(std::atomic<double>& atomic, double value) {
 }
 
 std::vector<DoublePixel> TextureTracerCPU::traceThroughTexture(
-    uint32_t ssboPhotons, size_t numPhotons, BodyWithAtmosphere const& body) {
+    std::variant<GPUBuffer, CPUBuffer> const& photonBuffer, BodyWithAtmosphere const& body) {
+
   const double atmosphericRadius = body.meanRadius + body.atmosphere.height;
   const double rectangleHeight =
       atmosphericRadius * TEX_HEIGHT_TO_RADIUS_FACTOR / static_cast<double>(TEX_HEIGHT);
@@ -186,9 +187,19 @@ std::vector<DoublePixel> TextureTracerCPU::traceThroughTexture(
     return glm::length(exit - entry);
   };
 
-  std::vector<Photon> photons(numPhotons);
-  glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboPhotons);
-  glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(Photon) * photons.size(), photons.data());
+  CPUBuffer photons;
+  if (std::holds_alternative<GPUBuffer>(photonBuffer)) {
+    GPUBuffer gpuBuffer = std::get<GPUBuffer>(photonBuffer);
+    photons             = CPUBuffer(gpuBuffer.size);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, gpuBuffer.buffer);
+    glGetBufferSubData(
+        GL_SHADER_STORAGE_BUFFER, 0, sizeof(Photon) * gpuBuffer.size, photons.data());
+
+    glDeleteBuffers(1, &gpuBuffer.buffer);
+  } else {
+    photons = std::get<CPUBuffer>(photonBuffer);
+  }
 
   const double pixelInAtmosphere = body.atmosphere.height / rectangleHeight;
   const double photonsPerPixel   = photons.size() / pixelInAtmosphere;

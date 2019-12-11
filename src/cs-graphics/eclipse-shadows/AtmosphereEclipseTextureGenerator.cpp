@@ -6,15 +6,16 @@
 
 #include "AtmosphereEclipseTextureGenerator.hpp"
 #include "../../cs-utils/ThreadPool.hpp"
+#include "../../cs-utils/filesystem.hpp"
 #include "../../cs-utils/geometry/Algortithms.hpp"
 #include "../../cs-utils/utils.hpp"
+#include "AtmosphereTracerCPU.hpp"
 #include "BlackBodySpectrum.hpp"
 #include "EclipseConstants.hpp"
 #include "Geometry.hpp"
 #include "SimpleEclipseShadowCaster.hpp"
 #include "TextureTracerCPU.hpp"
 #include <GL/glew.h>
-#include <fstream>
 #include <glm/detail/type_quat.hpp>
 #include <iomanip>
 #include <iostream>
@@ -113,11 +114,11 @@ AtmosphereEclipseTextureGenerator::AtmosphereEclipseTextureGenerator()
     , mDistributionWavelength(
           std::uniform_int_distribution<uint32_t>(MIN_WAVELENGTH, MAX_WAVELENGTH))
     , mDistributionBoolean(std::bernoulli_distribution(0.5))
-    , mPhotonAtmosphereTracer()
+    , mAtmosphereTracer(std::make_unique<AtmosphereTracerCPU>())
     , mTextureTracer(std::make_unique<TextureTracerCPU>())
     , mColorConverter() {
 
-  mPhotonAtmosphereTracer.init();
+  mAtmosphereTracer->init();
   mTextureTracer->init();
   mColorConverter.init();
 }
@@ -155,17 +156,23 @@ utils::Texture4f AtmosphereEclipseTextureGenerator::createShadowMap(
     BodyWithAtmosphere const& body, size_t photonCount) {
   std::vector<Photon> photons = generatePhotons(photonCount, body);
 
-  uint32_t ssboPhotons;
-  glGenBuffers(1, &ssboPhotons);
-  glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboPhotons);
-  glBufferData(
-      GL_SHADER_STORAGE_BUFFER, sizeof(Photon) * photons.size(), photons.data(), GL_DYNAMIC_COPY);
+  std::vector<glm::dvec3> positions(photons.size());
+  for (int i = 0; i < photons.size(); ++i) {
+    positions[i] = (photons[i].position / 6371000.0) * 20.0;
+  }
 
-  double rOcc = body.meanRadius + body.atmosphere.height;
-  double xOcc = (rOcc * (SUN_RADIUS + rOcc)) / body.orbit.semiMajorAxisSun;
-  mPhotonAtmosphereTracer.traceThroughAtmosphere(ssboPhotons, photons.size(), body, xOcc);
+  auto objString = utils::verticesToObjString(positions);
+  utils::filesystem::saveToFile(objString, "photon_positions_enter.obj");
 
-  auto result = mTextureTracer->traceThroughTexture(ssboPhotons, photons.size(), body);
+  double rOcc               = body.meanRadius + body.atmosphere.height;
+  double xOcc               = (rOcc * (SUN_RADIUS + rOcc)) / body.orbit.semiMajorAxisSun;
+  auto [photonBuffer, time] = utils::measureTimeSeconds<std::variant<GPUBuffer, CPUBuffer>>(
+      [&] { return mAtmosphereTracer->traceThroughAtmosphere(photons, body, xOcc); });
+  
+  std::cout << "time: " << time << " ms" << std::endl;
+  std::exit(0);
+
+  auto                    result  = mTextureTracer->traceThroughTexture(photonBuffer, body);
   std::vector<glm::dvec4> texture = mColorConverter.convert(result);
 
   toPPMFile(texture, TEX_WIDTH, TEX_HEIGHT,
@@ -180,10 +187,9 @@ utils::Texture4f AtmosphereEclipseTextureGenerator::createShadowMap(
   utils::Texture4f resultTexture(TEX_WIDTH, TEX_HEIGHT);
 
   for (size_t i = 0; i < outputTexture.size(); ++i) {
-    resultTexture.dataPtr()[i] = glm::vec4(outputTexture[i].rgb() + glm::dvec3(data[i].rgb()), 1.0f);
+    resultTexture.dataPtr()[i] =
+        glm::vec4(outputTexture[i].rgb() + glm::dvec3(data[i].rgb()), 1.0f);
   }
-
-  glDeleteBuffers(1, &ssboPhotons);
 
   return resultTexture;
 }
@@ -211,6 +217,7 @@ std::vector<Photon> AtmosphereEclipseTextureGenerator::generatePhotons(
   double xOcc = (rOcc * (SUN_RADIUS + rOcc)) / d;
 
   utils::geom::DSphere sphereBody({xOcc, 0.0, 0.0}, body.meanRadius);
+  utils::geom::DSphere sphereAtmosphere({xOcc, 0.0, 0.0}, body.meanRadius + body.atmosphere.height);
 
   double yLower = body.meanRadius;
   double yUpper = body.meanRadius + a;
@@ -246,7 +253,8 @@ std::vector<Photon> AtmosphereEclipseTextureGenerator::generatePhotons(
       utils::geom::DRay3 photonRay(origin, direction);
 
       // 5. validate resulting ray to ensure it can pass through atmosphere
-      if (utils::geom::rayHitSphere(photonRay, sphereBody)) {
+      if (utils::geom::rayHitSphere(photonRay, sphereBody) ||
+          !utils::geom::rayHitSphere(photonRay, sphereAtmosphere)) {
         return;
       }
 
@@ -266,8 +274,7 @@ std::vector<Photon> AtmosphereEclipseTextureGenerator::generatePhotons(
                                    photonRay, utils::geom::DSphere(sphereBody.center,
                                                   body.meanRadius + body.atmosphere.height));
 
-      Photon photon = {startPosition, direction, intensityAdjusted, wavelength, 0};
-      photons.push_back(photon);
+      photons.emplace_back(startPosition, direction, intensityAdjusted, wavelength);
     });
   }
 

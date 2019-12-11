@@ -11,9 +11,10 @@
 #include "BodyProperties.hpp"
 #include "ColorConverter.hpp"
 #include "Photon.hpp"
-#include "PhotonAtmosphereTracer.hpp"
+#include "AtmosphereTracer.hpp"
 #include "TextureTracer.hpp"
 #include <random>
+#include <memory>
 
 namespace cs::graphics {
 class AtmosphereEclipseTextureGenerator {
@@ -29,9 +30,9 @@ class AtmosphereEclipseTextureGenerator {
   std::uniform_int_distribution<uint32_t> mDistributionWavelength;
   std::bernoulli_distribution             mDistributionBoolean;
 
-  PhotonAtmosphereTracer         mPhotonAtmosphereTracer;
-  std::unique_ptr<TextureTracer> mTextureTracer;
-  ColorConverter                 mColorConverter;
+  std::unique_ptr<AtmosphereTracer> mAtmosphereTracer;
+  std::unique_ptr<TextureTracer>    mTextureTracer;
+  ColorConverter                    mColorConverter;
 };
 } // namespace cs::graphics
 

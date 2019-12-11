@@ -4,18 +4,19 @@
 //                        Copyright: (c) 2019 German Aerospace Center (DLR)                       //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "PhotonAtmosphereTracer.hpp"
+#include "AtmosphereTracerGPU.hpp"
 
 #include "LUTPrecalculator.hpp"
 
 #include "../../cs-utils/filesystem.hpp"
+#include "Photon.hpp"
 
 #include <GL/glew.h>
 #include <iostream>
 
 namespace cs::graphics {
 
-void PhotonAtmosphereTracer::init() {
+void AtmosphereTracerGPU::init() {
   mLutPrecalculator = std::make_unique<LUTPrecalculator>();
 
   mProgram               = glCreateProgram();
@@ -54,12 +55,12 @@ void PhotonAtmosphereTracer::init() {
   glDeleteShader(computeShader);
 }
 
-PhotonAtmosphereTracer::~PhotonAtmosphereTracer() {
+AtmosphereTracerGPU::~AtmosphereTracerGPU() {
   glDeleteProgram(mProgram);
 }
 
-void PhotonAtmosphereTracer::traceThroughAtmosphere(
-    uint32_t ssboPhotons, size_t numPhotons, BodyWithAtmosphere const& body, double xPosition) {
+std::variant<GPUBuffer, CPUBuffer> AtmosphereTracerGPU::traceThroughAtmosphere(
+    CPUBuffer const& photonBuffer, BodyWithAtmosphere const& body, double xPosition) {
   auto [ssboRefractiveIndices, ssboDensities] = mLutPrecalculator->createLUT(body);
 
   glUseProgram(mProgram);
@@ -70,12 +71,18 @@ void PhotonAtmosphereTracer::traceThroughAtmosphere(
       body.atmosphere.seaLevelMolecularNumberDensity);
   glUniform1d(mUniforms.planetRadius, body.meanRadius);
 
+  uint32_t ssboPhotons;
+  glGenBuffers(1, &ssboPhotons);
+  glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboPhotons);
+  glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Photon) * photonBuffer.size(), photonBuffer.data(),
+      GL_DYNAMIC_COPY);
+
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssboPhotons);
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssboRefractiveIndices);
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, ssboDensities);
 
-  const uint32_t passSize   = 8192u;
-  const uint32_t maxPasses  = (numPhotons / passSize) + 1;
+  const uint32_t passSize   = 512u;
+  const uint32_t maxPasses  = (photonBuffer.size() / passSize) + 1;
   const uint32_t numThreads = 32u;
   const uint32_t numBlocks  = passSize / numThreads;
 
@@ -90,11 +97,26 @@ void PhotonAtmosphereTracer::traceThroughAtmosphere(
     glFlush();
     glFinish();
   }
+  /*
+    std::vector<Photon> photons(numPhotons);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboPhotons);
+    glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(Photon) * photons.size(),
+    photons.data());
 
+    std::vector<glm::dvec3> positions(numPhotons);
+    for (int i = 0; i < numPhotons; ++i) {
+      positions[i] = (photons[i].position / 6371000.0) * 20.0;
+    }
+
+    auto objString = utils::verticesToObjString(positions);
+    utils::filesystem::saveToFile(objString, "photon_positions_exit.obj");
+  */
   glDeleteBuffers(1, &ssboDensities);
   glDeleteBuffers(1, &ssboRefractiveIndices);
 
   glUseProgram(0);
+
+  return GPUBuffer{ssboPhotons, photonBuffer.size()};
 }
 
 } // namespace cs::graphics

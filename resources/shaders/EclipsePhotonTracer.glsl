@@ -2,6 +2,8 @@
 
 #extension GL_ARB_compute_variable_group_size: enable
 
+layout (local_size_variable) in;
+
 // TODO make configurable
 const uint MIN_WAVELENGTH = 390u;
 const uint MAX_WAVELENGTH = 749u;
@@ -9,11 +11,10 @@ const uint NUM_WAVELENGTHS = MAX_WAVELENGTH - MIN_WAVELENGTH + 1;
 
 // Size: 24 bytes -> ~40,000,000 photons per available gigabyte of ram
 struct Photon {
-    dvec3 position;// m
-    dvec3 direction;// normalized
-    double intensity;// 0..1 should start at 1
-    uint wavelength;// nm
-    uint _padding;
+    dvec3 position;// m                         3 * 8 = 24
+    double intensity;// 0..1 should start at 1  1 * 8 = 56
+    dvec3 direction;// normalized               3 * 8 = 48
+    uint wavelength;// nm                       1 * 4 = 60
 };
 
 // maybe generate in GPU with rng?
@@ -36,16 +37,17 @@ struct Planet {
     double seaLevelMolecularNumberDensity;// cm^−3
 };
 
-uniform Planet planet;
-
 // TODO make configurable
 const double DL = 1000.0LF;// m
 const double DX = 10.0LF;// m
 
-layout (local_size_variable) in;
+uniform Planet planet;
 
 double densityAtAltitude(double altitude) {
-    return densitiesAtAltitudes[uint(altitude)];
+    if (altitude < planet.atmosphericHeight) {
+        return densitiesAtAltitudes[uint(altitude)];
+    }
+    return 0.0;
 }
 
 double refractiveIndexAtSeaLevel(uint wavelength) {
@@ -56,7 +58,7 @@ double refractiveIndexAtAltitude(double altitude, uint wavelength) {
     if (altitude < planet.atmosphericHeight) {
         return refractiveIndicesAtAltitudes[uint(altitude)][wavelength - MIN_WAVELENGTH];
     }
-    return 0.0;
+    return 1.0;
 }
 
 double partialRefractiveIndex(double altitude, double altitudeDelta, uint wavelength) {
@@ -78,22 +80,15 @@ void traceRay(inout Photon photon) {
     double altDz = calcAltitude(photon.position + dvec3(0.0LF, 0.0LF, DX));
     double altD1Approx = calcAltitude(photon.position + DL * photon.direction);
 
-    if (altitude < planet.atmosphericHeight
-    && altDx < planet.atmosphericHeight
-    && altDy < planet.atmosphericHeight
-    && altDz < planet.atmosphericHeight
-    && altD1Approx < planet.atmosphericHeight) {
+    double ni = refractiveIndexAtAltitude(altitude, photon.wavelength);
+    double pnx = partialRefractiveIndex(altitude, altDx, photon.wavelength);
+    double pny = partialRefractiveIndex(altitude, altDy, photon.wavelength);
+    double pnz = partialRefractiveIndex(altitude, altDz, photon.wavelength);
+    dvec3 dn = dvec3(pnx, pny, pnz);
 
-        double ni = refractiveIndexAtAltitude(altitude, photon.wavelength);
-        double pnx = partialRefractiveIndex(altitude, altDx, photon.wavelength);
-        double pny = partialRefractiveIndex(altitude, altDy, photon.wavelength);
-        double pnz = partialRefractiveIndex(altitude, altDz, photon.wavelength);
-        dvec3 dn = dvec3(pnx, pny, pnz);
-
-        double ni1 = refractiveIndexAtAltitude(altD1Approx, photon.wavelength);
-        dvec3 direction = ((ni * photon.direction) + (dn * DL)) / ni1;
-        photon.direction = normalize(direction);
-    }
+    double ni1 = refractiveIndexAtAltitude(altD1Approx, photon.wavelength);
+    dvec3 direction = ((ni * photon.direction) + (dn * DL)) / ni1;
+    photon.direction = normalize(direction);
 
     photon.position += (DL * photon.direction);
 }

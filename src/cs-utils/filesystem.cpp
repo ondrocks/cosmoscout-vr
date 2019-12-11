@@ -90,6 +90,11 @@ void downloadFile(std::string const& url, std::string const& destination,
 
   request.perform();
 }
+void saveToFile(std::string_view string, std::string_view fileName) {
+  std::ofstream os(fileName.data());
+  os << string;
+  os.close();
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

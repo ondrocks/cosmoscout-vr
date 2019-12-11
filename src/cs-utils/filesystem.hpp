@@ -36,6 +36,8 @@ CS_UTILS_EXPORT std::string loadToString(std::string const& file);
 CS_UTILS_EXPORT void downloadFile(std::string const& url, std::string const& destination,
     std::function<void(double, double)> const& progressCallback);
 
+CS_UTILS_EXPORT void saveToFile(std::string_view string, std::string_view fileName);
+
 } // namespace cs::utils::filesystem
 
 #endif // CS_UTILS_FILESYSTEM_HPP

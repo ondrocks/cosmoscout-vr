@@ -4,24 +4,25 @@
 //                        Copyright: (c) 2019 German Aerospace Center (DLR)                       //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef CS_GRAPHICS_TEXTURE_TRACER_HPP
-#define CS_GRAPHICS_TEXTURE_TRACER_HPP
+#ifndef CS_GRAPHICS_ATMOSPHERE_TRACER_HPP
+#define CS_GRAPHICS_ATMOSPHERE_TRACER_HPP
 
+#include "BodyProperties.hpp"
 #include "EclipseConstants.hpp"
-#include <array>
-#include <cstddef>
-#include <cstdint>
-#include <vector>
+#include "Photon.hpp"
 #include <variant>
 
 namespace cs::graphics {
 
-class TextureTracer {
+class AtmosphereTracer {
  public:
-  virtual void                     init(){};
-  virtual std::vector<DoublePixel> traceThroughTexture(
-      std::variant<GPUBuffer, CPUBuffer> const& photonBuffer, BodyWithAtmosphere const& body) = 0;
+  virtual void                               init(){};
+  virtual std::variant<GPUBuffer, CPUBuffer> traceThroughAtmosphere(
+      CPUBuffer& photonBuffer, BodyWithAtmosphere const& body, double xPosition) = 0;
+
+  virtual ~AtmosphereTracer() = default;
 };
+
 } // namespace cs::graphics
 
-#endif // CS_GRAPHICS_TEXTURE_TRACER_HPP
+#endif // CS_GRAPHICS_ATMOSPHERE_TRACER_HPP

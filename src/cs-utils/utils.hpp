@@ -10,6 +10,8 @@
 #include "cs_utils_export.hpp"
 
 #include <algorithm>
+#include <chrono>
+#include <glm/glm.hpp>
 #include <limits>
 #include <map>
 #include <sstream>
@@ -90,6 +92,42 @@ constexpr typename std::underlying_type<T>::type enumCast(T val) {
 /// Well, does what is says.
 float CS_UTILS_EXPORT getCurrentFarClipDistance();
 
+template <int Size, typename T>
+std::string verticesToObjString(std::vector<glm::vec<Size, T>> const& vertices) {
+  std::ostringstream oss;
+
+  oss << std::fixed;
+
+  for (const auto& vertex : vertices) {
+    oss << "v";
+    for (int i = 0; i < Size; ++i) {
+      oss << " " << vertex[i];
+    }
+    oss << "\n";
+  }
+
+  return oss.str();
+}
+
+template <typename T>
+std::pair<T, double> measureTimeSeconds(std::function<T()> const& f) {
+  auto start = std::chrono::high_resolution_clock::now();
+  T result = f();
+  auto end = std::chrono::high_resolution_clock::now();
+  return {result, std::chrono::duration<double>(end - start).count()};
+}
+
 } // namespace cs::utils
+
+
+template <int Size, typename T>
+std::ostream& operator<<(std::ostream& os, glm::vec<Size, T> const& vec) {
+  os << "(";
+  for (int i = 0; i < Size - 1; ++i) {
+    os << vec[i] << ", ";
+  }
+  os << vec[Size - 1] << ")";
+  return os;
+}
 
 #endif // CS_UTILS_UTILS_HPP

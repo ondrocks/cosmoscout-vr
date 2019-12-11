@@ -8,17 +8,19 @@
 #define CS_GRAPHICS_TEXTURE_TRACER_CPU_HPP
 
 #include "BodyProperties.hpp"
+#include "Photon.hpp"
 #include "TextureTracer.hpp"
 
 #include <cstddef>
 #include <cstdint>
+#include <variant>
 #include <vector>
 
 namespace cs::graphics {
 class TextureTracerCPU : public TextureTracer {
  public:
   std::vector<DoublePixel> traceThroughTexture(
-      uint32_t ssboPhotons, size_t numPhotons, BodyWithAtmosphere const& body) override;
+      std::variant<GPUBuffer, CPUBuffer> const& photonBuffer, BodyWithAtmosphere const& body);
 };
 } // namespace cs::graphics
 

@@ -7,7 +7,9 @@
 #ifndef CS_GRAPHICS_ECLIPSE_CONSTANTS_HPP
 #define CS_GRAPHICS_ECLIPSE_CONSTANTS_HPP
 
+#include "Photon.hpp"
 #include <array>
+#include <vector>
 #include <cstdint>
 
 namespace cs::graphics {
@@ -24,11 +26,19 @@ double const TEX_SHADOW_WIDTH_EXPONENT   = 2.0;
 // TODO make configurable
 uint32_t const TEX_WIDTH   = 256u;
 uint32_t const TEX_HEIGHT  = TEX_WIDTH;
-uint32_t const NUM_PHOTONS = 100'000;
+uint32_t const NUM_PHOTONS = 1'000'000u;
 
 struct DoublePixel {
   std::array<double, NUM_WAVELENGTHS> intensitiesAtWavelengths;
 };
+
+struct GPUBuffer {
+  uint32_t buffer;
+  size_t   size;
+};
+
+using CPUBuffer = std::vector<Photon>;
+
 } // namespace cs::graphics
 
 #endif // CS_GRAPHICS_ECLIPSE_CONSTANTS_HPP
