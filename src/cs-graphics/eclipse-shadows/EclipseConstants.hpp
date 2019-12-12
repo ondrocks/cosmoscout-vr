@@ -26,7 +26,7 @@ double const TEX_SHADOW_WIDTH_EXPONENT   = 2.0;
 // TODO make configurable
 uint32_t const TEX_WIDTH   = 256u;
 uint32_t const TEX_HEIGHT  = TEX_WIDTH;
-uint32_t const NUM_PHOTONS = 10'000'000u;
+uint32_t const NUM_PHOTONS = 1'000'000u;
 
 struct DoublePixel {
   std::array<double, NUM_WAVELENGTHS> intensitiesAtWavelengths;

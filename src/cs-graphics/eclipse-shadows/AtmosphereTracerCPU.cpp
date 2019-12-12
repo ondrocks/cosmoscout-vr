@@ -6,7 +6,7 @@
 
 #include "AtmosphereTracerCPU.hpp"
 #include "../../cs-utils/ThreadPool.hpp"
-#include "../../cs-utils/filesystem.hpp"
+#include "../../cs-utils/parallel.hpp"
 #include "EclipseConstants.hpp"
 #include "LUTPrecalculator.hpp"
 #include <GL/glew.h>
@@ -152,12 +152,8 @@ std::variant<GPUBuffer, CPUBuffer> AtmosphereTracerCPU::traceThroughAtmosphere(
     attenuateLight(photon, oldPosition);
   };
 
-  utils::ThreadPool              tp(std::thread::hardware_concurrency());
-  std::vector<std::future<void>> tasks;
-  tasks.reserve(photonBuffer.size());
-
-  for (auto&& photon : photonBuffer) {
-    tasks.push_back(tp.enqueue([&] {
+  cs::utils::executeParallel(photonBuffer.size(), [&](size_t i) {
+    auto& photon = photonBuffer[i];
       bool enteredAtmosphere = false;
       bool exitedAtmosphere  = false;
 
@@ -184,7 +180,7 @@ std::variant<GPUBuffer, CPUBuffer> AtmosphereTracerCPU::traceThroughAtmosphere(
           std::cerr << "Photon did loop forever!\n"
                     << "        Photon: " << photon << "\n"
                     << "      Altitude: " << calcAltitude(photon.position) << "\n"
-                    << "  Start Photon:" << photonStart << "\n"
+                    << "  Start Photon: " << photonStart << "\n"
                     << "Start Altitude: " << calcAltitude(photonStart.position) << std::endl;
           photon.intensity = -1.0;
           break;
@@ -194,12 +190,7 @@ std::variant<GPUBuffer, CPUBuffer> AtmosphereTracerCPU::traceThroughAtmosphere(
       if (!exitedAtmosphere || distFromCenter <= body.meanRadius) {
         photon.intensity = -1.0;
       }
-    }));
-  }
-
-  for (auto&& task : tasks) {
-    task.get();
-  }
+  });
 
   return photonBuffer;
 }

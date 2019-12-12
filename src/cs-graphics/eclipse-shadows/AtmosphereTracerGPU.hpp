@@ -4,8 +4,8 @@
 //                        Copyright: (c) 2019 German Aerospace Center (DLR)                       //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef CS_GRAPHICS_PHOTON_ATMOSPHERE_TRACER_HPP
-#define CS_GRAPHICS_PHOTON_ATMOSPHERE_TRACER_HPP
+#ifndef CS_GRAPHICS_ATMOSPHERE_TRACER_GPU_HPP
+#define CS_GRAPHICS_ATMOSPHERE_TRACER_GPU_HPP
 
 #include "AtmosphereTracer.hpp"
 #include "BodyProperties.hpp"
@@ -24,7 +24,7 @@ class AtmosphereTracerGPU : public AtmosphereTracer {
   void init() override;
 
   std::variant<GPUBuffer, CPUBuffer> traceThroughAtmosphere(
-      CPUBuffer& photonBuffer, BodyWithAtmosphere const& body, double xPosition);
+      CPUBuffer& photonBuffer, BodyWithAtmosphere const& body, double xPosition) override;
 
   ~AtmosphereTracerGPU() override;
 
@@ -46,4 +46,4 @@ class AtmosphereTracerGPU : public AtmosphereTracer {
 
 } // namespace cs::graphics
 
-#endif // CS_GRAPHICS_PHOTON_ATMOSPHERE_TRACER_HPP
+#endif // CS_GRAPHICS_ATMOSPHERE_TRACER_GPU_HPP

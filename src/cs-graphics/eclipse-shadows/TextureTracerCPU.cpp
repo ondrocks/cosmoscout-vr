@@ -6,9 +6,9 @@
 
 #include "TextureTracerCPU.hpp"
 
-#include "../../cs-utils/ThreadPool.hpp"
 #include "../../cs-utils/geometry/Line.hpp"
 #include "../../cs-utils/geometry/Rectangle.hpp"
+#include "../../cs-utils/parallel.hpp"
 #include "EclipseConstants.hpp"
 #include "Photon.hpp"
 
@@ -61,20 +61,10 @@ std::vector<DoublePixel> TextureTracerCPU::traceThroughTexture(
   };
 
   std::vector<AtomicPixel> pixels(TEX_WIDTH * TEX_HEIGHT);
-
-  cs::utils::ThreadPool          tp(std::thread::hardware_concurrency());
-  std::vector<std::future<void>> tasks(pixels.size());
-
-  for (size_t i = 0; i < pixels.size(); ++i) {
-    tasks[i] = tp.enqueue([&, i] {
-      for (auto&& a : pixels[i].intensityAtWavelengths)
-        a = 0.0;
-    });
-  }
-
-  for (auto&& task : tasks) {
-    task.get();
-  }
+  cs::utils::executeParallel(pixels.size(), [&](size_t i) {
+    for (auto&& a : pixels[i].intensityAtWavelengths)
+      a = 0.0;
+  });
 
   auto getRectangleAt = [&](glm::ivec2 const& indices) -> utils::geom::DRectangle {
     glm::dvec2 horRect = horizontalRectangles[indices.x];
@@ -204,64 +194,49 @@ std::vector<DoublePixel> TextureTracerCPU::traceThroughTexture(
   const double pixelInAtmosphere = body.atmosphere.height / rectangleHeight;
   const double photonsPerPixel   = photons.size() / pixelInAtmosphere;
 
-  std::vector<std::future<void>> photonTasks(photons.size());
+  cs::utils::executeParallel(photons.size(), [&](size_t gid) {
+    Photon localPhoton = photons[gid];
 
-  for (size_t gid = 0; gid < photons.size(); ++gid) {
-    photonTasks[gid] = tp.enqueue([&, gid] {
-      Photon localPhoton = photons[gid];
+    if (localPhoton.intensity > 0.0) {
+      glm::ivec2 photonTexIndices = getRectangleIdxAt(localPhoton.position);
 
-      if (localPhoton.intensity > 0.0) {
-        glm::ivec2 photonTexIndices = getRectangleIdxAt(localPhoton.position);
+      while (photonTexIndices.x < TEX_WIDTH && photonTexIndices.y < TEX_HEIGHT &&
+             photonTexIndices.x >= 0 && photonTexIndices.y >= 0) {
+        utils::geom::DRectangle rect     = getRectangleAt(photonTexIndices);
+        double                  distance = rayDistanceInRectangle(localPhoton, rect);
 
-        while (photonTexIndices.x < TEX_WIDTH && photonTexIndices.y < TEX_HEIGHT &&
-               photonTexIndices.x >= 0 && photonTexIndices.y >= 0) {
-          utils::geom::DRectangle rect     = getRectangleAt(photonTexIndices);
-          double                  distance = rayDistanceInRectangle(localPhoton, rect);
+        double contrib = (distance / rect.width);
 
-          double contrib = (distance / rect.width);
+        pixels[photonTexIndices.y * TEX_WIDTH + photonTexIndices.x].addAtWavelength(
+            localPhoton.wavelength, localPhoton.intensity * contrib);
 
-          pixels[photonTexIndices.y * TEX_WIDTH + photonTexIndices.x].addAtWavelength(
-              localPhoton.wavelength, localPhoton.intensity * contrib);
+        glm::ivec2 dir = getRayRectangleExitEdge(localPhoton, rect);
+        photonTexIndices += dir;
 
-          glm::ivec2 dir = getRayRectangleExitEdge(localPhoton, rect);
-          photonTexIndices += dir;
-
-          // When the ray goes out of bounds on the bottom then mirror it to simulate rays
-          // coming from the other side of the planet. This works because of the rotational
-          // symmetry of the system.
-          if (photonTexIndices.y < 0) {
-            photonTexIndices.y = 0;
-            localPhoton.position.y *= -1.0;
-            localPhoton.direction.y *= -1.0;
-          }
+        // When the ray goes out of bounds on the bottom then mirror it to simulate rays
+        // coming from the other side of the planet. This works because of the rotational
+        // symmetry of the system.
+        if (photonTexIndices.y < 0) {
+          photonTexIndices.y = 0;
+          localPhoton.position.y *= -1.0;
+          localPhoton.direction.y *= -1.0;
         }
       }
-    });
-  }
-
-  for (auto&& photonTask : photonTasks) {
-    photonTask.get();
-  }
+    }
+  });
 
   std::vector<DoublePixel> resultBuffer(TEX_WIDTH * TEX_HEIGHT);
 
-  std::vector<std::future<void>> bufferTasks(resultBuffer.size());
-  for (size_t i = 0; i < resultBuffer.size(); ++i) {
-    bufferTasks[i] = tp.enqueue([&, i] {
-      DoublePixel  fp{};
-      AtomicPixel& ap = pixels[i];
+  cs::utils::executeParallel(resultBuffer.size(), [&](size_t i) {
+    DoublePixel  fp{};
+    AtomicPixel& ap = pixels[i];
 
-      for (size_t p = 0; p < fp.intensitiesAtWavelengths.size(); ++p) {
-        fp.intensitiesAtWavelengths[p] = ap.intensityAtWavelengths[p] / photonsPerPixel;
-      }
+    for (size_t p = 0; p < fp.intensitiesAtWavelengths.size(); ++p) {
+      fp.intensitiesAtWavelengths[p] = ap.intensityAtWavelengths[p] / photonsPerPixel;
+    }
 
-      resultBuffer[i] = fp;
-    });
-  }
-
-  for (auto&& task : bufferTasks) {
-    task.get();
-  }
+    resultBuffer[i] = fp;
+  });
 
   return resultBuffer;
 }

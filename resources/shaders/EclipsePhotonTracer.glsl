@@ -44,7 +44,7 @@ const double DX = 10.0LF;// m
 uniform Planet planet;
 
 double densityAtAltitude(double altitude) {
-    if (altitude < planet.atmosphericHeight) {
+    if (altitude < planet.atmosphericHeight && altitude >= 0.0) {
         return densitiesAtAltitudes[uint(altitude)];
     }
     return 0.0;
@@ -55,7 +55,7 @@ double refractiveIndexAtSeaLevel(uint wavelength) {
 }
 
 double refractiveIndexAtAltitude(double altitude, uint wavelength) {
-    if (altitude < planet.atmosphericHeight) {
+    if (altitude < planet.atmosphericHeight && altitude >= 0.0) {
         return refractiveIndicesAtAltitudes[uint(altitude)][wavelength - MIN_WAVELENGTH];
     }
     return 1.0;
@@ -109,7 +109,7 @@ double rayleighScatteringCrossSection(uint wavelength) {
     double wavelengthInCM = double(wavelength) * 1.0e-7LF;
     double wavelengthInCM4 = square(square(wavelengthInCM));
 
-    double refractiveIndex = double(refractiveIndexAtSeaLevel(wavelength));
+    double refractiveIndex = refractiveIndexAtSeaLevel(wavelength);
     double refractiveIndex2 = refractiveIndex * refractiveIndex;
 
     double molecularNumberDensity = molecularNumberDensityAtAltitude(0.0);
@@ -134,7 +134,7 @@ double rayleighVolumeScatteringCoefficient(double altitude, uint wavelength) {
 /// [2, 2] Padé approximant for exp(x).
 /// Since there is no exp function for doubles, this is a good and fast approximation for small x.
 /// This is enough for this particular application.
-double approxE(double x) {
+double approxExp(double x) {
     return (square(x + 3.0LF) + 3.0LF) / (square(x - 3.0LF) + 3.0LF);
 }
 
@@ -149,7 +149,7 @@ void attenuateLight(inout Photon photon, dvec3 oldPosition) {
     /// and 1.0e-4 produces an L0 eclipse.
     double alpha = 15000.0LF < altitude && altitude < 20000.0LF ? 1.0e-5LF : 0.0LF;
 
-    photon.intensity = photon.intensity * approxE(-(alpha + beta) * DL);
+    photon.intensity *= approxExp(-(alpha + beta) * DL);
 }
 
 /// Does a single step of the ray tracing. It moves the photon to the next location and applies

@@ -4,13 +4,12 @@
 //                        Copyright: (c) 2019 German Aerospace Center (DLR)                       //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef CS_GRAPHICS_PHOTON_ATMOSPHERE_TRACER_HPP
-#define CS_GRAPHICS_PHOTON_ATMOSPHERE_TRACER_HPP
+#ifndef CS_GRAPHICS_ATMOSPHERE_TRACER_CPU_HPP
+#define CS_GRAPHICS_ATMOSPHERE_TRACER_CPU_HPP
 
 #include "AtmosphereTracer.hpp"
 #include "BodyProperties.hpp"
 #include "LUTPrecalculator.hpp"
-#include <boost/mpl/size_t.hpp>
 #include <cstdint>
 #include <memory>
 
@@ -22,7 +21,7 @@ class AtmosphereTracerCPU : public AtmosphereTracer {
   void init() override;
 
   std::variant<GPUBuffer, CPUBuffer> traceThroughAtmosphere(
-      CPUBuffer& photonBuffer, const BodyWithAtmosphere& body, double xPosition);
+      CPUBuffer& photonBuffer, const BodyWithAtmosphere& body, double xPosition) override;
 
   ~AtmosphereTracerCPU() override = default;
 
@@ -30,4 +29,4 @@ class AtmosphereTracerCPU : public AtmosphereTracer {
   std::unique_ptr<LUTPrecalculator> mLutPrecalculator;
 };
 } // namespace cs::graphics
-#endif // CS_GRAPHICS_PHOTON_ATMOSPHERE_TRACER_HPP
+#endif // CS_GRAPHICS_ATMOSPHERE_TRACER_CPU_HPP
