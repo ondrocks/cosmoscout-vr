@@ -23,6 +23,7 @@ class AtmosphereTracerCPU : public AtmosphereTracer {
 
   std::variant<GPUBuffer, CPUBuffer> traceThroughAtmosphere(
       CPUBuffer& photonBuffer, const BodyWithAtmosphere& body, double xPosition);
+
   ~AtmosphereTracerCPU() override = default;
 
  private:

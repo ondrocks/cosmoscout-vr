@@ -9,7 +9,8 @@
 #include "../../cs-utils/filesystem.hpp"
 #include "../../cs-utils/geometry/Algortithms.hpp"
 #include "../../cs-utils/utils.hpp"
-#include "AtmosphereTracerCPU.hpp"
+//#include "AtmosphereTracerCPU.hpp"
+#include "AtmosphereTracerGPU.hpp"
 #include "BlackBodySpectrum.hpp"
 #include "EclipseConstants.hpp"
 #include "Geometry.hpp"
@@ -114,7 +115,7 @@ AtmosphereEclipseTextureGenerator::AtmosphereEclipseTextureGenerator()
     , mDistributionWavelength(
           std::uniform_int_distribution<uint32_t>(MIN_WAVELENGTH, MAX_WAVELENGTH))
     , mDistributionBoolean(std::bernoulli_distribution(0.5))
-    , mAtmosphereTracer(std::make_unique<AtmosphereTracerCPU>())
+    , mAtmosphereTracer(std::make_unique<AtmosphereTracerGPU>())
     , mTextureTracer(std::make_unique<TextureTracerCPU>())
     , mColorConverter() {
 
@@ -168,9 +169,19 @@ utils::Texture4f AtmosphereEclipseTextureGenerator::createShadowMap(
   double xOcc               = (rOcc * (SUN_RADIUS + rOcc)) / body.orbit.semiMajorAxisSun;
   auto [photonBuffer, time] = utils::measureTimeSeconds<std::variant<GPUBuffer, CPUBuffer>>(
       [&] { return mAtmosphereTracer->traceThroughAtmosphere(photons, body, xOcc); });
-  
+
   std::cout << "time: " << time << " ms" << std::endl;
-  std::exit(0);
+
+  if (std::holds_alternative<CPUBuffer>(photonBuffer)) {
+    for (int i = 0; i < std::get<CPUBuffer>(photonBuffer).size(); ++i) {
+      positions[i] = (std::get<CPUBuffer>(photonBuffer)[i].position / 6371000.0) * 20.0;
+    }
+  } else {
+
+  }
+
+  objString = utils::verticesToObjString(positions);
+  utils::filesystem::saveToFile(objString, "photon_positions_exit.obj");
 
   auto                    result  = mTextureTracer->traceThroughTexture(photonBuffer, body);
   std::vector<glm::dvec4> texture = mColorConverter.convert(result);
@@ -190,6 +201,8 @@ utils::Texture4f AtmosphereEclipseTextureGenerator::createShadowMap(
     resultTexture.dataPtr()[i] =
         glm::vec4(outputTexture[i].rgb() + glm::dvec3(data[i].rgb()), 1.0f);
   }
+
+  std::exit(0);
 
   return resultTexture;
 }
@@ -269,18 +282,22 @@ std::vector<Photon> AtmosphereEclipseTextureGenerator::generatePhotons(
       double intensityAdjusted = limbDarkening * intensity;
 
       // 9. shoot photon on to atmosphere
-      glm::dvec3 startPosition =
-          origin + direction * utils::geom::raySphereDistance(
-                                   photonRay, utils::geom::DSphere(sphereBody.center,
-                                                  body.meanRadius + body.atmosphere.height));
+      double distanceToAtmosphere = utils::geom::raySphereDistance(photonRay,
+          utils::geom::DSphere(sphereBody.center, body.meanRadius + body.atmosphere.height));
 
-      photons.emplace_back(startPosition, direction, intensityAdjusted, wavelength);
+      glm::dvec3 startPosition = origin + direction * (distanceToAtmosphere + 10.0);
+
+      if (glm::length(startPosition - sphereBody.center) <= sphereAtmosphere.radius) {
+        photons.emplace_back(startPosition, direction, intensityAdjusted, wavelength);
+      }
     });
   }
 
   for (auto&& task : tasks) {
     task.get();
   }
+
+  std::cout << "Number of Photons send: " << photons.size() << std::endl;
 
   return photons;
 }

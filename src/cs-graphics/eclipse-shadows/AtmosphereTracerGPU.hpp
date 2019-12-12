@@ -10,13 +10,12 @@
 #include "AtmosphereTracer.hpp"
 #include "BodyProperties.hpp"
 #include "EclipseConstants.hpp"
+#include "LUTPrecalculator.hpp"
 
 #include <cstdint>
 #include <memory>
 
 namespace cs::graphics {
-
-class LUTPrecalculator;
 
 class AtmosphereTracerGPU : public AtmosphereTracer {
  public:
@@ -25,7 +24,7 @@ class AtmosphereTracerGPU : public AtmosphereTracer {
   void init() override;
 
   std::variant<GPUBuffer, CPUBuffer> traceThroughAtmosphere(
-      CPUBuffer const& photonBuffer, BodyWithAtmosphere const& body, double xPosition);
+      CPUBuffer& photonBuffer, BodyWithAtmosphere const& body, double xPosition);
 
   ~AtmosphereTracerGPU() override;
 

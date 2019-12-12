@@ -177,6 +177,7 @@ void main() {
     double atmosphereRadius = planet.radius + planet.atmosphericHeight;
 
     double distFromCenter = length(photon.position - dvec3(planet.xPosition, 0.0LF, 0.0LF));
+    uint counter = 0;
     while (!exitedAtmosphere && distFromCenter > planet.radius) {
         tracePhoton(photon);
         distFromCenter = length(photon.position - dvec3(planet.xPosition, 0.0LF, 0.0LF));
@@ -187,6 +188,12 @@ void main() {
 
         if (enteredAtmosphere && distFromCenter > atmosphereRadius) {
             exitedAtmosphere = true;
+        }
+
+        // Safety abort condition to avoid infinite loops on sketchy data.
+        if (counter++ == 100000) {
+            photon.intensity = -2.0;
+            break;
         }
     }
 

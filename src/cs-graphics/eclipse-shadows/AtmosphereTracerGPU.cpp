@@ -60,7 +60,7 @@ AtmosphereTracerGPU::~AtmosphereTracerGPU() {
 }
 
 std::variant<GPUBuffer, CPUBuffer> AtmosphereTracerGPU::traceThroughAtmosphere(
-    CPUBuffer const& photonBuffer, BodyWithAtmosphere const& body, double xPosition) {
+    CPUBuffer& photonBuffer, BodyWithAtmosphere const& body, double xPosition) {
   auto [ssboRefractiveIndices, ssboDensities] = mLutPrecalculator->createLUT(body);
 
   glUseProgram(mProgram);
@@ -81,7 +81,7 @@ std::variant<GPUBuffer, CPUBuffer> AtmosphereTracerGPU::traceThroughAtmosphere(
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssboRefractiveIndices);
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, ssboDensities);
 
-  const uint32_t passSize   = 512u;
+  const uint32_t passSize   = 4096u;
   const uint32_t maxPasses  = (photonBuffer.size() / passSize) + 1;
   const uint32_t numThreads = 32u;
   const uint32_t numBlocks  = passSize / numThreads;
@@ -97,20 +97,7 @@ std::variant<GPUBuffer, CPUBuffer> AtmosphereTracerGPU::traceThroughAtmosphere(
     glFlush();
     glFinish();
   }
-  /*
-    std::vector<Photon> photons(numPhotons);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboPhotons);
-    glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(Photon) * photons.size(),
-    photons.data());
 
-    std::vector<glm::dvec3> positions(numPhotons);
-    for (int i = 0; i < numPhotons; ++i) {
-      positions[i] = (photons[i].position / 6371000.0) * 20.0;
-    }
-
-    auto objString = utils::verticesToObjString(positions);
-    utils::filesystem::saveToFile(objString, "photon_positions_exit.obj");
-  */
   glDeleteBuffers(1, &ssboDensities);
   glDeleteBuffers(1, &ssboRefractiveIndices);
 

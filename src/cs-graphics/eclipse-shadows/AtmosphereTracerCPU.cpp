@@ -164,7 +164,8 @@ std::variant<GPUBuffer, CPUBuffer> AtmosphereTracerCPU::traceThroughAtmosphere(
       double atmosphereRadius = body.meanRadius + body.atmosphere.height;
 
       double distFromCenter = glm::length(photon.position - bodyPosition);
-      size_t counter = 0;
+      size_t counter        = 0;
+      auto   photonStart    = photon;
       while (!exitedAtmosphere && distFromCenter > body.meanRadius) {
         tracePhoton(photon);
         distFromCenter = glm::length(photon.position - bodyPosition);
@@ -177,9 +178,15 @@ std::variant<GPUBuffer, CPUBuffer> AtmosphereTracerCPU::traceThroughAtmosphere(
           exitedAtmosphere = true;
         }
 
-        // TODO Investigate why some photons do not finish.
-        if (counter++ == 1000) {
-          //std::cout << photon << std::endl;
+        // This is only for debug and error purposes. It protects against unforeseen infinite loops
+        // and logs the photons properties.
+        if (counter++ == 100'000) {
+          std::cerr << "Photon did loop forever!\n"
+                    << "        Photon: " << photon << "\n"
+                    << "      Altitude: " << calcAltitude(photon.position) << "\n"
+                    << "  Start Photon:" << photonStart << "\n"
+                    << "Start Altitude: " << calcAltitude(photonStart.position) << std::endl;
+          photon.intensity = -1.0;
           break;
         }
       }
@@ -193,15 +200,6 @@ std::variant<GPUBuffer, CPUBuffer> AtmosphereTracerCPU::traceThroughAtmosphere(
   for (auto&& task : tasks) {
     task.get();
   }
-  /*
-    std::vector<glm::dvec3> positions(photonBuffer.size());
-    for (int i = 0; i < photonBuffer.size(); ++i) {
-      //std::cout << photonBuffer[i] << std::endl;
-      positions[i] = (photonBuffer[i].position / 6371000.0) * 20.0;
-    }
-
-    auto objString = utils::verticesToObjString(positions);
-    utils::filesystem::saveToFile(objString, "photon_positions_exit.obj");*/
 
   return photonBuffer;
 }
