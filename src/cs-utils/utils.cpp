@@ -21,6 +21,24 @@ namespace cs::utils {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+bool contains(std::string const& string, std::string const& value) {
+  return string.find(value) != std::string::npos;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool startsWith(std::string const& string, std::string const& prefix) {
+  return string.find(prefix) == 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool endsWith(std::string const& string, std::string const& postfix) {
+  return std::mismatch(postfix.rbegin(), postfix.rend(), string.rbegin()).first == postfix.rend();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void replaceString(
     std::string& sInput, std::string const& sPlaceHolder, std::string const& sNewString) {
   std::size_t pos = 0;
@@ -130,6 +148,31 @@ void CS_UTILS_EXPORT enableGLDebug(bool onlyErrors) {
 void CS_UTILS_EXPORT disableGLDebug() {
   glDisable(GL_DEBUG_OUTPUT);
   glDebugMessageCallback(nullptr, nullptr);
+}
+
+TEST_CASE("cs::utils::contains") {
+  CHECK(contains("lorem ipsum", "lor"));
+  CHECK(contains("lorem ipsum", "psum"));
+  CHECK(contains("lorem ipsum", "m"));
+  CHECK(!contains("lorem ipsum", "emi"));
+  CHECK(!contains("lorem ipsum", "sum "));
+}
+
+TEST_CASE("cs::utils::startsWith") {
+  CHECK(startsWith("lorem ipsum", "lor"));
+  CHECK(startsWith("lorem ipsum", "lorem ipsum"));
+  CHECK(!startsWith("lorem ipsum", "orem"));
+  CHECK(!startsWith("lorem ipsum", "lorem ipsum foo"));
+  CHECK(!startsWith("lorem ipsum", "abracadabra simsalabim"));
+}
+
+TEST_CASE("cs::utils::endsWith") {
+  CHECK(endsWith("lorem ipsum", "sum"));
+  CHECK(endsWith("lorem ipsum", "m"));
+  CHECK(endsWith("lorem ipsum", "lorem ipsum"));
+  CHECK(!endsWith("lorem ipsum", "ipsu"));
+  CHECK(!endsWith("lorem ipsum", "foo lorem ipsum"));
+  CHECK(!endsWith("lorem ipsum", "abracadabra simsalabim"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
