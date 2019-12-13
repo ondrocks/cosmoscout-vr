@@ -1,13 +1,13 @@
 {
-    "startDate": "today",
+    "startDate": "2015-09-28 01:00:00.000",
     "minDate": "1950-01-02 00:00:00.000",
     "maxDate": "2049-12-31 00:00:00.000",
     "observer": {
-        "center": "Earth",
-        "frame": "IAU_Earth",
-        "distance": 10000000.0,
-        "longitude": 11.281067,
-        "latitude": 48.086709
+        "center": "Moon",
+        "frame": "IAU_Moon",
+        "distance": 5389000.0,
+        "longitude": 9.0,
+        "latitude": 6.0
     },
     "sceneScale": {
         "minScale": 5,
@@ -998,34 +998,6 @@
                     },
                     "drawDot": true
                 },
-                "Mars Express": {
-                    "color": [
-                        1.0,
-                        0.2,
-                        0.2
-                    ],
-                    "trail": {
-                        "length": 0.25,
-                        "samples": 2000,
-                        "parentCenter": "Mars",
-                        "parentFrame": "J2000"
-                    },
-                    "drawDot": true
-                },
-                "Mars Reconnaissance Orbiter": {
-                    "color": [
-                        1.0,
-                        1.0,
-                        0.4
-                    ],
-                    "trail": {
-                        "length": 0.1,
-                        "samples": 1000,
-                        "parentCenter": "Mars",
-                        "parentFrame": "IAU_Mars"
-                    },
-                    "drawDot": true
-                },
                 "Jupiter": {
                     "color": [
                         1.0,
@@ -1283,9 +1255,6 @@
                 },
                 "Phobos": {
                     "icon": "phobos.png"
-                },
-                "Mars Express": {
-                    "icon": "mex.png"
                 },
                 "Jupiter": {
                     "icon": "jupiter.png"

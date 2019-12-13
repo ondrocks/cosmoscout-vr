@@ -5,15 +5,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "AtmosphereEclipseTextureGenerator.hpp"
-#include "../../cs-utils/filesystem.hpp"
+#include "../../cs-utils/export.hpp"
 #include "../../cs-utils/geometry/Algortithms.hpp"
 #include "../../cs-utils/parallel.hpp"
 #include "../../cs-utils/utils.hpp"
 #include "AtmosphereTracerCPU.hpp"
-#include "AtmosphereTracerGPU.hpp"
 #include "BlackBodySpectrum.hpp"
 #include "EclipseConstants.hpp"
-#include "Geometry.hpp"
 #include "SimpleEclipseShadowCaster.hpp"
 #include "TextureTracerCPU.hpp"
 #include <GL/glew.h>
@@ -99,33 +97,6 @@ std::vector<glm::dvec4> guassianBlur(
 
   return output;
 }
-
-std::string toPPMString(const std::vector<glm::dvec4>& data, size_t width, size_t height) {
-  std::string output = "P3\n";
-  output.append(std::to_string(width) + " " + std::to_string(height) + "\n");
-  output.append("65535\n");
-
-  size_t counter = 0;
-  for (auto&& pixel : data) {
-    output.append(std::to_string(lround(std::clamp(pixel.x * 25.0, 0.0, 1.0) * 65535.0)) + " ");
-    output.append(std::to_string(lround(std::clamp(pixel.y * 25.0, 0.0, 1.0) * 65535.0)) + " ");
-    output.append(std::to_string(lround(std::clamp(pixel.z * 25.0, 0.0, 1.0) * 65535.0)));
-
-    if (counter++ == 5) {
-      output.append("\n");
-      counter = 0;
-    } else
-      output.append(" ");
-  }
-
-  return output;
-}
-
-void toPPMFile(
-    std::vector<glm::dvec4> const& data, size_t width, size_t height, std::string_view fileName) {
-  std::string output = toPPMString(data, width, height);
-  cs::utils::filesystem::saveToFile(output, fileName);
-}
 } // namespace
 
 namespace cs::graphics {
@@ -172,7 +143,7 @@ utils::Texture4f AtmosphereEclipseTextureGenerator::createShadowMap(
 
   std::vector<glm::dvec4> texture = mColorConverter.convert(result);
 
-  toPPMFile(texture, TEX_WIDTH, TEX_HEIGHT,
+  utils::savePPM16<glm::dvec4>(texture, TEX_WIDTH, TEX_HEIGHT,
       "eclipse_shadow_" + std::to_string(body.gravity) + ".raw.ppm");
 
   std::vector<glm::dvec4> outputTexture =
@@ -185,12 +156,13 @@ utils::Texture4f AtmosphereEclipseTextureGenerator::createShadowMap(
   std::vector<glm::dvec4> resultTextureVec(TEX_WIDTH * TEX_HEIGHT);
 
   for (size_t i = 0; i < outputTexture.size(); ++i) {
-    resultTextureVec[i] = glm::dvec4(glm::dvec3(outputTexture[i].rgb()) + glm::dvec3(data[i].rgb()), 1.0);
+    resultTextureVec[i] =
+        glm::dvec4(glm::dvec3(outputTexture[i].rgb()) + glm::dvec3(data[i].rgb()), 1.0);
     resultTexture.dataPtr()[i] =
         glm::vec4(outputTexture[i].rgb() + glm::dvec3(data[i].rgb()), 1.0f);
   }
 
-  toPPMFile(resultTextureVec, TEX_WIDTH, TEX_HEIGHT,
+  utils::savePPM16<glm::dvec4>(resultTextureVec, TEX_WIDTH, TEX_HEIGHT,
       "eclipse_shadow_" + std::to_string(body.gravity) + ".ppm");
 
   // TODO remove for prod

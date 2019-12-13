@@ -6,37 +6,16 @@
 
 #include "SimpleEclipseShadowCaster.hpp"
 #include <cmath>
-#include <fstream>
 #include <glm/glm.hpp>
 #include <string>
 
 #include "../../cs-utils/SimpleTexture.hpp"
+#include "../../cs-utils/export.hpp"
+#include "../../cs-utils/geometry/Algortithms.hpp"
 #include "../../cs-utils/parallel.hpp"
 #include "EclipseConstants.hpp"
-#include "Geometry.hpp"
 
 namespace cs::graphics {
-
-void saveGreyscale(const std::string& name, const utils::Texture4f& texture) {
-
-  std::ofstream output(name + ".pgm", std::ios::out | std::ios::trunc);
-
-  output << "P2 " << texture.mWidth << " " << texture.mHeight << " 255\n";
-
-  int linebreakCounter = 0;
-  for (int i = 0; i < texture.mWidth; ++i) {
-    for (int j = 0; j < texture.mHeight; ++j) {
-      output << static_cast<int>(texture.get(j, i).r * 255.0) << " ";
-
-      // pgm doesn't allow more then 70 characters per line. Every value uses up to 4 characters.
-      if (linebreakCounter++ == 16) {
-        output << "\n";
-        linebreakCounter = 0;
-      }
-    }
-  }
-}
-
 cs::utils::Texture4f generateShadowTexture(Body const& body) {
   const double shadowLength = TEX_SHADOW_LENGTH_FACTOR *
                               (body.orbit.semiMajorAxisSun * body.meanRadius) /
@@ -53,19 +32,19 @@ cs::utils::Texture4f generateShadowTexture(Body const& body) {
       const glm::dvec2 pixelPositionRelPlanet(xx, y * pixSize);
       const glm::dvec2 pixelPositionRelPlanetNorm = glm::normalize(pixelPositionRelPlanet);
       const double     pixelDistanceToPlanet      = glm::length(pixelPositionRelPlanet);
-      const double planetAngularRadius = angularRadOfSphere(pixelDistanceToPlanet, body.meanRadius);
+      const double planetAngularRadius = utils::geom::angularRadOfSphere(pixelDistanceToPlanet, body.meanRadius);
 
       const glm::dvec2 pixelPositionRelSun(body.orbit.semiMajorAxisSun + xx, y * pixSize);
       const glm::dvec2 pixelPositionRelSunNorm = glm::normalize(pixelPositionRelSun);
       const double     pixelDistanceToSun      = glm::length(pixelPositionRelSun);
-      const double     sunAngularRadius        = angularRadOfSphere(pixelDistanceToSun, SUN_RADIUS);
-      const double     sunSolidAngle           = areaOfCircle(sunAngularRadius);
+      const double     sunAngularRadius        = utils::geom::angularRadOfSphere(pixelDistanceToSun, SUN_RADIUS);
+      const double     sunSolidAngle           = utils::geom::areaOfCircle(sunAngularRadius);
 
       const double angularDistanceToSun =
-          enclosingAngle(pixelPositionRelSunNorm, pixelPositionRelPlanetNorm);
+          utils::geom::enclosingAngle(pixelPositionRelSunNorm, pixelPositionRelPlanetNorm);
 
       const double sunHiddenPart =
-          areaOfCircleIntersection(sunAngularRadius, planetAngularRadius, angularDistanceToSun);
+          utils::geom::areaOfCircleIntersection(sunAngularRadius, planetAngularRadius, angularDistanceToSun);
 
       const double visibleArea         = sunSolidAngle - sunHiddenPart;
       double       visibleAreaRelative = std::clamp(visibleArea / sunSolidAngle, 0.0, 1.0);
@@ -77,7 +56,11 @@ cs::utils::Texture4f generateShadowTexture(Body const& body) {
     }
   });
 
-  saveGreyscale("eclipse_shadow_" + std::to_string(body.meanRadius), texture);
+  std::vector<float> data(TEX_WIDTH * TEX_HEIGHT);
+  for (int i = 0; i < TEX_WIDTH * TEX_HEIGHT; ++i) {
+    data[i] = texture.dataPtr()[i].r;
+  }
+  utils::savePGM16<float>(data, TEX_WIDTH, TEX_HEIGHT, "eclipse_shadow_" + std::to_string(body.meanRadius));
 
   return texture;
 }

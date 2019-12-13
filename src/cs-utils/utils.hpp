@@ -35,6 +35,7 @@ enum class CS_UTILS_EXPORT DrawOrder : int {
   eRay              = 800,
   eGui              = 900
 };
+
 template <typename T>
 bool contains(T const& container, typename T::value_type const& item) {
   return std::find(std::begin(container), std::end(container), item) != std::end(container);
@@ -92,29 +93,11 @@ constexpr typename std::underlying_type<T>::type enumCast(T val) {
 /// Well, does what is says.
 float CS_UTILS_EXPORT getCurrentFarClipDistance();
 
-template <int Size, typename T>
-std::string verticesToObjString(std::vector<glm::vec<Size, T>> const& vertices) {
-  std::ostringstream oss;
-
-  oss << std::fixed;
-
-  for (const auto& vertex : vertices) {
-    oss << "v";
-    for (int i = 0; i < Size; ++i) {
-      oss << " " << vertex[i];
-    }
-    oss << "\n";
-  }
-
-  return oss.str();
-}
-
 double CS_UTILS_EXPORT measureTimeSeconds(std::function<void()> const& f);
 
 void CS_UTILS_EXPORT enableGLDebug(bool onlyErrors = true);
 void CS_UTILS_EXPORT disableGLDebug();
 } // namespace cs::utils
-
 
 template <int Size, typename T>
 std::ostream& operator<<(std::ostream& os, glm::vec<Size, T> const& vec) {

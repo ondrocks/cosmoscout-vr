@@ -140,7 +140,7 @@ std::variant<GPUBuffer, CPUBuffer> AtmosphereTracerCPU::traceThroughAtmosphere(
     // TODO don't know what to do with this for now... maybe make it configurable per planet?
     /// This value simulates particles in the upper atmosphere. On earth a value of 1.0e-6
     /// corresponds to an L4 eclipse and 1.0e-4 produces an L0 eclipse.
-    double alpha = 15000.0 < altitude && altitude < 20000.0 ? 1.0e-5 : 0.0;
+    double alpha = 15000.0 < altitude && altitude < 20000.0 ? 0.0e-5 : 0.0;
 
     photon.intensity *= std::exp(-(alpha + beta) * DL);
   };
