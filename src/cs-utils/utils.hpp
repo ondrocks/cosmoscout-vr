@@ -109,14 +109,10 @@ std::string verticesToObjString(std::vector<glm::vec<Size, T>> const& vertices) 
   return oss.str();
 }
 
-template <typename T>
-std::pair<T, double> measureTimeSeconds(std::function<T()> const& f) {
-  auto start = std::chrono::high_resolution_clock::now();
-  T result = f();
-  auto end = std::chrono::high_resolution_clock::now();
-  return {result, std::chrono::duration<double>(end - start).count()};
-}
+double CS_UTILS_EXPORT measureTimeSeconds(std::function<void()> const& f);
 
+void CS_UTILS_EXPORT enableGLDebug(bool onlyErrors = true);
+void CS_UTILS_EXPORT disableGLDebug();
 } // namespace cs::utils
 
 

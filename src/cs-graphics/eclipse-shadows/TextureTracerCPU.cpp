@@ -192,7 +192,7 @@ std::vector<DoublePixel> TextureTracerCPU::traceThroughTexture(
   }
 
   const double pixelInAtmosphere = body.atmosphere.height / rectangleHeight;
-  const double photonsPerPixel   = photons.size() / pixelInAtmosphere;
+  const double photonsPerPixel   = NUM_PHOTONS / pixelInAtmosphere;
 
   cs::utils::executeParallel(photons.size(), [&](size_t gid) {
     Photon localPhoton = photons[gid];

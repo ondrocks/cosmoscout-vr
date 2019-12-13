@@ -247,7 +247,7 @@
                 "semiMajorAxisSun": 149598023000.0
             },
             "atmosphere": {
-                "seaLevelMolecularNumberDensity": 2.547e19,
+                "seaLevelMolecularNumberDensity": 2.54743e19,
                 "molarMass": 0.0289644,
                 "height": 42000.0,
                 "layers": [
@@ -870,25 +870,6 @@
                         ],
                         "scale": 100
                     }
-                },
-                "Curiosity": {
-                    "modelFile": "/vr_data/Geometry/NASA/MSL/msl.gltf",
-                    "environmentMap": "../share/resources/textures/marsEnvMap.dds",
-                    "size": 0,
-                    "transformation": {
-                        "translation": [
-                            0.0,
-                            -133.6,
-                            0.0
-                        ],
-                        "rotation": [
-                            1.0,
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "scale": 1
-                    }
                 }
             }
         },
@@ -1043,14 +1024,6 @@
                         "parentCenter": "Mars",
                         "parentFrame": "IAU_Mars"
                     },
-                    "drawDot": true
-                },
-                "Curiosity": {
-                    "color": [
-                        1.0,
-                        0.0,
-                        0.4
-                    ],
                     "drawDot": true
                 },
                 "Jupiter": {
@@ -1282,12 +1255,6 @@
                             "longitude": 137.8,
                             "extent": 300000
                         },
-                        "Curiosity": {
-                            "group": "Rover",
-                            "latitude": -4.63,
-                            "longitude": 137.3528,
-                            "extent": 100
-                        },
                         "Hadriacus Mons": {
                             "group": "Volcanoes",
                             "latitude": -30,
@@ -1319,9 +1286,6 @@
                 },
                 "Mars Express": {
                     "icon": "mex.png"
-                },
-                "Curiosity": {
-                    "icon": "curiosity.png"
                 },
                 "Jupiter": {
                     "icon": "jupiter.png"

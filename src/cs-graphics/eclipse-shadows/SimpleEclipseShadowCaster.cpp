@@ -11,7 +11,7 @@
 #include <string>
 
 #include "../../cs-utils/SimpleTexture.hpp"
-#include "../../cs-utils/ThreadPool.hpp"
+#include "../../cs-utils/parallel.hpp"
 #include "EclipseConstants.hpp"
 #include "Geometry.hpp"
 
@@ -46,46 +46,36 @@ cs::utils::Texture4f generateShadowTexture(Body const& body) {
 
   cs::utils::Texture4f texture(TEX_WIDTH, TEX_HEIGHT);
 
-  cs::utils::ThreadPool tp(std::thread::hardware_concurrency());
+  cs::utils::executeParallel(TEX_HEIGHT, [&](size_t y) {
+    for (size_t x = 0; x < TEX_WIDTH; ++x) {
+      const double xx =
+          std::pow(static_cast<double>(x) / TEX_WIDTH, TEX_SHADOW_WIDTH_EXPONENT) * shadowLength;
+      const glm::dvec2 pixelPositionRelPlanet(xx, y * pixSize);
+      const glm::dvec2 pixelPositionRelPlanetNorm = glm::normalize(pixelPositionRelPlanet);
+      const double     pixelDistanceToPlanet      = glm::length(pixelPositionRelPlanet);
+      const double planetAngularRadius = angularRadOfSphere(pixelDistanceToPlanet, body.meanRadius);
 
-  std::vector<std::future<void>> tasks(TEX_HEIGHT);
-  for (size_t y = 0; y < TEX_HEIGHT; ++y) {
-    tasks[y] = tp.enqueue([&, y] {
-      for (size_t x = 0; x < TEX_WIDTH; ++x) {
-        const double xx =
-            std::pow(static_cast<double>(x) / TEX_WIDTH, TEX_SHADOW_WIDTH_EXPONENT) * shadowLength;
-        const glm::dvec2 pixelPositionRelPlanet(xx, y * pixSize);
-        const glm::dvec2 pixelPositionRelPlanetNorm = glm::normalize(pixelPositionRelPlanet);
-        const double     pixelDistanceToPlanet      = glm::length(pixelPositionRelPlanet);
-        const double     planetAngularRadius =
-            angularRadOfSphere(pixelDistanceToPlanet, body.meanRadius);
+      const glm::dvec2 pixelPositionRelSun(body.orbit.semiMajorAxisSun + xx, y * pixSize);
+      const glm::dvec2 pixelPositionRelSunNorm = glm::normalize(pixelPositionRelSun);
+      const double     pixelDistanceToSun      = glm::length(pixelPositionRelSun);
+      const double     sunAngularRadius        = angularRadOfSphere(pixelDistanceToSun, SUN_RADIUS);
+      const double     sunSolidAngle           = areaOfCircle(sunAngularRadius);
 
-        const glm::dvec2 pixelPositionRelSun(body.orbit.semiMajorAxisSun + xx, y * pixSize);
-        const glm::dvec2 pixelPositionRelSunNorm = glm::normalize(pixelPositionRelSun);
-        const double     pixelDistanceToSun      = glm::length(pixelPositionRelSun);
-        const double     sunAngularRadius = angularRadOfSphere(pixelDistanceToSun, SUN_RADIUS);
-        const double     sunSolidAngle    = areaOfCircle(sunAngularRadius);
+      const double angularDistanceToSun =
+          enclosingAngle(pixelPositionRelSunNorm, pixelPositionRelPlanetNorm);
 
-        const double angularDistanceToSun =
-            enclosingAngle(pixelPositionRelSunNorm, pixelPositionRelPlanetNorm);
+      const double sunHiddenPart =
+          areaOfCircleIntersection(sunAngularRadius, planetAngularRadius, angularDistanceToSun);
 
-        const double sunHiddenPart =
-            areaOfCircleIntersection(sunAngularRadius, planetAngularRadius, angularDistanceToSun);
+      const double visibleArea         = sunSolidAngle - sunHiddenPart;
+      double       visibleAreaRelative = std::clamp(visibleArea / sunSolidAngle, 0.0, 1.0);
 
-        const double visibleArea         = sunSolidAngle - sunHiddenPart;
-        double       visibleAreaRelative = std::clamp(visibleArea / sunSolidAngle, 0.0, 1.0);
+      if (std::isnan(visibleAreaRelative))
+        visibleAreaRelative = 0.0;
 
-        if (std::isnan(visibleAreaRelative))
-          visibleAreaRelative = 0.0;
-
-        texture.set(x, y, glm::vec4(static_cast<float>(visibleAreaRelative)));
-      }
-    });
-  }
-
-  for (auto&& task : tasks) {
-    task.get();
-  }
+      texture.set(x, y, glm::vec4(static_cast<float>(visibleAreaRelative)));
+    }
+  });
 
   saveGreyscale("eclipse_shadow_" + std::to_string(body.meanRadius), texture);
 

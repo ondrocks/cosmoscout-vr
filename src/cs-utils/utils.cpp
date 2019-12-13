@@ -11,6 +11,8 @@
 #include <VistaKernel/DisplayManager/VistaViewport.h>
 #include <VistaKernel/VistaSystem.h>
 
+#include <GL/glew.h>
+
 #include <boost/filesystem.hpp>
 #include <chrono>
 #include <iostream>
@@ -94,6 +96,40 @@ float getCurrentFarClipDistance() {
       ->GetProjectionProperties()
       ->GetClippingRange(near, far);
   return (float)far;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+double measureTimeSeconds(std::function<void()> const& f) {
+  auto start = std::chrono::high_resolution_clock::now();
+  f();
+  auto end = std::chrono::high_resolution_clock::now();
+  return std::chrono::duration<double>(end - start).count();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool glDebugOnlyErrors = true;
+
+void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity,
+    GLsizei length, const GLchar* message, const void* userParam) {
+  if (type == GL_DEBUG_TYPE_ERROR)
+    fprintf(
+        stderr, "GL ERROR: type = 0x%x, severity = 0x%x, message = %s\n", type, severity, message);
+  else if (!glDebugOnlyErrors)
+    fprintf(stdout, "GL WARNING: type = 0x%x, severity = 0x%x, message = %s\n", type, severity,
+        message);
+}
+
+void CS_UTILS_EXPORT enableGLDebug(bool onlyErrors) {
+  glDebugOnlyErrors = onlyErrors;
+  glEnable(GL_DEBUG_OUTPUT);
+  glDebugMessageCallback(MessageCallback, nullptr);
+}
+
+void CS_UTILS_EXPORT disableGLDebug() {
+  glDisable(GL_DEBUG_OUTPUT);
+  glDebugMessageCallback(nullptr, nullptr);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

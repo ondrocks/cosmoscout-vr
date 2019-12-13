@@ -10,10 +10,8 @@
 
 #include <curlpp/Easy.hpp>
 #include <curlpp/Info.hpp>
-#include <curlpp/Infos.hpp>
 #include <curlpp/Options.hpp>
 
-#include <cmath>
 #include <iostream>
 
 namespace cs::utils::filesystem {

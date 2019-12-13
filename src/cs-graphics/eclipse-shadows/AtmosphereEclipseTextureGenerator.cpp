@@ -99,22 +99,6 @@ std::vector<glm::dvec4> guassianBlur(
 
   return output;
 }
-} // namespace
-
-namespace cs::graphics {
-AtmosphereEclipseTextureGenerator::AtmosphereEclipseTextureGenerator()
-    : mRNG(/*133713371337 */ std::random_device()())
-    , mDistributionWavelength(
-          std::uniform_int_distribution<uint32_t>(MIN_WAVELENGTH, MAX_WAVELENGTH))
-    , mDistributionBoolean(std::bernoulli_distribution(0.5))
-    , mAtmosphereTracer(std::make_unique<AtmosphereTracerCPU>())
-    , mTextureTracer(std::make_unique<TextureTracerCPU>())
-    , mColorConverter() {
-
-  mAtmosphereTracer->init();
-  mTextureTracer->init();
-  mColorConverter.init();
-}
 
 std::string toPPMString(const std::vector<glm::dvec4>& data, size_t width, size_t height) {
   std::string output = "P3\n";
@@ -137,12 +121,28 @@ std::string toPPMString(const std::vector<glm::dvec4>& data, size_t width, size_
   return output;
 }
 
-void toPPMFile(const std::vector<glm::dvec4>& data, size_t width, size_t height,
-    const std::string_view fileName) {
-  std::string   output = toPPMString(data, width, height);
-  std::ofstream ofStream(fileName.data(), std::ios::out);
-  ofStream << output;
-  ofStream.close();
+void toPPMFile(
+    std::vector<glm::dvec4> const& data, size_t width, size_t height, std::string_view fileName) {
+  std::string output = toPPMString(data, width, height);
+  cs::utils::filesystem::saveToFile(output, fileName);
+}
+} // namespace
+
+namespace cs::graphics {
+AtmosphereEclipseTextureGenerator::AtmosphereEclipseTextureGenerator()
+    : mRNG(/*133713371337 */ std::random_device()())
+    , mDistributionWavelength(
+          std::uniform_int_distribution<uint32_t>(MIN_WAVELENGTH, MAX_WAVELENGTH))
+    , mDistributionBoolean(std::bernoulli_distribution(0.5))
+    , mAtmosphereTracer(std::make_unique<AtmosphereTracerCPU>())
+    , mTextureTracer(std::make_unique<TextureTracerCPU>())
+    , mColorConverter() {
+
+  // TODO remove for prod
+  utils::enableGLDebug();
+  mAtmosphereTracer->init();
+  mTextureTracer->init();
+  mColorConverter.init();
 }
 
 utils::Texture4f AtmosphereEclipseTextureGenerator::createShadowMap(
@@ -154,39 +154,22 @@ utils::Texture4f AtmosphereEclipseTextureGenerator::createShadowMap(
     positions[i] = (photons[i].position / 6371000.0) * 20.0;
   }
 
-  auto objString = utils::verticesToObjString(positions);
-  utils::filesystem::saveToFile(objString, "photon_positions_enter.obj");
+  double rOcc = body.meanRadius + body.atmosphere.height;
+  double xOcc = (rOcc * (SUN_RADIUS + rOcc)) / body.orbit.semiMajorAxisSun;
+  std::variant<GPUBuffer, CPUBuffer> photonBuffer;
 
-  double rOcc               = body.meanRadius + body.atmosphere.height;
-  double xOcc               = (rOcc * (SUN_RADIUS + rOcc)) / body.orbit.semiMajorAxisSun;
-  auto [photonBuffer, time] = utils::measureTimeSeconds<std::variant<GPUBuffer, CPUBuffer>>(
-      [&] { return mAtmosphereTracer->traceThroughAtmosphere(photons, body, xOcc); });
+  auto atmoTime = utils::measureTimeSeconds(
+      [&] { photonBuffer = mAtmosphereTracer->traceThroughAtmosphere(photons, body, xOcc); });
 
-  std::cout << "time: " << time << " seconds" << std::endl;
+  std::cout << "Atmosphere Time: " << atmoTime << " seconds" << std::endl;
 
-  std::exit(0);
+  std::vector<DoublePixel> result;
 
-  if (std::holds_alternative<CPUBuffer>(photonBuffer)) {
-    for (int i = 0; i < std::get<CPUBuffer>(photonBuffer).size(); ++i) {
-      positions[i] = (std::get<CPUBuffer>(photonBuffer)[i].position / 6371000.0) * 20.0;
-    }
-  } else {
-    GPUBuffer gpuBuffer = std::get<GPUBuffer>(photonBuffer);
-    photons             = CPUBuffer(gpuBuffer.size);
+  auto textureTime = utils::measureTimeSeconds(
+      [&] { result = mTextureTracer->traceThroughTexture(photonBuffer, body); });
 
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, gpuBuffer.buffer);
-    glGetBufferSubData(
-        GL_SHADER_STORAGE_BUFFER, 0, sizeof(Photon) * gpuBuffer.size, photons.data());
+  std::cout << "   Texture Time: " << textureTime << " seconds" << std::endl;
 
-    for (int i = 0; i < photons.size(); ++i) {
-      positions[i] = (photons[i].position / 6371000.0) * 20.0;
-    }
-  }
-
-  objString = utils::verticesToObjString(positions);
-  utils::filesystem::saveToFile(objString, "photon_positions_exit.obj");
-
-  auto                    result  = mTextureTracer->traceThroughTexture(photonBuffer, body);
   std::vector<glm::dvec4> texture = mColorConverter.convert(result);
 
   toPPMFile(texture, TEX_WIDTH, TEX_HEIGHT,
@@ -198,14 +181,20 @@ utils::Texture4f AtmosphereEclipseTextureGenerator::createShadowMap(
   auto shadowTexture = generateShadowTexture({body.meanRadius, body.orbit});
   auto data          = shadowTexture.dataPtr();
 
-  utils::Texture4f resultTexture(TEX_WIDTH, TEX_HEIGHT);
+  utils::Texture4f        resultTexture(TEX_WIDTH, TEX_HEIGHT);
+  std::vector<glm::dvec4> resultTextureVec(TEX_WIDTH * TEX_HEIGHT);
 
   for (size_t i = 0; i < outputTexture.size(); ++i) {
+    resultTextureVec[i] = glm::dvec4(glm::dvec3(outputTexture[i].rgb()) + glm::dvec3(data[i].rgb()), 1.0);
     resultTexture.dataPtr()[i] =
         glm::vec4(outputTexture[i].rgb() + glm::dvec3(data[i].rgb()), 1.0f);
   }
 
-  std::exit(0);
+  toPPMFile(resultTextureVec, TEX_WIDTH, TEX_HEIGHT,
+      "eclipse_shadow_" + std::to_string(body.gravity) + ".ppm");
+
+  // TODO remove for prod
+  cs::utils::disableGLDebug();
 
   return resultTexture;
 }
