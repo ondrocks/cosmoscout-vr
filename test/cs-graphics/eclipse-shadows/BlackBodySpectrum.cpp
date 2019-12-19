@@ -7,7 +7,6 @@
 #include "../../../src/cs-graphics/eclipse-shadows/BlackBodySpectrum.hpp"
 #include "../../../src/cs-utils/doctest.hpp"
 #include <glm/gtx/norm.hpp>
-#include <iostream>
 
 namespace cs::graphics {
 TEST_CASE("cs::graphics::INTENSITY_LUT") {
