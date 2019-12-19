@@ -11,9 +11,6 @@
 #include <VistaKernel/DisplayManager/VistaViewport.h>
 #include <VistaKernel/VistaSystem.h>
 
-#include <GL/glew.h>
-
-#include <boost/filesystem.hpp>
 #include <chrono>
 #include <iostream>
 

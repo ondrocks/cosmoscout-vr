@@ -9,6 +9,7 @@
 #include "../cs-core/Settings.hpp"
 #include "../cs-gui/gui.hpp"
 #include "../cs-utils/CommandLine.hpp"
+#include "../cs-utils/doctest.hpp"
 #include "Application.hpp"
 
 #include <VistaKernel/VistaSystem.h>

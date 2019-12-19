@@ -21,6 +21,7 @@ add_library(cs-utils SHARED
 target_link_libraries(cs-utils
   PUBLIC
     glm::glm
+    doctest::doctest
     tinygltf::tinygltf
     Boost::filesystem
     Boost::chrono
