@@ -11,6 +11,9 @@
 
 namespace cs::graphics {
 
+/// Calculates the limb darkening between the radii 0 - 1.
+double calculateLimbDarkening(double radius);
+
 static const std::array<double, NUM_WAVELENGTHS> INTENSITY_LUT = {0.933913974094111,
     0.937241518455151, 0.940533596424491, 0.943790196122492, 0.947011310654367, 0.950196938027021,
     0.953347081066286, 0.956461747334589, 0.959540949049037, 0.96258470299998, 0.965593030470037,

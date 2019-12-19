@@ -8,13 +8,14 @@
 #define CS_GRAPHICS_ATMOSPHERE_ECLIPSE_SHADOW_GENERATOR_HPP
 
 #include "../../cs-utils/SimpleTexture.hpp"
+#include "AtmosphereTracer.hpp"
 #include "BodyProperties.hpp"
 #include "ColorConverter.hpp"
 #include "Photon.hpp"
-#include "AtmosphereTracer.hpp"
+#include "PhotonGenerator.hpp"
 #include "TextureTracer.hpp"
-#include <random>
 #include <memory>
+#include <random>
 
 namespace cs::graphics {
 class AtmosphereEclipseTextureGenerator {
@@ -24,12 +25,10 @@ class AtmosphereEclipseTextureGenerator {
   cs::utils::Texture4f createShadowMap(BodyWithAtmosphere const& body, size_t photonCount);
 
  private:
-  std::vector<Photon> generatePhotons(uint32_t count, BodyWithAtmosphere const& body);
-
   std::mt19937_64                         mRNG;
-  std::uniform_int_distribution<uint32_t> mDistributionWavelength;
   std::bernoulli_distribution             mDistributionBoolean;
 
+  std::unique_ptr<PhotonGenerator>  mPhotonGenerator;
   std::unique_ptr<AtmosphereTracer> mAtmosphereTracer;
   std::unique_ptr<TextureTracer>    mTextureTracer;
   ColorConverter                    mColorConverter;
