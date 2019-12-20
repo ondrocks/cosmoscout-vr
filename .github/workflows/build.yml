@@ -118,14 +118,14 @@ jobs:
         shell: cmd
         run: |
           choco install ninja
-          set CC=cl.exe
-          set CXX=cl.exe
+          set CC=cl
+          set CXX=cl
       - name: Build Externals
         shell: cmd
-        run: make_externals.bat -G Ninja
+        run: make_externals.bat -G Ninja -DCMAKE_C_COMPILER=cl.exe -DCMAKE_CXX_COMPILER=cl.exe -DMSVC_TOOLSET_VERSION=141
       - name: Build CosmoScout VR
         shell: cmd
-        run: make.bat -G Ninja
+        run: make.bat -G Ninja -DCMAKE_C_COMPILER=cl.exe -DCMAKE_CXX_COMPILER=cl.exe -DMSVC_TOOLSET_VERSION=141
       - name: Run Tests
         shell: cmd
         run: install\\windows-release\\bin\\run_all_tests.bat
