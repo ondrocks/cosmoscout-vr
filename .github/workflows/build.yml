@@ -118,8 +118,8 @@ jobs:
         shell: cmd
         run: |
           choco install ninja
-          set CC=cl
-          set CXX=cl
+          set CC=cl.exe
+          set CXX=cl.exe
       - name: Build Externals
         shell: cmd
         run: make_externals.bat -G Ninja -DCMAKE_C_COMPILER=cl.exe -DCMAKE_CXX_COMPILER=cl.exe -DMSVC_TOOLSET_VERSION=141
