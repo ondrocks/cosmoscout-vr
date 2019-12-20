@@ -21,8 +21,8 @@ TEST_CASE("cs::graphics::INTENSITY_LUT") {
 }
 
 TEST_CASE("cs::graphics::calculateLimbDarkening") {
-  const int64_t STEPS     = 2000;
-  const double  STEP_SIZE = 2.0 / STEPS;
+  const int64_t STEPS     = 1000;
+  const double  STEP_SIZE = 2.0 / (STEPS + 1.0);
 
   double   sum     = 0.0;
   uint64_t counter = 0;
