@@ -11,7 +11,7 @@
 
 namespace cs::utils::geom {
 
-template <uint8_t Dimensions, typename T>
+template <int32_t Dimensions, typename T>
 struct Ray {
   Ray(glm::vec<Dimensions, T> const& origin, glm::vec<Dimensions, T> const& direction)
       : origin(origin)

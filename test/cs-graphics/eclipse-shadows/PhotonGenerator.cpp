@@ -35,10 +35,10 @@ TEST_CASE("cs::graphics::PhotonGenerator Wavelengths") {
   uint64_t min     = std::numeric_limits<uint64_t>::max();
   uint64_t max     = 0ul;
 
-  double sum = 0;
+  uint64_t sum = 0ul;
 
   for (const auto& photon : photons) {
-    sum += static_cast<double>(photon.wavelength);
+    sum += photon.wavelength;
 
     if (photon.wavelength < min)
       min = photon.wavelength;
@@ -50,7 +50,7 @@ TEST_CASE("cs::graphics::PhotonGenerator Wavelengths") {
   WARN_EQ(min, MIN_WAVELENGTH);
   WARN_EQ(max, MAX_WAVELENGTH);
 
-  double average         = sum / photons.size();
+  double average         = static_cast<double>(sum) / photons.size();
   double expectedAverage = (MIN_WAVELENGTH + MAX_WAVELENGTH) / 2.0;
 
   WARN_EQ(average, doctest::Approx(expectedAverage).epsilon(0.01));
