@@ -45,9 +45,9 @@ struct SellmeierCoefficients {
 
 /// DocTODO
 struct Atmosphere {
-  double                        seaLevelMolecularNumberDensity; ///< cm^-3
-  double                        molarMass;                      ///< kg/mol
-  double                        height;                         ///< m
+  double                       seaLevelMolecularNumberDensity; ///< cm^-3
+  double                       molarMass;                      ///< kg/mol
+  double                       height;                         ///< m
   std::vector<AtmosphereLayer> layers;
   SellmeierCoefficients        sellmeierCoefficients;
 
@@ -84,8 +84,8 @@ struct Body {
 };
 
 struct BodyWithAtmosphere {
-  double      gravity;
-  double      meanRadius;
+  double     gravity;
+  double     meanRadius;
   Orbit      orbit;
   Atmosphere atmosphere;
 
