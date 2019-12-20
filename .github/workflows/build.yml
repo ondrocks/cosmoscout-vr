@@ -118,8 +118,8 @@ jobs:
         shell: cmd
         run: |
           choco install ninja
-          dir C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Tools\MSVC
-          set PATH=C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Tools\MSVC\15.9.17\bin\Hostx64\x64;%PATH%
+          dir "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Tools\MSVC"
+          set PATH="C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Tools\MSVC\15.9.17\bin\Hostx64\x64;%PATH%"
           set CC=cl.exe
           set CXX=cl.exe
       - name: Build Externals
