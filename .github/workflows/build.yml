@@ -121,14 +121,14 @@ jobs:
       - name: Build Externals
         shell: cmd
         run: |
-          set PATH="C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Tools\MSVC\14.16.27023\bin\Hostx64\x64\cl.exe";%PATH%
+          set PATH="C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Tools\MSVC\14.16.27023\bin\Hostx64\x64\cl.exe;%PATH%"
           set CC=cl.exe
           set CXX=cl.exe
           make_externals.bat -G Ninja -DCMAKE_C_COMPILER=cl.exe -DCMAKE_CXX_COMPILER=cl.exe -DMSVC_TOOLSET_VERSION=141
       - name: Build CosmoScout VR
         shell: cmd
         run: |
-          set PATH="C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Tools\MSVC\14.16.27023\bin\Hostx64\x64\cl.exe";%PATH%
+          set PATH="C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Tools\MSVC\14.16.27023\bin\Hostx64\x64\cl.exe;%PATH%"
           set CC=cl.exe
           set CXX=cl.exe
           make.bat -G Ninja -DCMAKE_C_COMPILER=cl.exe -DCMAKE_CXX_COMPILER=cl.exe -DMSVC_TOOLSET_VERSION=141
