@@ -51,7 +51,7 @@ std::array<std::array<double, SIZE>, SIZE> generateGaussianKernel() {
 }
 
 template <size_t RADIUS>
-std::vector<glm::dvec4> guassianBlur(
+std::vector<glm::dvec4> gaussianBlur(
     const std::vector<glm::dvec4>& image, int64_t width, int64_t height) {
   const int64_t filterSize   = RADIUS * 2 + 1;
   const int64_t filterRadius = RADIUS;
@@ -99,7 +99,7 @@ std::vector<glm::dvec4> guassianBlur(
 
 namespace cs::graphics {
 AtmosphereEclipseTextureGenerator::AtmosphereEclipseTextureGenerator()
-    : mRNG(/*133713371337 */ std::random_device()())
+    : mRNG(133713371337)// std::random_device()())
     , mDistributionBoolean(std::bernoulli_distribution(0.5))
     , mPhotonGenerator(std::make_unique<PhotonGenerator>())
     , mAtmosphereTracer(std::make_unique<AtmosphereTracerCPU>())
@@ -144,7 +144,7 @@ utils::Texture4f AtmosphereEclipseTextureGenerator::createShadowMap(
       "eclipse_shadow_" + std::to_string(body.gravity) + ".raw.ppm");
 
   std::vector<glm::dvec4> outputTexture =
-      guassianBlur<static_cast<size_t>(TEX_WIDTH * 0.01)>(texture, TEX_WIDTH, TEX_HEIGHT);
+      gaussianBlur<static_cast<size_t>(TEX_WIDTH * 0.01)>(texture, TEX_WIDTH, TEX_HEIGHT);
 
   auto shadowTexture = generateShadowTexture({body.meanRadius, body.orbit});
   auto data          = shadowTexture.dataPtr();
@@ -164,6 +164,8 @@ utils::Texture4f AtmosphereEclipseTextureGenerator::createShadowMap(
 
   // TODO remove for prod
   cs::utils::disableGLDebug();
+
+  std::cout << 6 << std::endl;
 
   return resultTexture;
 }

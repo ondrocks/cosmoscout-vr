@@ -145,6 +145,12 @@ double densityAtAltitude(double altitude) {
 }
 
 double refractiveIndexAtSeaLevel(uint wavelength) {
+    /*const double dWavelength = double(wavelength);
+    const double a = 1.00027643;
+    const double b = 0.12288 / (dWavelength * dWavelength);
+    const double c = 3.555e4 / (dWavelength * dWavelength * dWavelength * dWavelength);
+    return a + b + c;*/
+
     double wavelengthEN2 = 1.0e6LF / double(wavelength * wavelength);
 
     double sum = 0.0LF;

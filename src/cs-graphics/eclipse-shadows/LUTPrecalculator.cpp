@@ -128,8 +128,8 @@ std::pair<uint32_t, uint32_t> LUTPrecalculator::createLUT(BodyWithAtmosphere con
   glUseProgram(0);
 
   glDeleteBuffers(1, &layerSSBO);
-
-  /*std::cout << body << "\n" << std::endl;
+/*
+  std::cout << body << "\n" << std::endl;
 
   for (int h = 0; h < body.atmosphere.height; h += 10000) {
     std::cout << "Height: " << h * DX << std::endl;
@@ -139,9 +139,9 @@ std::pair<uint32_t, uint32_t> LUTPrecalculator::createLUT(BodyWithAtmosphere con
       printf("%.8f, ", data[idx]);
     }
     std::cout << std::endl;
-  }
+  }*/
 
-  std::exit(0);*/
+  //std::exit(0);
 
   return {ssboRefractiveIndices, ssboDensities};
 }

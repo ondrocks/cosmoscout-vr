@@ -46,7 +46,7 @@ std::vector<Photon> PhotonGenerator::generatePhotons(
   std::mutex lock{};
 
   // 2. for each i in count
-  cs::utils::executeParallel(count, [&](size_t i) {
+  cs::utils::executeParallel(count, 1, [&](size_t i) {
     // 3. sample random point in target area,
     glm::dvec3 target(xOcc, targetDistribution(mRNG), 0.0);
 
