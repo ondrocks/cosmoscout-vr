@@ -9,11 +9,135 @@
 
 #include <glm/ext/scalar_constants.hpp>
 #include <glm/glm.hpp>
+#include <optional>
 
+#include "Line.hpp"
+#include "LineSegment.hpp"
+#include "Quadrilateral.hpp"
 #include "Ray.hpp"
 #include "Sphere.hpp"
+#include "Triangle.hpp"
 
 namespace cs::utils::geom {
+
+/// Returns the intersection point of two line segments.
+/// https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_two_points_on_each_line
+template <typename T>
+std::optional<glm::tvec2<T>> intersection(TLineSegment2<T> const& l1, TLineSegment2<T> const& l2) {
+  T x1 = l1.start.x;
+  T x2 = l1.end.x;
+  T x3 = l2.start.x;
+  T x4 = l2.end.x;
+
+  T y1 = l1.start.y;
+  T y2 = l1.end.y;
+  T y3 = l2.start.y;
+  T y4 = l2.end.y;
+
+  T denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+
+  // parallel or identical
+  if (denominator == 0.0)
+    return std::nullopt;
+
+  T t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denominator;
+
+  // intersection not on l1
+  if (t < 0.0 || t > 1.0)
+    return std::nullopt;
+
+  T u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / denominator;
+
+  // intersection not on l2
+  if (u < 0.0 || u > 1.0)
+    return std::nullopt;
+
+  T x = x1 + t * (x2 - x1);
+  T y = y1 + t * (y2 - y1);
+  return glm::tvec2<T>{x, y};
+}
+
+/// Returns the intersection point of two line segments.
+/// https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_two_points_on_each_line
+template <typename T>
+bool doIntersect(TLineSegment2<T> const& l1, TLineSegment2<T> const& l2) {
+  T x1 = l1.start.x;
+  T x2 = l1.end.x;
+  T x3 = l2.start.x;
+  T x4 = l2.end.x;
+
+  T y1 = l1.start.y;
+  T y2 = l1.end.y;
+  T y3 = l2.start.y;
+  T y4 = l2.end.y;
+
+  T denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+
+  // parallel or identical
+  if (denominator == 0.0)
+    return false;
+
+  T t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denominator;
+
+  // intersection not on l1
+  if (t < 0.0 || t > 1.0)
+    return false;
+
+  T u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / denominator;
+
+  // intersection not on l2
+  if (u < 0.0 || u > 1.0)
+    return false;
+
+  return true;
+}
+
+/// Returns the intersection point of two lines.
+/// https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_two_points_on_each_line
+template <typename T>
+std::optional<glm::tvec2<T>> intersection(TLine2<T> const& l1, TLine2<T> const& l2) {
+  T x1 = l1.start.x;
+  T x2 = l1.end.x;
+  T x3 = l2.start.x;
+  T x4 = l2.end.x;
+
+  T y1 = l1.start.y;
+  T y2 = l1.end.y;
+  T y3 = l2.start.y;
+  T y4 = l2.end.y;
+
+  T denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+
+  // parallel or identical
+  if (denominator == 0.0)
+    return std::nullopt;
+
+  T a = x1 * y2 - y1 * x2;
+  T b = x3 * y4 - y3 * x4;
+
+  T x = (a * (x3 - x4) - (x1 - x2) * b) / denominator;
+  T y = (a * (y3 - y4) - (y1 - y2) * b) / denominator;
+  return glm::tvec2<T>{x, y};
+}
+
+/// Returns the intersection point of two lines.
+/// https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_two_points_on_each_line
+template <typename T>
+bool doIntersect(TLine2<T> const& l1, TLine2<T> const& l2) {
+  T x1 = l1.start.x;
+  T x2 = l1.end.x;
+  T x3 = l2.start.x;
+  T x4 = l2.end.x;
+
+  T y1 = l1.start.y;
+  T y2 = l1.end.y;
+  T y3 = l2.start.y;
+  T y4 = l2.end.y;
+
+  T denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+
+  return denominator != 0.0;
+}
 
 template <typename T>
 bool rayHitSphere(Ray<3, T> const& ray, Sphere<T> const& sphere) {
@@ -92,6 +216,32 @@ T areaOfCircleIntersection(T radiusSun, T radiusPlanet, T centerDistance) {
   T third  = std::fma(rrP, std::acos(d2 / radiusPlanet), fourth);
   T second = std::fma(-d1, std::sqrt(std::fma(-d1, d1, rrS)), third);
   return std::fma(rrS, std::acos(d1 / radiusSun), second);
+}
+
+template <int Size, typename T>
+glm::vec<Size, T> centerOfGravity(Triangle<Size, T> const& triangle) {
+  return (1.0 / 3.0) * (triangle.a + triangle.b + triangle.c);
+}
+
+/// See https://www.maa.org/sites/default/files/Korshidi-1-0748801.pdf
+template <typename T>
+glm::tvec2<T> centerOfGravityConvex(Quadrilateral<T> const& quad) {
+  TLine2<T> ac{quad.a, quad.c};
+  TLine2<T> bd{quad.b, quad.d};
+
+  bool inside = doIntersect(TLineSegment2<T>{ac.start, ac.end}, TLineSegment2<T>{bd.start, bd.end});
+  glm::tvec2<T> e = *intersection(ac, bd);
+  T dist = glm::distance(e, quad.a);
+
+  glm::tvec2<T> acDir = glm::normalize(quad.c - quad.a) * dist;
+  glm::tvec2<T> f = quad.c + (inside ?  -1.0 : 1.0) * acDir;
+
+  return centerOfGravity(TTriangle2<T>{quad.d, quad.b, f});
+}
+
+template <int Size, typename T>
+glm::vec<Size, T> signedDistance(glm::vec<Size, T> const& a, glm::vec<Size, T> const& b) {
+
 }
 
 } // namespace cs::utils::geom

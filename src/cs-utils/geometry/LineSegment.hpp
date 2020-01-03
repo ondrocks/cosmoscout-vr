@@ -4,16 +4,16 @@
 //                        Copyright: (c) 2019 German Aerospace Center (DLR)                       //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef CS_UTIL_GEOMETRY_LINE_HPP
-#define CS_UTIL_GEOMETRY_LINE_HPP
+#ifndef CS_UTIL_GEOMETRY_LINE_SEGMENT_HPP
+#define CS_UTIL_GEOMETRY_LINE_SEGMENT_HPP
 
 #include <glm/glm.hpp>
 
 namespace cs::utils::geom {
 
 template <uint8_t Size, typename T>
-struct Line {
-  Line(glm::vec<Size, T> start, glm::vec<Size, T> end)
+struct LineSegment {
+  LineSegment(glm::vec<Size, T> start, glm::vec<Size, T> end)
       : start(start)
       , end(end) {
   }
@@ -38,17 +38,17 @@ struct Line {
 };
 
 template <typename T>
-using TLine2 = Line<2, T>;
+using TLineSegment2 = LineSegment<2, T>;
 
 template <typename T>
-using TLine3 = Line<3, T>;
+using TLineSegment3 = LineSegment<3, T>;
 
-using DLine2 = Line<2, double>;
-using DLine3 = Line<3, double>;
+using DLineSegment2 = LineSegment<2, double>;
+using DLineSegment3 = LineSegment<3, double>;
 
-using FLine2 = Line<2, float>;
-using FLine3 = Line<3, float>;
+using FLineSegment2 = LineSegment<2, float>;
+using FLineSegment3 = LineSegment<3, float>;
 
 } // namespace cs::utils::geom
 
-#endif // CS_UTIL_GEOMETRY_LINE_HPP
+#endif // CS_UTIL_GEOMETRY_LINE_SEGMENT_HPP
