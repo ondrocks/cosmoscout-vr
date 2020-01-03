@@ -211,18 +211,13 @@ glm::tvec2<T> centerOfGravityConvex(Quadrilateral<T> const& quad) {
   TLine2<T> bd{quad.b, quad.d};
 
   bool inside = doIntersect(TLineSegment2<T>{ac.start, ac.end}, TLineSegment2<T>{bd.start, bd.end});
-  glm::tvec2<T> e = *intersection(ac, bd);
-  T dist = glm::distance(e, quad.a);
+  glm::tvec2<T> e    = *intersection(ac, bd);
+  T             dist = glm::distance(e, quad.a);
 
   glm::tvec2<T> acDir = glm::normalize(quad.c - quad.a) * dist;
-  glm::tvec2<T> f = quad.c + (inside ?  -1.0 : 1.0) * acDir;
+  glm::tvec2<T> f     = quad.c + (inside ? -1.0 : 1.0) * acDir;
 
   return centerOfGravity(TTriangle2<T>{quad.d, quad.b, f});
-}
-
-template <int Size, typename T>
-glm::vec<Size, T> signedDistance(glm::vec<Size, T> const& a, glm::vec<Size, T> const& b) {
-
 }
 
 } // namespace cs::utils::geom
