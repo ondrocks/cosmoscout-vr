@@ -17,19 +17,17 @@ class CS_CORE_EXPORT MessageBus {
   struct Request {
     enum class Type { eSet, eGet } mType;
 
-    std::string mReceiver;
+    std::string mScope;
     std::string mName;
     std::string mData;
-    std::string mSender;
   };
 
   struct Response {
     enum class Type { eInfo, eChanged } mType;
 
-    std::string mSender;
+    std::string mScope;
     std::string mName;
     std::string mData;
-    std::string mRequestSender;
   };
 
   utils::Signal<Request> const&  onRequest() const;
