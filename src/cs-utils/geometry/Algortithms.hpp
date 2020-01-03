@@ -163,25 +163,6 @@ T raySphereDistance(Ray<3, T> const& ray, Sphere<T> const& sphere) {
   }
 }
 
-template <int Size, typename T>
-double enclosingAngle(glm::vec<Size, T> v1, glm::vec<Size, T> v2) {
-  double a = glm::length(v1);
-  double b = glm::length(v2);
-  double c = glm::length(v1 - v2);
-
-  double mu;
-  if (b >= c) {
-    mu = c - (a - b);
-  } else {
-    mu = b - (a - c);
-  }
-
-  double top = ((a - b) + c) * mu;
-  double bot = (a + (b + c)) * ((a - c) + b);
-
-  return 2.0 * glm::atan(std::sqrt(top), std::sqrt(bot));
-}
-
 template <typename T>
 T angularRadOfSphere(T distance, T radius) {
   return std::asin(radius / distance);

@@ -85,5 +85,4 @@ TEST_CASE("cs::utils::geom::centerOfGravityConvex(Quadrilateral)") {
     CHECK_EQ(center.y, doctest::Approx(7.0 / 6.0));
   }
 }
-
 } // namespace cs::utils::geom

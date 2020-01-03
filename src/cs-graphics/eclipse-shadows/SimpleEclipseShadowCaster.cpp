@@ -7,6 +7,7 @@
 #include "SimpleEclipseShadowCaster.hpp"
 #include <cmath>
 #include <glm/glm.hpp>
+#include <glm/gtx/vector_angle.hpp>
 #include <string>
 
 #include "../../cs-utils/SimpleTexture.hpp"
@@ -32,19 +33,21 @@ cs::utils::Texture4f generateShadowTexture(Body const& body) {
       const glm::dvec2 pixelPositionRelPlanet(xx, y * pixSize);
       const glm::dvec2 pixelPositionRelPlanetNorm = glm::normalize(pixelPositionRelPlanet);
       const double     pixelDistanceToPlanet      = glm::length(pixelPositionRelPlanet);
-      const double planetAngularRadius = utils::geom::angularRadOfSphere(pixelDistanceToPlanet, body.meanRadius);
+      const double     planetAngularRadius =
+          utils::geom::angularRadOfSphere(pixelDistanceToPlanet, body.meanRadius);
 
       const glm::dvec2 pixelPositionRelSun(body.orbit.semiMajorAxisSun + xx, y * pixSize);
       const glm::dvec2 pixelPositionRelSunNorm = glm::normalize(pixelPositionRelSun);
       const double     pixelDistanceToSun      = glm::length(pixelPositionRelSun);
-      const double     sunAngularRadius        = utils::geom::angularRadOfSphere(pixelDistanceToSun, SUN_RADIUS);
-      const double     sunSolidAngle           = utils::geom::areaOfCircle(sunAngularRadius);
+      const double     sunAngularRadius =
+          utils::geom::angularRadOfSphere(pixelDistanceToSun, SUN_RADIUS);
+      const double sunSolidAngle = utils::geom::areaOfCircle(sunAngularRadius);
 
       const double angularDistanceToSun =
-          utils::geom::enclosingAngle(pixelPositionRelSunNorm, pixelPositionRelPlanetNorm);
+          glm::angle(pixelPositionRelSunNorm, pixelPositionRelPlanetNorm);
 
-      const double sunHiddenPart =
-          utils::geom::areaOfCircleIntersection(sunAngularRadius, planetAngularRadius, angularDistanceToSun);
+      const double sunHiddenPart = utils::geom::areaOfCircleIntersection(
+          sunAngularRadius, planetAngularRadius, angularDistanceToSun);
 
       const double visibleArea         = sunSolidAngle - sunHiddenPart;
       double       visibleAreaRelative = std::clamp(visibleArea / sunSolidAngle, 0.0, 1.0);
@@ -60,7 +63,8 @@ cs::utils::Texture4f generateShadowTexture(Body const& body) {
   for (int i = 0; i < TEX_WIDTH * TEX_HEIGHT; ++i) {
     data[i] = texture.dataPtr()[i].r;
   }
-  utils::savePGM16<float>(data, TEX_WIDTH, TEX_HEIGHT, "eclipse_shadow_" + std::to_string(body.meanRadius));
+  utils::savePGM16<float>(
+      data, TEX_WIDTH, TEX_HEIGHT, "eclipse_shadow_" + std::to_string(body.meanRadius));
 
   return texture;
 }
