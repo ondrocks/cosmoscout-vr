@@ -9,6 +9,7 @@
 
 #include <array>
 #include <glm/glm.hpp>
+#include "Triangle.hpp"
 
 namespace cs::utils::geom {
 
@@ -36,6 +37,102 @@ struct Quadrilateral {
       glm::tvec2<T> d;
     };
   };
+
+  TTriangle2<T> abc() const {
+    return {a, b, c};
+  }
+
+  TTriangle2<T> abd() const {
+    return {a, b, d};
+  }
+
+  TTriangle2<T> acb() const {
+    return {a, c, b};
+  }
+
+  TTriangle2<T> acd() const {
+    return {a, c, d};
+  }
+
+  TTriangle2<T> adb() const {
+    return {a, d, b};
+  }
+
+  TTriangle2<T> adc() const {
+    return {a, d, c};
+  }
+
+  TTriangle2<T> bac() const {
+    return {b, a, c};
+  }
+
+  TTriangle2<T> bad() const {
+    return {b, a, d};
+  }
+
+  TTriangle2<T> bca() const {
+    return {b, c, a};
+  }
+
+  TTriangle2<T> bcd() const {
+    return {b, c, d};
+  }
+
+  TTriangle2<T> bda() const {
+    return {b, d, a};
+  }
+
+  TTriangle2<T> bdc() const {
+    return {b, d, c};
+  }
+
+  TTriangle2<T> cab() const {
+    return {c, a, b};
+  }
+
+  TTriangle2<T> cad() const {
+    return {c, a, d};
+  }
+
+  TTriangle2<T> cba() const {
+    return {c, b, a};
+  }
+
+  TTriangle2<T> cbd() const {
+    return {c, b, d};
+  }
+
+  TTriangle2<T> cda() const {
+    return {c, d, a};
+  }
+
+  TTriangle2<T> cdb() const {
+    return {c, d, c};
+  }
+
+  TTriangle2<T> dab() const {
+    return {d, a, b};
+  }
+
+  TTriangle2<T> dac() const {
+    return {d, a, c};
+  }
+
+  TTriangle2<T> dba() const {
+    return {d, b, a};
+  }
+
+  TTriangle2<T> dbc() const {
+    return {d, b, c};
+  }
+
+  TTriangle2<T> dca() const {
+    return {d, c, a};
+  }
+
+  TTriangle2<T> dcb() const {
+    return {d, c, b};
+  }
 };
 
 using FQuadrilateral = Quadrilateral<float>;

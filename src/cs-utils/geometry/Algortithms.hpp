@@ -204,20 +204,17 @@ glm::vec<Size, T> centerOfGravity(Triangle<Size, T> const& triangle) {
   return (1.0 / 3.0) * (triangle.a + triangle.b + triangle.c);
 }
 
-/// See https://www.maa.org/sites/default/files/Korshidi-1-0748801.pdf
 template <typename T>
-glm::tvec2<T> centerOfGravityConvex(Quadrilateral<T> const& quad) {
-  TLine2<T> ac{quad.a, quad.c};
-  TLine2<T> bd{quad.b, quad.d};
+glm::tvec2<T> centerOfGravity(Quadrilateral<T> const& quad) {
+  glm::tvec2<T> c1 = centerOfGravity(quad.abd());
+  glm::tvec2<T> c2 = centerOfGravity(quad.bcd());
+  glm::tvec2<T> c3 = centerOfGravity(quad.abc());
+  glm::tvec2<T> c4 = centerOfGravity(quad.cda());
 
-  bool inside = doIntersect(TLineSegment2<T>{ac.start, ac.end}, TLineSegment2<T>{bd.start, bd.end});
-  glm::tvec2<T> e    = *intersection(ac, bd);
-  T             dist = glm::distance(e, quad.a);
+  TLine2<T> l1{c1, c2};
+  TLine2<T> l2{c3, c4};
 
-  glm::tvec2<T> acDir = glm::normalize(quad.c - quad.a) * dist;
-  glm::tvec2<T> f     = quad.c + (inside ? -1.0 : 1.0) * acDir;
-
-  return centerOfGravity(TTriangle2<T>{quad.d, quad.b, f});
+  return *intersection(l1, l2);
 }
 
 } // namespace cs::utils::geom
