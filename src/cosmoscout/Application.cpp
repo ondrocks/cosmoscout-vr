@@ -10,6 +10,7 @@
 #include "../cs-core/GraphicsEngine.hpp"
 #include "../cs-core/GuiManager.hpp"
 #include "../cs-core/InputManager.hpp"
+#include "../cs-core/MessageBus.hpp"
 #include "../cs-core/PluginBase.hpp"
 #include "../cs-core/Settings.hpp"
 #include "../cs-core/SolarSystem.hpp"
@@ -87,7 +88,13 @@ bool Application::Init(VistaSystem* pVistaSystem) {
   mTimeControl = std::make_shared<cs::core::TimeControl>(mSettings);
   mSolarSystem = std::make_shared<cs::core::SolarSystem>(
       mSettings, mFrameTimings, mGraphicsEngine, mTimeControl);
+  mMessageBus = std::make_shared<cs::core::MessageBus>();
   mDragNavigation.reset(new cs::core::DragNavigation(mSolarSystem, mInputManager, mTimeControl));
+
+  mMessageBus->onResponse().connect([](cs::core::MessageBus::Response const& response) {
+    std::cout << "MB RESPONSE: " << response.mScope << " " << response.mName << " "
+              << response.mData << std::endl;
+  });
 
   // The ObserverNavigationNode is used by several DFN networks to move the celestial observer.
   VdfnNodeFactory* pNodeFactory = VdfnNodeFactory::GetSingleton();
@@ -354,7 +361,7 @@ void Application::FrameUpdate() {
         // First provide the plugin with all required class instances.
         plugin->second.mPlugin->setAPI(mSettings, mSolarSystem, mGuiManager, mInputManager,
             GetVistaSystem()->GetGraphicsManager()->GetSceneGraph(), mGraphicsEngine, mFrameTimings,
-            mTimeControl);
+            mTimeControl, mMessageBus);
 
         // Then do the actual initialization. This may actually take a while and the loading screen
         // will become unresponsive in the meantime.

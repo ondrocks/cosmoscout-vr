@@ -15,7 +15,8 @@ void PluginBase::setAPI(std::shared_ptr<const Settings> const& settings,
     std::shared_ptr<InputManager> const& inputManager, VistaSceneGraph* sceneGraph,
     std::shared_ptr<GraphicsEngine> const&      graphicsEngine,
     std::shared_ptr<utils::FrameTimings> const& frameTimings,
-    std::shared_ptr<TimeControl> const&         timeControl) {
+    std::shared_ptr<TimeControl> const&         timeControl,
+    std::shared_ptr<MessageBus> const&          messageBus) {
 
   mAllSettings    = settings;
   mSolarSystem    = solarSystem;
@@ -25,6 +26,7 @@ void PluginBase::setAPI(std::shared_ptr<const Settings> const& settings,
   mInputManager   = inputManager;
   mFrameTimings   = frameTimings;
   mTimeControl    = timeControl;
+  mMessageBus     = messageBus;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
