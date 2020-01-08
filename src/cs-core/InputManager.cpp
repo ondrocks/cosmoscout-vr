@@ -202,6 +202,10 @@ void InputManager::update() {
     return;
   }
 
+  /**
+   * TODO this needs to be refactored. There is only one Gui
+   */
+
   // Test the Intention Node for Intersection with screen space gui.
   if (!mScreenSpaceGuis.empty()) {
     VistaViewport* pViewport(GetVistaSystem()->GetDisplayManager()->GetViewports().begin()->second);
@@ -237,6 +241,9 @@ void InputManager::update() {
         int y = (int)((1.0 - (guiIntersection[1] - dBottom) / (dTop - dBottom)) *
                       pViewportGui->getHeight());
 
+        mMousePosition.x = x;
+        mMousePosition.y = y;
+
         gui::GuiItem* item = pViewportGui->getItemAt(x, y);
 
         // If there is a pActiveGuiNode in this pViewportGui, we want to send the input events even
@@ -266,6 +273,7 @@ void InputManager::update() {
           }
           return;
         }
+        break;
       }
     }
   }
@@ -391,10 +399,13 @@ void InputManager::update() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool InputManager::HandleKeyPress(int key, int mods, bool bIsKeyRepeat) {
-
   if (key == VISTA_KEY_ESC) {
     sOnEscapePressed.emit();
     return true;
+  }
+
+  if (!bIsKeyRepeat) {
+      pCurrentKey = key;
   }
 
   if (!pHoveredGuiNode.get()) {
@@ -414,6 +425,7 @@ bool InputManager::HandleKeyPress(int key, int mods, bool bIsKeyRepeat) {
     // above the gui.
     return false;
   }
+
 
   return true;
 }
