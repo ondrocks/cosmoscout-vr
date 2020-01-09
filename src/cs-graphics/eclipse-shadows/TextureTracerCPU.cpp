@@ -199,6 +199,9 @@ std::vector<DoublePixel> TextureTracerCPU::traceThroughTexture(
   cs::utils::executeParallel(photons.size(), [&](size_t gid) {
     Photon localPhoton = photons[gid];
 
+    // TODO temporary hack to convert 3D to 2D
+    localPhoton.position.x = glm::length(localPhoton.position.xz());
+
     if (localPhoton.intensity > 0.0) {
       glm::ivec2 photonTexIndices = getRectangleIdxAt(localPhoton.position);
 

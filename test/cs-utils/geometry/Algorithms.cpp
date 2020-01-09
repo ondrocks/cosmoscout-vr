@@ -60,7 +60,7 @@ TEST_CASE("cs::utils::geom::intersection(TLineSegment2, TLineSegment2)") {
   }
 }
 
-TEST_CASE("cs::utils::geom::centerOfGravity(Quadrilateral)") {
+TEST_CASE("cs::utils::geom::center(Quadrilateral)") {
   {
     glm::dvec2 a{0.0, 0.0};
     glm::dvec2 b{0.0, 1.0};
@@ -68,9 +68,9 @@ TEST_CASE("cs::utils::geom::centerOfGravity(Quadrilateral)") {
     glm::dvec2 d{1.0, 0.0};
 
     DQuadrilateral q{a, b, c, d};
-    glm::dvec2     center = centerOfGravity(q);
-    CHECK_EQ(center.x, doctest::Approx(0.5));
-    CHECK_EQ(center.y, doctest::Approx(0.5));
+    glm::dvec2     c1 = center(q);
+    CHECK_EQ(c1.x, doctest::Approx(0.5));
+    CHECK_EQ(c1.y, doctest::Approx(0.5));
   }
 
   {
@@ -80,9 +80,9 @@ TEST_CASE("cs::utils::geom::centerOfGravity(Quadrilateral)") {
     glm::dvec2 d{4.0, 1.5};
 
     DQuadrilateral q{a, b, c, d};
-    glm::dvec2     center = centerOfGravity(q);
-    CHECK_EQ(center.x, doctest::Approx(13.0 / 6.0));
-    CHECK_EQ(center.y, doctest::Approx(7.0 / 6.0));
+    glm::dvec2     c1 = center(q);
+    CHECK_EQ(c1.x, doctest::Approx(13.0 / 6.0));
+    CHECK_EQ(c1.y, doctest::Approx(7.0 / 6.0));
   }
 
   {
@@ -92,9 +92,9 @@ TEST_CASE("cs::utils::geom::centerOfGravity(Quadrilateral)") {
     glm::dvec2 d{3.0, 1.0};
 
     DQuadrilateral q{a, b, c, d};
-    glm::dvec2     center = centerOfGravity(q);
-    CHECK_EQ(center.x, doctest::Approx(4.0 / 3.0));
-    CHECK_EQ(center.y, doctest::Approx(1.0));
+    glm::dvec2     c1 = center(q);
+    CHECK_EQ(c1.x, doctest::Approx(4.0 / 3.0));
+    CHECK_EQ(c1.y, doctest::Approx(1.0));
   }
 }
 } // namespace cs::utils::geom

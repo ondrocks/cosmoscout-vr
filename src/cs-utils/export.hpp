@@ -52,9 +52,9 @@ void savePPM(std::vector<T> const& data, uint64_t width, uint64_t height, std::s
 
   size_t counter = 0;
   for (const auto& pixel : data) {
-    oss << static_cast<uint16_t>(lround(std::clamp(pixel.r * 500.0, 0.0, 1.0) * MAX_VALUE)) << " "
-        << static_cast<uint16_t>(lround(std::clamp(pixel.g * 500.0, 0.0, 1.0) * MAX_VALUE)) << " "
-        << static_cast<uint16_t>(lround(std::clamp(pixel.b * 500.0, 0.0, 1.0) * MAX_VALUE));
+    oss << static_cast<uint16_t>(lround(std::clamp(pixel.r * 150.0, 0.0, 1.0) * MAX_VALUE)) << " "
+        << static_cast<uint16_t>(lround(std::clamp(pixel.g * 150.0, 0.0, 1.0) * MAX_VALUE)) << " "
+        << static_cast<uint16_t>(lround(std::clamp(pixel.b * 150.0, 0.0, 1.0) * MAX_VALUE));
 
     if (counter++ == 4) {
       oss << "\n";

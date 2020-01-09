@@ -17,6 +17,7 @@
 #include "Ray.hpp"
 #include "Sphere.hpp"
 #include "Triangle.hpp"
+#include "Rectangle.hpp"
 
 namespace cs::utils::geom {
 
@@ -120,7 +121,7 @@ std::optional<glm::tvec2<T>> intersection(TLine2<T> const& l1, TLine2<T> const& 
   return glm::tvec2<T>{x, y};
 }
 
-/// Returns the intersection point of two lines.
+/// True if lines intersect exactly in one point.
 /// https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_two_points_on_each_line
 template <typename T>
 bool doIntersect(TLine2<T> const& l1, TLine2<T> const& l2) {
@@ -200,21 +201,26 @@ T areaOfCircleIntersection(T radiusSun, T radiusPlanet, T centerDistance) {
 }
 
 template <int Size, typename T>
-glm::vec<Size, T> centerOfGravity(Triangle<Size, T> const& triangle) {
-  return (1.0 / 3.0) * (triangle.a + triangle.b + triangle.c);
+glm::vec<Size, T> center(Triangle<Size, T> const& triangle) {
+  return static_cast<T>(1.0 / 3.0) * (triangle.a + triangle.b + triangle.c);
 }
 
 template <typename T>
-glm::tvec2<T> centerOfGravity(Quadrilateral<T> const& quad) {
-  glm::tvec2<T> c1 = centerOfGravity(quad.abd());
-  glm::tvec2<T> c2 = centerOfGravity(quad.bcd());
-  glm::tvec2<T> c3 = centerOfGravity(quad.abc());
-  glm::tvec2<T> c4 = centerOfGravity(quad.cda());
+glm::tvec2<T> center(Quadrilateral<T> const& quad) {
+  glm::tvec2<T> c1 = center(quad.abd());
+  glm::tvec2<T> c2 = center(quad.bcd());
+  glm::tvec2<T> c3 = center(quad.abc());
+  glm::tvec2<T> c4 = center(quad.cda());
 
   TLine2<T> l1{c1, c2};
   TLine2<T> l2{c3, c4};
 
   return *intersection(l1, l2);
+}
+
+template <typename T>
+glm::tvec2<T> center(Rectangle<T> const& rect) {
+  return rect.position + static_cast<T>(0.5) * rect.dimensions;
 }
 
 } // namespace cs::utils::geom

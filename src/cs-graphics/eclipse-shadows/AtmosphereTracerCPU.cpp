@@ -10,6 +10,7 @@
 #include "EclipseConstants.hpp"
 #include "LUTPrecalculator.hpp"
 #include <GL/glew.h>
+#include <glm/ext/scalar_constants.hpp>
 #include <iostream>
 
 double square(double value) {
@@ -111,7 +112,7 @@ double PhotonTracer::calcAltitude(glm::dvec3 const& position) {
 
 double PhotonTracer::densityAtAltitude(double altitude) {
   if (altitude < mBody.atmosphere.height && altitude >= 0.0) {
-    return mDensities[static_cast<size_t>(altitude)];
+    return mDensities.at(static_cast<size_t>(altitude));
   }
   return 0.0;
 }
@@ -119,14 +120,14 @@ double PhotonTracer::densityAtAltitude(double altitude) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 double PhotonTracer::refractiveIndexAtSeaLevel(uint64_t wavelength) {
-  return mRefractiveIndexes[0][wavelength - MIN_WAVELENGTH];
+  return mRefractiveIndexes[0].at(wavelength - MIN_WAVELENGTH);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 double PhotonTracer::refractiveIndexAtAltitude(double altitude, uint64_t wavelength) {
   if (altitude < mBody.atmosphere.height && altitude >= 0.0) {
-    return mRefractiveIndexes[static_cast<uint64_t>(altitude)][wavelength - MIN_WAVELENGTH];
+    return mRefractiveIndexes.at(static_cast<uint64_t>(altitude)).at(wavelength - MIN_WAVELENGTH);
   }
   return 1.0;
 }
@@ -174,10 +175,9 @@ double PhotonTracer::molecularNumberDensityAtAltitude(double altitude) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 double PhotonTracer::rayleighScatteringCrossSection(uint64_t wavelength) {
-  // TODO Normally wavelength should be converted with a factor of 1.0e-7, but for no particular
-  // reason 2.1e-8 works best.
-  //      Let's not talk about this :/
-  double wavelengthInCM  = static_cast<double>(wavelength) * 1.0e-7;
+  double const NM_TO_CM = 1.0e-7;
+
+  double wavelengthInCM  = static_cast<double>(wavelength) * NM_TO_CM;
   double wavelengthInCM4 = square(square(wavelengthInCM));
 
   double refractiveIndex  = refractiveIndexAtSeaLevel(wavelength);
@@ -187,10 +187,9 @@ double PhotonTracer::rayleighScatteringCrossSection(uint64_t wavelength) {
   double molecularNumberDensity2 = molecularNumberDensity * molecularNumberDensity;
 
   const double kingCorrectionFactor = 1.05;
-  const double PI_F                 = 3.14159265358979323846;
-  const double PI_F_3               = PI_F * PI_F * PI_F;
+  const double PI_3                 = glm::pi<double>() * glm::pi<double>() * glm::pi<double>();
 
-  double dividend = 24.0 * PI_F_3 * square(refractiveIndex2 - 1.0);
+  double dividend = 24.0 * PI_3 * square(refractiveIndex2 - 1.0);
   double divisor  = wavelengthInCM4 * molecularNumberDensity2 * square(refractiveIndex2 + 2.0);
   return (dividend / divisor) * kingCorrectionFactor;
 }
@@ -200,14 +199,15 @@ double PhotonTracer::rayleighScatteringCrossSection(uint64_t wavelength) {
 double PhotonTracer::rayleighVolumeScatteringCoefficient(double altitude, uint64_t wavelength) {
   double sigma = rayleighScatteringCrossSection(wavelength);
   double mnd   = molecularNumberDensityAtAltitude(altitude);
-  return mnd * sigma;
+  double const CM_TO_M = 1.0e2;
+  return mnd * sigma * CM_TO_M;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void PhotonTracer::attenuateLight(Photon& photon, glm::dvec3 const& oldPosition) {
   double altitude = calcAltitude(oldPosition);
-  double beta = rayleighVolumeScatteringCoefficient(altitude, photon.wavelength);
+  double beta     = rayleighVolumeScatteringCoefficient(altitude, photon.wavelength);
 
   // TODO don't know what to do with this for now... maybe make it configurable per planet?
   /// This value simulates particles in the upper atmosphere. On earth a value of 1.0e-6
