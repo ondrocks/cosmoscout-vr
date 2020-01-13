@@ -54,16 +54,6 @@ AtmosphericLayer layerAtAltitude(double altitude) {
     }
 
     return atmosphericLayers[atmosphericLayers.length() - 1];
-
-    /*if (altitude < 11000.0) {
-        return AtmosphericLayer(0.0, 288.15, -0.0065, 1.2250);
-    } else if (altitude < 20000.0) {
-        return AtmosphericLayer(11000.0, 216.65, 0.0, 0.36391);
-    } else if (altitude < 32000.0) {
-        return AtmosphericLayer(20000.0, 216.65, 0.001, 0.08803);
-    } else {
-        return AtmosphericLayer(32000.0, 228.65, 0.0028, 0.01322);
-    }*/
 }
 
 const double EPSILON = 0.00000001;
@@ -145,12 +135,6 @@ double densityAtAltitude(double altitude) {
 }
 
 double refractiveIndexAtSeaLevel(uint wavelength) {
-    /*const double dWavelength = double(wavelength);
-    const double a = 1.00027643;
-    const double b = 0.12288 / (dWavelength * dWavelength);
-    const double c = 3.555e4 / (dWavelength * dWavelength * dWavelength * dWavelength);
-    return a + b + c;*/
-
     double wavelengthEN2 = 1.0e6LF / double(wavelength * wavelength);
 
     double sum = 0.0LF;
@@ -167,7 +151,6 @@ double refractiveIndexAtAltitude(double altitude, uint wavelength) {
     double seaLevelDensity = densityAtAltitude(0.0LF);
 
     return fma(refractiveIndexAtSeaLevel - 1.0LF, densityAtAlt / seaLevelDensity, 1.0LF);
-    //return 1.0 + (refractiveIndexAtSeaLevel - 1.0) * (densityAtAlt / seaLevelDensity);
 }
 
 void main() {

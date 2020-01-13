@@ -29,9 +29,9 @@ struct Photon {
   // DO NOT CHANGE THIS LAYOUT! IT IS REQUIRED TO BE LIKE THIS FOR GPU PADDING REASONS!
 
   glm::dvec3 position; ///< m
-  double   intensity;
-  glm::dvec3 direction; ///< normalized
-  uint64_t wavelength; ///< nm
+  double     intensity;
+  glm::dvec3 direction;  ///< normalized
+  uint64_t   wavelength; ///< nm
 
   // DO NOT CHANGE THIS LAYOUT! IT IS REQUIRED TO BE LIKE THIS FOR GPU PADDING REASONS!
   // ###############################################################################################

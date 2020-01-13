@@ -104,13 +104,13 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-double PhotonTracer::calcAltitude(glm::dvec3 const& position) {
+double PhotonTracer::calcAltitude(glm::dvec3 const& position) noexcept {
   return glm::distance(position, mBodyPosition) - mBody.meanRadius;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-double PhotonTracer::densityAtAltitude(double altitude) {
+double PhotonTracer::densityAtAltitude(double altitude) noexcept {
   if (altitude < mBody.atmosphere.height && altitude >= 0.0) {
     return mDensities.at(static_cast<size_t>(altitude));
   }
@@ -119,13 +119,13 @@ double PhotonTracer::densityAtAltitude(double altitude) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-double PhotonTracer::refractiveIndexAtSeaLevel(uint64_t wavelength) {
+double PhotonTracer::refractiveIndexAtSeaLevel(uint64_t wavelength) noexcept {
   return mRefractiveIndexes[0].at(wavelength - MIN_WAVELENGTH);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-double PhotonTracer::refractiveIndexAtAltitude(double altitude, uint64_t wavelength) {
+double PhotonTracer::refractiveIndexAtAltitude(double altitude, uint64_t wavelength) noexcept {
   if (altitude < mBody.atmosphere.height && altitude >= 0.0) {
     return mRefractiveIndexes.at(static_cast<uint64_t>(altitude)).at(wavelength - MIN_WAVELENGTH);
   }
@@ -135,7 +135,7 @@ double PhotonTracer::refractiveIndexAtAltitude(double altitude, uint64_t wavelen
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 double PhotonTracer::partialRefractiveIndex(
-    double altitude, double altitudeDelta, uint64_t wavelength) {
+    double altitude, double altitudeDelta, uint64_t wavelength) noexcept {
   double refrIndexPlusDelta = refractiveIndexAtAltitude(altitudeDelta, wavelength);
   double refrIndex          = refractiveIndexAtAltitude(altitude, wavelength);
 
@@ -144,7 +144,7 @@ double PhotonTracer::partialRefractiveIndex(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void PhotonTracer::traceRay(Photon& photon) {
+void PhotonTracer::traceRay(Photon& photon) noexcept {
   double altitude    = calcAltitude(photon.position);
   double altDx       = calcAltitude(photon.position + glm::dvec3(DX, 0.0, 0.0));
   double altDy       = calcAltitude(photon.position + glm::dvec3(0.0, DX, 0.0));
@@ -166,7 +166,7 @@ void PhotonTracer::traceRay(Photon& photon) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-double PhotonTracer::molecularNumberDensityAtAltitude(double altitude) {
+double PhotonTracer::molecularNumberDensityAtAltitude(double altitude) noexcept {
   double seaLevelDensity = densityAtAltitude(0.0);
   return mBody.atmosphere.seaLevelMolecularNumberDensity *
          (densityAtAltitude(altitude) / seaLevelDensity);
@@ -174,7 +174,7 @@ double PhotonTracer::molecularNumberDensityAtAltitude(double altitude) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-double PhotonTracer::rayleighScatteringCrossSection(uint64_t wavelength) {
+double PhotonTracer::rayleighScatteringCrossSection(uint64_t wavelength) noexcept {
   double const NM_TO_CM = 1.0e-7;
 
   double wavelengthInCM  = static_cast<double>(wavelength) * NM_TO_CM;
@@ -196,23 +196,24 @@ double PhotonTracer::rayleighScatteringCrossSection(uint64_t wavelength) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-double PhotonTracer::rayleighVolumeScatteringCoefficient(double altitude, uint64_t wavelength) {
-  double sigma = rayleighScatteringCrossSection(wavelength);
-  double mnd   = molecularNumberDensityAtAltitude(altitude);
+double PhotonTracer::rayleighVolumeScatteringCoefficient(
+    double altitude, uint64_t wavelength) noexcept {
+  double const sigma   = rayleighScatteringCrossSection(wavelength);
+  double const mnd     = molecularNumberDensityAtAltitude(altitude);
   double const CM_TO_M = 1.0e2;
   return mnd * sigma * CM_TO_M;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void PhotonTracer::attenuateLight(Photon& photon, glm::dvec3 const& oldPosition) {
+void PhotonTracer::attenuateLight(Photon& photon, glm::dvec3 const& oldPosition) noexcept {
   double altitude = calcAltitude(oldPosition);
   double beta     = rayleighVolumeScatteringCoefficient(altitude, photon.wavelength);
 
   // TODO don't know what to do with this for now... maybe make it configurable per planet?
   /// This value simulates particles in the upper atmosphere. On earth a value of 1.0e-6
   /// corresponds to an L4 eclipse and 1.0e-4 produces an L0 eclipse.
-  double alpha = 15000.0 < altitude && altitude < 20000.0 ? 0.0e-5 : 0.0;
+  double alpha = 15000.0 < altitude && altitude < 20000.0 ? 1.0e-6 : 0.0;
 
   photon.intensity *= std::exp(-(alpha + beta) * DL);
 }

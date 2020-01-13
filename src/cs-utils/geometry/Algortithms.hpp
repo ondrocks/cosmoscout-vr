@@ -15,9 +15,9 @@
 #include "LineSegment.hpp"
 #include "Quadrilateral.hpp"
 #include "Ray.hpp"
+#include "Rectangle.hpp"
 #include "Sphere.hpp"
 #include "Triangle.hpp"
-#include "Rectangle.hpp"
 
 namespace cs::utils::geom {
 
@@ -221,6 +221,67 @@ glm::tvec2<T> center(Quadrilateral<T> const& quad) {
 template <typename T>
 glm::tvec2<T> center(Rectangle<T> const& rect) {
   return rect.position + static_cast<T>(0.5) * rect.dimensions;
+}
+
+template <typename T>
+std::optional<glm::tvec2<T>> intersection(
+    Ray<2, T> const& ray, utils::geom::TLineSegment2<T> const& line) {
+  glm::tvec2<T> v1 = glm::tvec2<T>(ray.origin) - line.start;
+  glm::tvec2<T> v2 = line.end - line.start;
+  glm::tvec2<T> v3 = glm::tvec2<T>(-ray.direction.y, ray.direction.x);
+
+  double dist = 0.0;
+
+  double dot = glm::dot(v2, v3);
+  if (glm::abs(dot) < 0.000001)
+    return std::nullopt;
+
+  double t1 = (v1.x * v2.y - v1.y * v2.x) / dot;
+  double t2 = glm::dot(v1, v3) / dot;
+
+  if (t1 >= 0.0 && (t2 >= 0.0 && t2 <= 1.0))
+    return std::make_optional<glm::tvec2<T>>(
+        glm::tvec2<T>(ray.origin) + (glm::tvec2<T>(ray.direction) * t1));
+  else
+    return std::nullopt;
+}
+
+template <typename T>
+std::pair<glm::tvec2<T>, glm::tvec2<T>> intersection(
+    Ray<2, T> const& ray, utils::geom::Rectangle<T> const& rect) {
+  glm::tvec2<T> topLeft(rect.position), topRight(rect.x + rect.width, rect.y);
+  glm::tvec2<T> botLeft(rect.x, rect.y + rect.height),
+      botRight(rect.x + rect.width, rect.y + rect.height);
+
+  std::array<utils::geom::TLineSegment2<T>, 4> rectEdges{
+      utils::geom::TLineSegment2<T>{botLeft, topLeft},
+      utils::geom::TLineSegment2<T>{topLeft, topRight},
+      utils::geom::TLineSegment2<T>{botRight, botLeft},
+      utils::geom::TLineSegment2<T>{topRight, botRight}};
+
+  glm::tvec2<T> entry;
+  glm::tvec2<T> exit;
+
+  bool entryFound = false;
+  for (const auto& edge : rectEdges) {
+    if (auto point = intersection(ray, edge)) {
+      if (!entryFound) {
+        entry      = point.value();
+        entryFound = true;
+      } else {
+        exit = point.value();
+        break;
+      }
+    }
+  }
+
+  return std::pair<glm::tvec2<T>, glm::tvec2<T>>(entry, exit);
+}
+
+template <typename T>
+double rayDistanceInRectangle(Ray<2, T> const& ray, utils::geom::Rectangle<T> const& rect) {
+  auto [entry, exit] = intersection(ray, rect);
+  return glm::distance(exit, entry);
 }
 
 } // namespace cs::utils::geom

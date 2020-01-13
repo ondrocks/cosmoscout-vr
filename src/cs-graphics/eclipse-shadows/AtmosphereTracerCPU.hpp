@@ -38,25 +38,25 @@ class PhotonTracer {
   PhotonTracer(BodyWithAtmosphere const& body, glm::dvec3 const& bodyPosition,
       RefractiveIndexLUT const& refractiveIndexes, std::vector<double> const& densities);
 
-  double calcAltitude(glm::dvec3 const& position);
+  double calcAltitude(glm::dvec3 const& position) noexcept;
 
-  double densityAtAltitude(double altitude);
+  double densityAtAltitude(double altitude) noexcept;
 
-  double refractiveIndexAtSeaLevel(uint64_t wavelength);
+  double refractiveIndexAtSeaLevel(uint64_t wavelength) noexcept;
 
-  double refractiveIndexAtAltitude(double altitude, uint64_t wavelength);
+  double refractiveIndexAtAltitude(double altitude, uint64_t wavelength) noexcept;
 
-  double partialRefractiveIndex(double altitude, double altitudeDelta, uint64_t wavelength);
+  double partialRefractiveIndex(double altitude, double altitudeDelta, uint64_t wavelength) noexcept;
 
-  void traceRay(Photon& photon);
+  void traceRay(Photon& photon) noexcept;
 
-  double molecularNumberDensityAtAltitude(double altitude);
+  double molecularNumberDensityAtAltitude(double altitude) noexcept;
 
-  double rayleighScatteringCrossSection(uint64_t wavelength);
+  double rayleighScatteringCrossSection(uint64_t wavelength) noexcept;
 
-  double rayleighVolumeScatteringCoefficient(double altitude, uint64_t wavelength);
+  double rayleighVolumeScatteringCoefficient(double altitude, uint64_t wavelength) noexcept;
 
-  void attenuateLight(Photon& photon, glm::dvec3 const& oldPosition);
+  void attenuateLight(Photon& photon, glm::dvec3 const& oldPosition) noexcept;
 
  private:
   BodyWithAtmosphere  const& mBody;

@@ -104,9 +104,9 @@ double square(double value) {
 }
 
 double rayleighScatteringCrossSection(uint wavelength) {
-    // TODO Normally wavelength should be converted with a factor of 1.0e-7, but for no particular reason 2.1e-8 works best.
-    //      Let's not talk about this :/
-    double wavelengthInCM = double(wavelength) * 1.0e-7LF;
+    const double NM_TO_CM = 1.0e-7LF;
+
+    double wavelengthInCM = double(wavelength) * NM_TO_CM;
     double wavelengthInCM4 = square(square(wavelengthInCM));
 
     double refractiveIndex = refractiveIndexAtSeaLevel(wavelength);
@@ -116,10 +116,10 @@ double rayleighScatteringCrossSection(uint wavelength) {
     double molecularNumberDensity2 = square(molecularNumberDensity);
 
     const double kingCorrectionFactor = 1.05LF;
-    const double PI_F = 3.14159265358979323846LF;
-    const double PI_F_3 = PI_F * PI_F * PI_F;
+    const double PI_D = 3.14159265358979323846LF;
+    const double PI_D_3 = PI_D * PI_D * PI_D;
 
-    double dividend = 24.0LF * PI_F_3 * square(refractiveIndex2 - 1.0LF);
+    double dividend = 24.0LF * PI_D_3 * square(refractiveIndex2 - 1.0LF);
     double divisor = wavelengthInCM4 * molecularNumberDensity2 * square(refractiveIndex2 + 2.0LF);
     return (dividend / divisor) * kingCorrectionFactor;
 }
@@ -128,7 +128,9 @@ double rayleighScatteringCrossSection(uint wavelength) {
 double rayleighVolumeScatteringCoefficient(double altitude, uint wavelength) {
     double sigma = rayleighScatteringCrossSection(wavelength);
     double mnd = molecularNumberDensityAtAltitude(altitude);
-    return mnd * sigma;
+
+    const double CM_TO_M = 1.0e2LF; // cm^-1 -> m^-1
+    return mnd * sigma * CM_TO_M;
 }
 
 /// [2, 2] Padé approximant for exp(x).

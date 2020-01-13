@@ -430,7 +430,7 @@
         }
     },
     "plugins": {
-        "#csp-stars": {
+        "csp-stars": {
             "backgroundColor1": [
                 0.5,
                 0.8,
