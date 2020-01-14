@@ -30,6 +30,7 @@ class InputManager;
 class TimeControl;
 class SolarSystem;
 class Settings;
+class MessageBus;
 
 /// The base interface for all plugins. This class serves as an entry point and gives the plugin
 /// a hook into the update loop.
@@ -50,7 +51,8 @@ class CS_CORE_EXPORT PluginBase {
       std::shared_ptr<InputManager> const& inputManager, VistaSceneGraph* sceneGraph,
       std::shared_ptr<GraphicsEngine> const&      graphicsEngine,
       std::shared_ptr<utils::FrameTimings> const& frameTimings,
-      std::shared_ptr<TimeControl> const&         timeControl);
+      std::shared_ptr<TimeControl> const&         timeControl,
+      std::shared_ptr<MessageBus> const&          messageBus);
 
   /// Override this function to initialize your plugin. It will be called directly after
   /// application startup and before the update loop starts.
@@ -73,6 +75,7 @@ class CS_CORE_EXPORT PluginBase {
   std::shared_ptr<InputManager>        mInputManager;
   std::shared_ptr<utils::FrameTimings> mFrameTimings;
   std::shared_ptr<TimeControl>         mTimeControl;
+  std::shared_ptr<MessageBus>          mMessageBus;
 };
 
 } // namespace cs::core

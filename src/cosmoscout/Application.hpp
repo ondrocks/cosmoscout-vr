@@ -29,6 +29,7 @@ class InputManager;
 class GraphicsEngine;
 class TimeControl;
 class SolarSystem;
+class MessageBus;
 class DragNavigation;
 } // namespace cs::core
 
@@ -145,6 +146,7 @@ class Application : public VistaFrameLoop {
   std::shared_ptr<cs::core::GuiManager>     mGuiManager;
   std::shared_ptr<cs::core::TimeControl>    mTimeControl;
   std::shared_ptr<cs::core::SolarSystem>    mSolarSystem;
+  std::shared_ptr<cs::core::MessageBus>     mMessageBus;
   std::unique_ptr<cs::core::DragNavigation> mDragNavigation;
   std::shared_ptr<cs::utils::FrameTimings>  mFrameTimings;
   std::map<std::string, Plugin>             mPlugins;
