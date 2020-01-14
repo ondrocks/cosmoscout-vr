@@ -405,7 +405,7 @@ bool InputManager::HandleKeyPress(int key, int mods, bool bIsKeyRepeat) {
   }
 
   if (!bIsKeyRepeat) {
-      pCurrentKey = key;
+    pCurrentKey = key;
   }
 
   if (!pHoveredGuiNode.get()) {
@@ -425,7 +425,6 @@ bool InputManager::HandleKeyPress(int key, int mods, bool bIsKeyRepeat) {
     // above the gui.
     return false;
   }
-
 
   return true;
 }

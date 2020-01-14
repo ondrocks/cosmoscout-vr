@@ -41,14 +41,14 @@ namespace cs::core {
 class CS_CORE_EXPORT InputManager : public VistaKeyboardSystemControl::IVistaDirectKeySink,
                                     public VistaEventHandler {
  public:
-    struct MousePosition{
-        unsigned int x;
-        unsigned int y;
-    };
+  struct MousePosition {
+    unsigned int x;
+    unsigned int y;
+  };
 
-    MousePosition mMousePosition;
+  MousePosition mMousePosition;
 
-    utils::Property<int> pCurrentKey;
+  utils::Property<int> pCurrentKey;
 
   /// This class describes an intersection point on an IntersectableObject. Usually this is used for
   /// intersections between the mouse ray and planets or moons.
