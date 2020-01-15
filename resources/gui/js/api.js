@@ -459,6 +459,8 @@ class CosmoScout {
     const slider = document.getElementById(id);
 
     if (slider !== null && typeof slider.noUiSlider !== 'undefined') {
+      value = value.map(val => Number(val));
+
       if (value.length === 1) {
         slider.noUiSlider.set(value[0]);
       } else {
@@ -487,14 +489,15 @@ class CosmoScout {
    * @param id {string} DropDown ID
    * @param value {string|number} Option value
    * @param text {string} Option text
-   * @param selected {boolean} Selected flag
+   * @param selected {boolean|number} Selected flag
    */
   static addDropdownValue(id, value, text, selected = false) {
     const dropdown = document.getElementById(id);
     const option = document.createElement('option');
 
     option.value = value;
-    option.selected = selected === true;
+    // This ugly hack converts bools / truthy integers to explicit booleans
+    option.selected = Boolean(Number(selected)) === true;
     option.text = text;
 
     if (dropdown !== null) {
@@ -530,13 +533,13 @@ class CosmoScout {
    * Sets a checkboxs checked state to true/false
    *
    * @param id {string} Checkbox id
-   * @param value {boolean} True = checked / False = unchecked
+   * @param value {boolean|number} True = checked / False = unchecked
    */
   static setCheckboxValue(id, value) {
     const element = document.getElementById(id);
 
     if (element !== null) {
-      element.checked = value === true;
+      element.checked = Boolean(Number(value)) === true;
     }
   }
 

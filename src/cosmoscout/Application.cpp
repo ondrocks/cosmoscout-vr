@@ -92,7 +92,7 @@ bool Application::Init(VistaSystem* pVistaSystem) {
   mDragNavigation.reset(new cs::core::DragNavigation(mSolarSystem, mInputManager, mTimeControl));
 
   mMessageBus->onResponse().connect([](cs::core::MessageBus::Response const& response) {
-    std::cout << "MB RESPONSE: " << response.mScope << " " << response.mName << " "
+    std::cout << "MB RESPONSE: " << response.mSender << " " << response.mName << " "
               << response.mData << std::endl;
   });
 
