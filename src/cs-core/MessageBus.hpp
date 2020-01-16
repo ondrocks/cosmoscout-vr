@@ -14,6 +14,11 @@
 namespace cs::core {
 class CS_CORE_EXPORT MessageBus {
  public:
+  /// A request message. eGet will typically result in a Response with type eInfo.
+  /// mReceiver must equal to the namespace of the targeted plugin. E.g.: csp::atmospheres
+  /// mName is the name of the targeted property
+  /// mData only required for eSet requests. The value to set the property to
+  /// mSender must equal to the namespace of the sending plugin. E.g.: csp::pie
   struct Request {
     enum class Type { eSet, eGet } mType;
 
@@ -23,6 +28,11 @@ class CS_CORE_EXPORT MessageBus {
     std::string mSender;
   };
 
+  /// A response message. eInfo for eGet requests or eSet requests that do not change the value.
+  /// eChanged if a value changed mSender must equal to the namespace of the sending plugin. E.g.:
+  /// csp::atmospheres mName is the name of the targeted property mData must contain the value of
+  /// the requested property mRequestSender must equal to the namespace of the requesting plugin.
+  /// E.g.: csp::pie
   struct Response {
     enum class Type { eInfo, eChanged } mType;
 
@@ -32,14 +42,21 @@ class CS_CORE_EXPORT MessageBus {
     std::string mRequestSender;
   };
 
-  utils::Signal<Request> const&  onRequest() const;
+  /// Broadcast signal for all requests
+  utils::Signal<Request> const& onRequest() const;
+
+  /// Broadcast signal for all responses
   utils::Signal<Response> const& onResponse() const;
 
+  /// Sends a request to all connected receivers
+  /// @param request The request to send
   void send(Request const& request);
-  void send(Response const& response);
-  void update();
 
-  MessageBus();
+  /// Sends a response to all connected receivers
+  /// @param response The response to send
+  void send(Response const& response);
+
+  MessageBus(){};
   ~MessageBus();
 
  private:
