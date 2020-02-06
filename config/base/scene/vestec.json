@@ -42,10 +42,6 @@
       "file": "../share/download/stars/hip_main.dat"
     },
     {
-      "url": "ftp://ftp.imcce.fr/pub/catalogs/TYCHO-2/catalog.dat",
-      "file": "../share/download/stars/tyc2_main.dat"
-    },
-    {
       "url": "https://naif.jpl.nasa.gov/pub/naif/cosmographia/kernels/spice/pck/pck00010.tpc",
       "file": "../share/download/spice/pck00010.tpc"
     },
@@ -137,7 +133,8 @@
   },
   "plugins": {
     "csp-vestec": {
-      "vestec-data-dir": "../share/vestec/data"
+      "vestec-data-dir": "../share/vestec/data/persistence",
+      "vestec-2D-fire": "../share/vestec/data/2D-fire"
     },
     "csp-stars": {
       "backgroundColor1": [
@@ -162,42 +159,69 @@
       "minSize": 0.1,
       "scalingExponent": 3.0,
       "starTexture": "../share/resources/textures/star.png",
-      "hipparcosCatalog": "../share/download/stars/hip_main.dat",
-      "tycho2Catalog": "../share/download/stars/tyc2_main.dat"
+      "hipparcosCatalog": "../share/download/stars/hip_main.dat"
     },
-    "csp-atmospheres": {
-      "atmospheres": {
-        "Mars": {
-          "atmosphereHeight": 0.03,
-          "mieAnisotropy": 0.76,
-          "mieHeight": 0.00144509,
-          "mieScatteringB": 52.66,
-          "mieScatteringG": 52.66,
-          "mieScatteringR": 52.66,
-          "rayleighAnisotropy": 0,
-          "rayleighHeight": 0.00317919,
-          "rayleighScatteringB": 19.89,
-          "rayleighScatteringG": 46.71,
-          "rayleighScatteringR": 69.2,
-          "sunIntensity": 12
-        },
-        "Earth": {
-          "atmosphereHeight": 0.015,
-          "mieAnisotropy": 0.76,
-          "mieHeight": 0.000188679,
-          "mieScatteringB": 133.56,
-          "mieScatteringG": 133.56,
-          "mieScatteringR": 133.56,
-          "rayleighAnisotropy": 0,
-          "rayleighHeight": 0.001257862,
-          "rayleighScatteringB": 210.516,
-          "rayleighScatteringG": 85.86,
-          "rayleighScatteringR": 36.89,
-          "sunIntensity": 15,
-          "cloudHeight": 0.001,
-          "cloudTexture": "../share/resources/textures/earth-clouds.jpg"
+    "csp-lod-bodies": {
+      "maxGPUTilesColor": 2048,
+      "maxGPUTilesGray": 2048,
+      "maxGPUTilesDEM": 2048,
+      "mapCache": "/localdata1/map-cache/",
+      "bodies": {
+          "Earth": {
+              "imgDatasets": [
+                  {
+                      "name": "Helgoland + Blue Marble",
+                      "copyright": "DLR, NASA",
+                      "url": "http://129.247.34.87/mapserv?service=wms",
+                      "format": "U8Vec3",
+                      "layers": "earth.bluemarble.rgb,earth.os.helgoland.rgb",
+                      "maxLevel": 18
+                  },
+                  {
+                      "name": "Blue Marble",
+                      "copyright": "NASA",
+                      "url": "http://129.247.34.87/mapserv?service=wms",
+                      "format": "U8Vec3",
+                      "layers": "earth.bluemarble.rgb",
+                      "maxLevel": 7
+                  }
+              ],
+              "demDatasets": [
+                  {
+                      "name": "Helgoland + SRTM30",
+                      "copyright": "DLR, NASA",
+                      "url": "http://129.247.34.87/mapserv?service=wms",
+                      "format": "Float32",
+                      "layers": "earth.srtm30.dem,earth.os.helgoland.dem",
+                      "maxLevel": 17
+                  },
+                  {
+                      "name": "SRTM30",
+                      "copyright": "NASA",
+                      "url": "http://129.247.34.87/mapserv?service=wms",
+                      "format": "Float32",
+                      "layers": "earth.srtm30.dem",
+                      "maxLevel": 12
+                  },
+                  {
+                      "name": "Blue Marble",
+                      "copyright": "NASA",
+                      "url": "http://129.247.34.87/mapserv?service=wms",
+                      "format": "Float32",
+                      "layers": "earth.bluemarble.dem",
+                      "maxLevel": 6
+                  },
+                  {
+                      "name": "CleanTOPO",
+                      "copyright": "Tom Patterson, US National Park Service",
+                      "url": "http://129.247.34.87/mapserv?service=wms",
+                      "format": "Float32",
+                      "layers": "earth.cleantopo.dem",
+                      "maxLevel": 6
+                  }
+              ]
+          }
         }
-      }
     },
     "csp-simple-bodies": {
       "bodies": {

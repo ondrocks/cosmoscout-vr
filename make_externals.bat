@@ -53,6 +53,46 @@ cmake -E make_directory "%INSTALL_DIR%/share"
 cmake -E make_directory "%INSTALL_DIR%/bin"
 cmake -E make_directory "%INSTALL_DIR%/include"
 
+rem gdal 3.0 --------------------------------------------------------------------------------------------
+
+echo.
+echo Downloading and installing gdal ...
+echo.
+
+cmake -E make_directory "%BUILD_DIR%/gdal/extracted" && cd "%BUILD_DIR%/gdal"
+powershell.exe -command Invoke-WebRequest -Uri http://download.gisinternals.com/sdk/downloads/release-1911-x64-gdal-3-0-2-mapserver-7-4-2-libs.zip -OutFile gdal.zip
+powershell.exe -command Invoke-WebRequest -Uri http://download.gisinternals.com/sdk/downloads/release-1911-x64-gdal-3-0-2-mapserver-7-4-2.zip -OutFile gdal_bin.zip
+
+
+cd "%BUILD_DIR%/gdal/extracted"
+cmake -E tar xfvj ../gdal.zip
+cmake -E tar xfvj ../gdal_bin.zip
+
+cmake -E copy_directory "%BUILD_DIR%/gdal/extracted/include"                   "%INSTALL_DIR%/gdal/include/"
+cmake -E copy_directory "%BUILD_DIR%/gdal/extracted/lib"        			   "%INSTALL_DIR%/gdal/lib"
+cmake -E copy_directory "%BUILD_DIR%/gdal/extracted/bin"        			   "%INSTALL_DIR%/gdal/lib"
+rem # VTK -----------------------------------------------------------------------------------------
+
+echo .
+echo Building and installing VTK 8.1.0 ...
+echo .
+
+cmake -E make_directory "%BUILD_DIR%/vtk" && cd "%BUILD_DIR%/vtk"
+cmake %CMAKE_FLAGS% -DCMAKE_INSTALL_PREFIX="%INSTALL_DIR%"^
+      -DBUILD_TESTING=off "%EXTERNALS_DIR%/vtk"
+cmake --build . --config %BUILD_TYPE% --target install --parallel 8
+
+rem # TTK -----------------------------------------------------------------------------------------
+
+echo .
+echo Building and installing TTK 0.9.8 ...
+echo .
+
+cmake -E make_directory "%BUILD_DIR%/ttk" && cd "%BUILD_DIR%/ttk"
+cmake %CMAKE_FLAGS% -DCMAKE_INSTALL_PREFIX="%INSTALL_DIR%"^
+      -DTTK_BUILD_PARAVIEW_PLUGINS=Off -DTTK_ENABLE_GRAPHVIZ=Off -DBUILD_TESTING=off "%EXTERNALS_DIR%/ttk"
+cmake --build . --config %BUILD_TYPE% --target install --parallel 8
+
 rem glew -------------------------------------------------------------------------------------------
 
 echo.
@@ -77,8 +117,8 @@ echo Building and installing freeglut ...
 echo.
 
 cmake -E make_directory "%BUILD_DIR%/freeglut" && cd "%BUILD_DIR%/freeglut"
-cmake %CMAKE_FLAGS% -DCMAKE_INSTALL_PREFIX="%INSTALL_DIR%"^
-      -DCMAKE_INSTALL_LIBDIR=lib^
+cmake %CMAKE_FLAGS% -DCMAKE_INSTALL_PREFIX="%INSTALL_DIR%" -DFREEGLUT_BUILD_DEMOS=Off^
+      -DCMAKE_INSTALL_LIBDIR=lib -DFREEGLUT_BUILD_STATIC_LIBS=Off^
       "%EXTERNALS_DIR%/freeglut/freeglut/freeglut" || exit /b
 
 cmake --build . --config %BUILD_TYPE% --target install --parallel 8
@@ -145,6 +185,14 @@ cmake %CMAKE_FLAGS% -DCMAKE_INSTALL_PREFIX="%INSTALL_DIR%"^
       "%EXTERNALS_DIR%/libtiff" || exit /b
 
 cmake --build . --config %BUILD_TYPE% --target install --parallel 8
+
+rem doctest --------------------------------------------------------------------------------------------
+
+echo.
+echo Installing doctest ...
+echo.
+
+cmake -E copy_directory "%EXTERNALS_DIR%/doctest/doctest" "%INSTALL_DIR%/include/doctest" || exit /b
 
 rem gli --------------------------------------------------------------------------------------------
 
@@ -264,7 +312,7 @@ rmdir %CEF_DIR%\tests /s /q
 cd ..
 
 cmake %CMAKE_FLAGS% -DCMAKE_INSTALL_PREFIX="%INSTALL_DIR%"^
-      -DCEF_RUNTIME_LIBRARY_FLAG=/MD^
+      -DCEF_RUNTIME_LIBRARY_FLAG=/MD -DCEF_DEBUG_INFO_FLAG=""^
       "%BUILD_DIR%/cef/extracted/%CEF_DIR%" || exit /b
 
 cmake --build . --config %BUILD_TYPE% --parallel 8 || exit /b

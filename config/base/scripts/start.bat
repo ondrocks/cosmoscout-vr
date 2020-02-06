@@ -26,8 +26,10 @@ IF NOT "%1"=="" (
 )
 
 rem Set paths so that all libraries are found.
+set PROJ_LIB=%SCRIPT_DIR%\proj6\share
+ 
 set VISTACORELIBS_DRIVER_PLUGIN_DIRS=%SCRIPT_DIR%\..\lib\DriverPlugins
-set PATH=%SCRIPT_DIR%\..\lib;%PATH%
+set PATH=%SCRIPT_DIR%\..\lib;%SCRIPT_DIR%\..\lib\ttk;%PATH%
 
 cosmoscout.exe --settings=%SETTINGS% -vistaini %VISTA_INI%
 
