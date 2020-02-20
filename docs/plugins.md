@@ -153,7 +153,8 @@ CosmoScout.init(FooApi, BarApi, BazApi);
 
 #### `CosmoScout.initDropDowns`
 Initializes the `selectpicker` extension on all `.simple-value-dropdown` elements.
-A change event listener will be added which calls the CosmoScout application with the elements id and currently selected value.  
+A change event listener will be added which calls the CosmoScout application with the elements id and currently selected value.
+The listener initialization can be disabled by adding `data-nonnative` to the input element.    
 This method is idempotent. Event listeners will be only added once.  
 
 ```javascript
@@ -162,6 +163,7 @@ CosmoScout.initDropDowns();
 
 #### `CosmoScout.initChecklabelInputs`
 Adds a change event listener to all `.checklabel input` elements. On change the CosmoScout application will be called with the elements id and current check state.  
+The listener initialization can be disabled by adding `data-nonnative` to the input element.   
 This method is idempotent. Event listeners will be only added once.  
 
 ```javascript
@@ -170,6 +172,7 @@ CosmoScout.initChecklabelInputs();
 
 #### `CosmoScout.initRadiolabelInputs`
 Adds a change event listener to all `.radiolabel input` elements. On change the CosmoScout application will be called with the elements id.  
+The listener initialization can be disabled by adding `data-nonnative` to the input element.  
 This method is idempotent. Event listeners will be only added once.  
 
 ```javascript
@@ -179,10 +182,12 @@ CosmoScout.initRadiolabelInputs();
 #### `CosmoScout.initDataCalls`
 Adds an onclick listener to every element containing `[data-call="'methodname'"]`.  
 The method name gets passed to CosmoScout.callNative.  
+Alternatively a js api name and method name can be passed as `apiName.methodName` to call a javascript api instead of an application api.   
 Arguments can be passed by separating the content with ','  
 E.g.: `'fly_to','Africa' -> CosmoScout.callNative('fly_to', 'Africa')`  
       `method,arg1,...,argN -> CosmoScout.callNative('method', arg1, ..., argN)`  
-Attribute content will be passed to eval. Strings need to be wrapped in '  
+Attribute content will be passed to eval. Strings need to be wrapped in `'`.  
+Javascript api call example: `data-call="flyTo.flyTo,'Aftica' -> CosmoScout.flyTo.flyTo('Africa')`    
 This method is idempotent. Event listeners will be only added once.  
 
 ```html

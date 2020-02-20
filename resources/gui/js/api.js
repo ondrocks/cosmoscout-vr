@@ -150,7 +150,7 @@ class CosmoScout {
     };
 
     document.querySelectorAll('.simple-value-dropdown').forEach((dropdown) => {
-      if (typeof dropdown.dataset.initialized !== 'undefined') {
+      if (typeof dropdown.dataset.initialized !== 'undefined' || typeof dropdown.dataset.nonnative !== 'undefined') {
         return;
       }
 
@@ -216,7 +216,7 @@ class CosmoScout {
    */
   static initDataCalls() {
     document.querySelectorAll('[data-call]').forEach((input) => {
-      if (typeof input.dataset.initialized !== 'undefined' || typeof input.dataset.nonnative !== 'undefined') {
+      if (typeof input.dataset.initialized !== 'undefined') {
         return;
       }
 
