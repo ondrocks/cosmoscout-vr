@@ -167,7 +167,7 @@ class CosmoScout {
    */
   static initChecklabelInputs() {
     document.querySelectorAll('.checklabel input').forEach((input) => {
-      if (typeof input.dataset.initialized !== 'undefined') {
+      if (typeof input.dataset.initialized !== 'undefined' || typeof input.dataset.nonnative !== 'undefined') {
         return;
       }
 
@@ -189,7 +189,7 @@ class CosmoScout {
    */
   static initRadiolabelInputs() {
     document.querySelectorAll('.radiolabel input').forEach((input) => {
-      if (typeof input.dataset.initialized !== 'undefined') {
+      if (typeof input.dataset.initialized !== 'undefined' || typeof input.dataset.nonnative !== 'undefined') {
         return;
       }
 
@@ -216,7 +216,7 @@ class CosmoScout {
    */
   static initDataCalls() {
     document.querySelectorAll('[data-call]').forEach((input) => {
-      if (typeof input.dataset.initialized !== 'undefined') {
+      if (typeof input.dataset.initialized !== 'undefined' || typeof input.dataset.nonnative !== 'undefined') {
         return;
       }
 
@@ -224,8 +224,15 @@ class CosmoScout {
         if (typeof input.dataset.call !== 'undefined') {
           const args = input.dataset.call;
 
-          // eslint-disable-next-line no-eval
-          eval(`CosmoScout.callNative(${args})`);
+          let apiMethod = args.split(',')[0];
+          if (apiMethod.split('.').length === 2) {
+            const [api, method] = apiMethod.split('.');
+
+            CosmoScout[api][method](...args.split(',').slice(1));
+          } else {
+            // eslint-disable-next-line no-eval
+            eval(`CosmoScout.callNative(${args})`);
+          }
         }
       });
 
