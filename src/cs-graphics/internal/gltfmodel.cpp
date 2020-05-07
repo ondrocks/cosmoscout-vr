@@ -1112,7 +1112,7 @@ Primitive GltfShared::createMeshPrimitive(
     auto buffer = getOrCreateBufferObject(
         bufferMap, gltf, static_cast<unsigned int>(accessor.bufferView), GL_ARRAY_BUFFER);
     glBindBuffer(GL_ARRAY_BUFFER, *buffer.id);
-    int size = tinygltf::GetTypeSizeInBytes(accessor.type);
+    int size = tinygltf::GetNumComponentsInType(accessor.type);
     // pair.first would be "POSITION", "NORMAL", "TEXCOORD_0", ...
     auto it = myPrimitive.programInfo.pbr_attributes.find(attrName);
 
