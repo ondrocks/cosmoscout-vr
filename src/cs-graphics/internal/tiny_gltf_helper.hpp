@@ -13,27 +13,6 @@
 
 namespace cs::graphics::internal {
 
-/// Returns the name of the tinygltf::Accessor.
-inline std::string stringFromGltfAccessorType(tinygltf::Accessor const& accessor) {
-  if (accessor.type == TINYGLTF_TYPE_SCALAR) {
-    return "TINYGLTF_TYPE_SCALAR";
-  } else if (accessor.type == TINYGLTF_TYPE_VEC2) {
-    return "TINYGLTF_TYPE_VEC2";
-  } else if (accessor.type == TINYGLTF_TYPE_VEC3) {
-    return "TINYGLTF_TYPE_VEC3";
-  } else if (accessor.type == TINYGLTF_TYPE_VEC4) {
-    return "TINYGLTF_TYPE_VEC4";
-  } else if (accessor.type == TINYGLTF_TYPE_MAT2) {
-    return "TINYGLTF_TYPE_Mat2";
-  } else if (accessor.type == TINYGLTF_TYPE_MAT3) {
-    return "TINYGLTF_TYPE_Mat3";
-  } else if (accessor.type == TINYGLTF_TYPE_MAT4) {
-    return "TINYGLTF_TYPE_Mat4";
-  } else {
-    return "UNKNOWN TINYGLTF_TYPE";
-  }
-}
-
 /// Converts GLTF primitives to OpenGL primitives.
 // constexpr int toGLprimitiveMode(tinygltf::Primitive const& primitive)
 inline int toGLprimitiveMode(tinygltf::Primitive const& primitive) {

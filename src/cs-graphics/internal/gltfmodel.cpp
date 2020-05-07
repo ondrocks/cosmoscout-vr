@@ -567,7 +567,6 @@ GLProgramInfo getProgramInfo(unsigned int program) {
   info.u_FarClip_loc                 = glGetUniformLocation(program, "u_FarClip");
 
   auto usTexs   = get_active_uniforms(program);
-  info.uniforms = usTexs.first;
   info.textures = usTexs.second;
 
   glUseProgram(0);
