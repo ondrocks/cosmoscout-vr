@@ -13,27 +13,6 @@
 
 namespace cs::graphics::internal {
 
-/// Returns the number of components from the tinygltf::Accessor.
-// constexpr int sizeFromGltfAccessorType(tinygltf::Accessor const& accessor)
-inline int sizeFromGltfAccessorType(tinygltf::Accessor const& accessor) {
-  if (accessor.type == TINYGLTF_TYPE_SCALAR) {
-    return 1;
-  } else if (accessor.type == TINYGLTF_TYPE_VEC2) {
-    return 2;
-  } else if (accessor.type == TINYGLTF_TYPE_VEC3) {
-    return 3;
-  } else if (accessor.type == TINYGLTF_TYPE_VEC4) {
-    return 4;
-  } else if (accessor.type == TINYGLTF_TYPE_MAT2) {
-    return 4;
-  } else if (accessor.type == TINYGLTF_TYPE_MAT3) {
-    return 9;
-    //} else if (accessor.type == tinygltf::TINYGLTF_TYPE_MAT4) { return 16;
-  } else {
-    return 16;
-  }
-}
-
 /// Returns the name of the tinygltf::Accessor.
 inline std::string stringFromGltfAccessorType(tinygltf::Accessor const& accessor) {
   if (accessor.type == TINYGLTF_TYPE_SCALAR) {
