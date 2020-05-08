@@ -20,9 +20,11 @@
 #include <VistaKernel/DisplayManager/VistaViewport.h>
 #include <VistaKernel/VistaSystem.h>
 #include <VistaMath/VistaBoundingBox.h>
+//#include <VistaOGLExt/VistaOGLUtils.h> // VistaOGLUtils::CheckForOGLError
 #include <algorithm>
 #include <fstream>
 #include <gli/gli.hpp>
+#include <optional>
 #include <utility>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,6 +41,38 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace cs::graphics::internal {
+
+enum class Attribute {
+  POSITION   = 0,
+  NORMAL     = 1,
+  TANGENT    = 2,
+  TEXCOORD_0 = 3,
+  TEXCOORD_1 = 4,
+  COLOR_0    = 5,
+  JOINTS_0   = 6,
+  WEIGHTS_0  = 7
+};
+
+std::optional<Attribute> attributeFromString(std::string_view name) {
+  if ("POSITION" == name)
+    return Attribute::POSITION;
+  else if ("NORMAL" == name)
+    return Attribute::NORMAL;
+  else if ("TANGENT" == name)
+    return Attribute::TANGENT;
+  else if ("TEXCOORD_0" == name)
+    return Attribute::TEXCOORD_0;
+  else if ("TEXCOORD_1" == name)
+    return Attribute::TEXCOORD_1;
+  else if ("COLOR_0" == name)
+    return Attribute::COLOR_0;
+  else if ("JOINTS_0" == name)
+    return Attribute::JOINTS_0;
+  else if ("WEIGHTS_0" == name)
+    return Attribute::WEIGHTS_0;
+  else
+    return {};
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -533,16 +567,7 @@ GLProgramInfo getProgramInfo(unsigned int program) {
   GLProgramInfo info;
   glUseProgram(program);
 
-  // glGetActiveAttrib(program, index, maxLength, size, type, name)
-  std::map<std::string, std::string> attributeMap{{"a_Position", "POSITION"},
-      {"a_Normal", "NORMAL"}, {"a_Tangent", "TANGENT"}, {"a_UV", "TEXCOORD_0"}};
-  for (auto const& mapping : attributeMap) {
-    auto loc = glGetAttribLocation(program, mapping.first.c_str());
-    if (loc != -1) {
-      info.pbr_attributes[mapping.second] = loc;
-    }
-  }
-
+  auto count              = getProgrami(program, GL_ACTIVE_ATTRIBUTES);
   info.u_MVPMatrix_loc    = glGetUniformLocation(program, "u_MVPMatrix");
   info.u_ModelMatrix_loc  = glGetUniformLocation(program, "u_ModelMatrix");
   info.u_NormalMatrix_loc = glGetUniformLocation(program, "u_NormalMatrix");
@@ -1112,14 +1137,11 @@ Primitive GltfShared::createMeshPrimitive(
         bufferMap, gltf, static_cast<unsigned int>(accessor.bufferView), GL_ARRAY_BUFFER);
     glBindBuffer(GL_ARRAY_BUFFER, *buffer.id);
     int size = tinygltf::GetNumComponentsInType(accessor.type);
-    // pair.first would be "POSITION", "NORMAL", "TEXCOORD_0", ...
-    auto it = myPrimitive.programInfo.pbr_attributes.find(attrName);
-
-    if (it != myPrimitive.programInfo.pbr_attributes.end() && it->second >= 0) {
-      glEnableVertexAttribArray(static_cast<GLuint>(it->second));
-      glVertexAttribPointer(static_cast<GLuint>(it->second), size,
+    if (auto attribute = attributeFromString(attrName)) {
+      glEnableVertexAttribArray(static_cast<GLuint>(*attribute));
+      glVertexAttribPointer(static_cast<GLuint>(*attribute), size,
           static_cast<GLenum>(accessor.componentType),
-          GLboolean(accessor.normalized ? GL_TRUE : GL_FALSE),
+          static_cast<GLboolean>(accessor.normalized ? GL_TRUE : GL_FALSE),
           static_cast<GLsizei>(gltf.bufferViews[accessor.bufferView].byteStride),
           // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
           static_cast<char*>(nullptr) + accessor.byteOffset);
@@ -1143,9 +1165,8 @@ Primitive GltfShared::createMeshPrimitive(
   glBindVertexArray(0);
 
   for (auto const& pair : primitive.attributes) {
-    auto it = myPrimitive.programInfo.pbr_attributes.find(pair.first);
-    if (it != myPrimitive.programInfo.pbr_attributes.end() && it->second >= 0) {
-      glDisableVertexAttribArray(static_cast<GLuint>(it->second));
+    if (auto attribute = attributeFromString(pair.first)) {
+      glDisableVertexAttribArray(static_cast<GLuint>(*attribute));
     }
   }
 

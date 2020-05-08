@@ -10,16 +10,14 @@
 namespace cs::graphics::internal {
 
 const char* GLTF_VERT = R"(
-in vec4 a_Position;
-#ifdef HAS_NORMALS
-in vec3 a_Normal;
-#endif
-#ifdef HAS_TANGENTS
-in vec4 a_Tangent;
-#endif
-#ifdef HAS_UV
-in vec2 a_UV;
-#endif
+layout (location=0) in vec4 a_Position;
+layout (location=1) in vec3 a_Normal;
+layout (location=2) in vec4 a_Tangent;
+layout (location=3) in vec2 a_TexCoord0;
+layout (location=4) in vec2 a_TexCoord1;
+layout (location=5) in vec2 a_Color0;
+layout (location=6) in vec2 a_Joints0;
+layout (location=7) in vec2 a_Weights0;
 
 uniform mat4 u_MVPMatrix;
 
@@ -56,7 +54,7 @@ void main()
   #endif
 
   #ifdef HAS_UV
-  v_UV = a_UV;
+  v_UV = a_TexCoord0;
   #else
   v_UV = vec2(0.0);
   #endif
