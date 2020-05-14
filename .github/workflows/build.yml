@@ -187,10 +187,9 @@ jobs:
       ( contains(github.ref, 'develop') && !contains(github.event.head_commit.message, '[no-ci]') ) ||
       contains(github.event.head_commit.message, '[run-ci]')
     steps:
-      - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.0.0
       - name: Test CL.exe
-        run: |
+        uses: microsoft/setup-msbuild@v1.0.0
+        run: >
           cl.exe
       - name: Checkout Repository
         uses: actions/checkout@v2
