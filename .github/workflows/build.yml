@@ -188,9 +188,8 @@ jobs:
       contains(github.event.head_commit.message, '[run-ci]')
     steps:
       - name: Test CL.exe
-        run: |
-          C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe
-          cl.exe
+        run: >
+          "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe"
       - name: Checkout Repository
         uses: actions/checkout@v2
       - name: Checkout Submodules
