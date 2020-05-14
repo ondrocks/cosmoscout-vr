@@ -188,8 +188,8 @@ jobs:
       contains(github.event.head_commit.message, '[run-ci]')
     steps:
       - name: Test CL.exe
-        uses: microsoft/setup-msbuild@v1.0.0
-        run: >
+        run: |
+          C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe
           cl.exe
       - name: Checkout Repository
         uses: actions/checkout@v2
