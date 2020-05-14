@@ -189,8 +189,7 @@ jobs:
     steps:
       - name: Test CL.exe
         run: |
-          tree "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\"
-          # cl.exe
+          dir "C:\Program Files (x86)\Microsoft Visual Studio\"
       - name: Checkout Repository
         uses: actions/checkout@v2
       - name: Checkout Submodules
